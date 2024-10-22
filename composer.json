@@ -1,0 +1,23 @@
+{
+    "name": "likewinter/card-deck",
+    "description": "Card deck games library",
+    "type": "library",
+    "require": {
+        "php": "^8.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.4"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Likewinter\\CardDeck\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Anton Orlov",
+            "email": "anton@pinked.ru"
+        }
+    ]
+}
