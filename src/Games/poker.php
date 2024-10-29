@@ -8,8 +8,9 @@ use Likewinter\CardDeck\Games\Poker\PokerHand;
 
 class Poker
 {
+    private Dealer $dealer;
+
     public function __construct(
-        public Dealer $dealer,
         private int $handSize = 5,
         private int $numHands = 4,
     ) {
@@ -38,7 +39,12 @@ class Poker
 
     public function handsState(): string
     {
+        if ($this->handSize !== PokerHand::HAND_SIZE) {
+            throw new \LogicException('Hand size must be ' . PokerHand::HAND_SIZE);
+        }
+
         $state = 'Hands:' . PHP_EOL;
+
         foreach ($this->dealer->getHands() as $hand) {
             $pokerHand = PokerHand::fromHand($hand);
             $state .= '  ' . $pokerHand . ' -> ' . $pokerHand->handRank->getName() . PHP_EOL;

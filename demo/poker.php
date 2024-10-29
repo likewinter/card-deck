@@ -1,13 +1,14 @@
 <?php
 
-use Likewinter\CardDeck\Dealer;
-use Likewinter\CardDeck\Deck;
+use Likewinter\CardDeck\{Dealer,Deck};
 use Likewinter\CardDeck\Games\Poker;
-use Likewinter\CardDeck\Games\Poker\PokerHand;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$poker = new Poker(new Dealer(new Deck(), []), 5, 4);
+$poker = new Poker(handSize: 5, numHands: 3);
+
+echo $poker->state();
+
 $poker->deal();
 
 echo $poker->state();
