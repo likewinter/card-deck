@@ -2,14 +2,14 @@
 
 namespace Likewinter\CardDeck;
 
-class Deck
+class Deck extends Stack
 {
-    use Stack;
-
-    /** @var Card[] */
     public function __construct(
-        private array $cards = [],
+        /** @var list<Card> */
+        protected array $cards = [],
+        public readonly int $deckSize = 52,
     ) {
+        parent::__construct($cards, $deckSize);
     }
 
     public function shuffle(): void

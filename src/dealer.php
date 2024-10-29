@@ -14,16 +14,14 @@ class Dealer
         self::DRAW_RANDOM,
     ];
 
-    private Deck $discarded;
+    private Stack $pile;
 
     public function __construct(
         private Deck $deck,
-        private int $drawMode = self::DRAW_SEQUENTIAL,
+        /** @var list<Hand> */
         private array $hands = [],
+        private int $drawMode = self::DRAW_SEQUENTIAL,
     ) {
-        $deck->shuffle();
-        $this->discarded = new Deck();
-
         if (!in_array($drawMode, self::DRAW_MODES)) {
             throw new \InvalidArgumentException('Invalid draw mode');
         }
@@ -33,29 +31,8 @@ class Dealer
                 throw new \InvalidArgumentException('Hands must be instances of Hand');
             }
         }
-    }
-
-    public function addHand(Hand $hand): void
-    {
-        $this->hands[] = $hand;
-    }
-
-    public function removeHand(Hand $hand): void
-    {
-        $this->discardHand($hand);
-        unset($this->hands[array_search($hand, $this->hands)]);
-    }
-
-    public function checkHand(Hand $hand): void
-    {
-        if (!in_array($hand, $this->hands)) {
-            throw new \InvalidArgumentException('Dealer does not have this hand');
-        }
-    }
-
-    public function getHands(): array
-    {
-        return $this->hands;
+        $this->pile = new Stack();
+        $deck->shuffle();
     }
 
     public function getDeck(): Deck
@@ -63,9 +40,37 @@ class Dealer
         return $this->deck;
     }
 
-    public function getDiscarded(): Deck
+    public function getPile(): Stack
     {
-        return $this->discarded;
+        return $this->pile;
+    }
+
+    /** @return list<Hand> */
+    public function getHands(): array
+    {
+        return $this->hands;
+    }
+
+    public function handExists(Hand $hand): void
+    {
+        if (!in_array($hand, $this->hands)) {
+            throw new \InvalidArgumentException('Dealer does not have this hand');
+        }
+    }
+
+    public function addHands(Hand ...$hands): void
+    {
+        $this->hands = array_merge($this->hands, array_values($hands));
+    }
+
+    public function removeHands(Hand ...$hands): void
+    {
+        foreach ($hands as $hand) {
+            $this->handExists($hand);
+            $this->pile->addCards(...$hand);
+            $this->hands = array_diff($this->hands, [$hand]);
+            unset($hand);
+        }
     }
 
     public function drawAll(int $num = 1): void
@@ -81,21 +86,21 @@ class Dealer
         if ($this->drawMode === self::DRAW_ONE_BY_ONE) {
             for ($i = 0; $i < $num; $i++) {
                 foreach ($this->hands as $hand) {
-                    $hand->add($this->deck->takeTopCard());
+                    $hand->addCards(...$this->deck->takeTopCards(1));
                 }
             }
         }
 
         if ($this->drawMode === self::DRAW_SEQUENTIAL) {
             foreach ($this->hands as $hand) {
-                $hand->addMany($this->deck->takeTopCards($num));
+                $hand->addCards(...$this->deck->takeTopCards($num));
             }
         }
 
         if ($this->drawMode === self::DRAW_RANDOM) {
             for ($i = 0; $i < $num; $i++) {
                 foreach ($this->hands as $hand) {
-                    $hand->add($this->deck->takeRandomCard());
+                    $hand->addCards($this->deck->takeRandomCard());
                 }
             }
         }
@@ -103,24 +108,19 @@ class Dealer
 
     public function drawToHand(Hand $hand, int $num = 1): void
     {
-        $this->checkHand($hand);
+        $this->handExists($hand);
 
         if ($num > $this->deck->count()) {
             throw new \InvalidArgumentException('Not enough cards in deck');
         }
 
-        $hand->addMany($this->deck->takeTopCards($num));
+        $hand->addCards(...$this->deck->takeTopCards($num));
     }
 
-    public function discard(array $cards, Hand $hand): void
+    public function discard(Hand $hand, Card ...$cards): void
     {
-        $this->checkHand($hand);
-        $this->discarded->addMany($hand->removeMany($cards));
-    }
-
-    public function discardHand(Hand $hand): void
-    {
-        $this->checkHand($hand);
-        $this->discarded->addMany($hand->clear());
+        $this->handExists($hand);
+        $hand->removeCards(...$cards);
+        $this->pile->addCards(...$cards);
     }
 }

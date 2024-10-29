@@ -4,6 +4,7 @@ namespace Likewinter\CardDeck\Card;
 
 enum Rank: int
 {
+    case Joker = 0;
     case Two = 2;
     case Three = 3;
     case Four = 4;
@@ -17,7 +18,6 @@ enum Rank: int
     case Queen = 12;
     case King = 13;
     case Ace = 14;
-    case Joker = 15;
 
     public function getSymbol(): string
     {
@@ -37,5 +37,13 @@ enum Rank: int
             self::King => 'K',
             self::Joker => '🃏',
         };
+    }
+
+    /**
+     * @return list<Rank>
+     */
+    public static function casesWithoutJoker(): array
+    {
+        return array_filter(self::cases(), fn (Rank $rank) => $rank !== self::Joker);
     }
 }

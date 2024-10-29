@@ -2,28 +2,32 @@
 
 namespace Likewinter\CardDeck;
 
-class Hand
+use Likewinter\CardDeck\Card\{Rank, Suit};
+
+class Hand extends Stack
 {
-    use Stack;
-
-    /** @var Card[] */
     public function __construct(
-        private array $cards = [],
+        /** @var list<Card> */
+        protected array $cards = [],
+        int $handSize = 5,
     ) {
+        parent::__construct($cards, $handSize);
     }
 
-    public function sort(): void
+    public function sortByRank(): void
     {
-        usort($this->cards, fn (Card $a, Card $b) => $a->rank->value - $b->rank->value);
+        $this->sort(fn (Card $a, Card $b) => $a->rank->value - $b->rank->value);
     }
 
+    /** @return list<Rank> */
     public function getRanks(): array
     {
-        return array_map(fn ($card) => $card->rank, $this->getCards());
+        return array_map(fn (Card $card) => $card->rank, $this->cards);
     }
 
+    /** @return list<Suit> */
     public function getSuits(): array
     {
-        return array_map(fn ($card) => $card->suit, $this->getCards());
+        return array_map(fn (Card $card) => $card->suit, $this->cards);
     }
 }
