@@ -21,10 +21,12 @@ class PokerDeck extends Deck
     {
         $cards = [];
         foreach (Rank::casesWithoutJoker() as $rank) {
-            $cards[] = new Card(Suit::Clubs, $rank);
-            $cards[] = new Card(Suit::Diamonds, $rank);
-            $cards[] = new Card(Suit::Hearts, $rank);
-            $cards[] = new Card(Suit::Spades, $rank);
+            $cards = array_merge($cards, [
+                new Card(suit: Suit::Clubs, rank: $rank),
+                new Card(suit: Suit::Diamonds, rank: $rank),
+                new Card(suit: Suit::Hearts, rank: $rank),
+                new Card(suit: Suit::Spades, rank: $rank),
+            ]);
         }
 
         return $cards;

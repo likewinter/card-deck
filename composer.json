@@ -6,8 +6,8 @@
         "php": "^8.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "^11",
-        "phpstan/phpstan": "^1.12"
+        "phpstan/phpstan": "^1.12",
+        "pestphp/pest": "^3.5"
     },
     "license": "MIT",
     "autoload": {
@@ -20,5 +20,10 @@
             "name": "Anton Orlov",
             "email": "anton@pinked.ru"
         }
-    ]
+    ],
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
 }

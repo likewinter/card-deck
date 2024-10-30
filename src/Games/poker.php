@@ -14,10 +14,10 @@ class Poker
         private int $handSize = 5,
         private int $numHands = 4,
     ) {
-        $this->dealer = new Dealer(
-            new PokerDeck(),
-            array_map(fn () => new Hand(handSize: $this->handSize), range(0, $this->numHands - 1))
-        );
+        $this->dealer = new Dealer(deck: new PokerDeck());
+        for ($i = 0; $i < $this->numHands; $i++) {
+            $this->dealer->addHands(new Hand(handSize: $this->handSize));
+        }
     }
 
     public function deal(): void
@@ -25,14 +25,16 @@ class Poker
         $this->dealer->drawAll($this->handSize);
     }
 
-    public function state(): string
+    public function gameState(): string
     {
-        $state = '';
-        $state .= 'Number of hands: ' . count($this->dealer->getHands()) . PHP_EOL;
-        $state .= 'Hand size: ' . $this->handSize . PHP_EOL;
-        $state .= 'Deck size: ' . $this->dealer->getDeck()->deckSize . PHP_EOL;
-        $state .= 'Deck: [' . $this->dealer->getDeck() . ']' . PHP_EOL;
-        $state .= 'Pile: [' . $this->dealer->getPile() . ']' . PHP_EOL;
+        $state = <<<STATE
+        Number of hands: {$this->numHands}
+        Hand size: {$this->handSize}
+        Deck size: {$this->dealer->getDeck()->deckSize}
+        Deck: [{$this->dealer->getDeck()}]
+        Pile: [{$this->dealer->getPile()}]
+
+        STATE;
 
         return $state;
     }
