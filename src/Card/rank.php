@@ -19,6 +19,17 @@ enum Rank: int
     case King = 13;
     case Ace = 14;
 
+    /**
+     * @return list<Rank>
+     */
+    public static function casesWithoutJoker(): array
+    {
+        return array_filter(self::cases(), fn(Rank $rank) => $rank !== self::Joker);
+    }
+
+    /**
+     * Returns the display symbol for the card rank
+     */
     public function getSymbol(): string
     {
         return match ($this) {
@@ -40,10 +51,46 @@ enum Rank: int
     }
 
     /**
-     * @return list<Rank>
+     * Determines if the rank is a face card (10 or higher)
      */
-    public static function casesWithoutJoker(): array
+    public function isFaceCard(): bool
     {
-        return array_filter(self::cases(), fn (Rank $rank) => $rank !== self::Joker);
+        return $this->value >= self::Ten->value;
+    }
+
+    /**
+     * Compares if this rank is higher than another rank
+     */
+    public function isHigherThan(self $other): bool
+    {
+        if ($this === self::Joker || $other === self::Joker) {
+            throw new \InvalidArgumentException('Cannot compare Joker cards');
+        }
+
+        return $this->value > $other->value;
+    }
+
+    /**
+     * Returns the next rank in sequence (null if at Ace)
+     */
+    public function next(): ?self
+    {
+        return match ($this) {
+            self::Ace => null,
+            self::Joker => null,
+            default => self::from($this->value + 1)
+        };
+    }
+
+    /**
+     * Returns the previous rank in sequence (null if at Two)
+     */
+    public function previous(): ?self
+    {
+        return match ($this) {
+            self::Two => null,
+            self::Joker => null,
+            default => self::from($this->value - 1)
+        };
     }
 }

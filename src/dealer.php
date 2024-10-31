@@ -2,6 +2,8 @@
 
 namespace Likewinter\CardDeck;
 
+use Likewinter\CardDeck\Exceptions\DealerException;
+
 class Dealer
 {
     public const DRAW_SEQUENTIAL = 0;
@@ -20,15 +22,14 @@ class Dealer
         private Deck $deck,
         /** @var list<Hand> */
         private array $hands = [],
+        /** @var value-of<self::DRAW_MODES> */
         private int $drawMode = self::DRAW_SEQUENTIAL,
     ) {
-        if (!in_array($drawMode, self::DRAW_MODES)) {
-            throw new \InvalidArgumentException('Invalid draw mode');
-        }
+        $this->setDrawMode($drawMode);
 
         foreach ($hands as $hand) {
             if (!is_a($hand, Hand::class)) {
-                throw new \InvalidArgumentException('Hands must be instances of Hand');
+                throw new DealerException('Hands must be instances of Hand');
             }
         }
         $this->pile = new Stack();
@@ -51,13 +52,6 @@ class Dealer
         return $this->hands;
     }
 
-    public function handExists(Hand $hand): void
-    {
-        if (!in_array($hand, $this->hands)) {
-            throw new \InvalidArgumentException('Dealer does not have this hand');
-        }
-    }
-
     public function addHands(Hand ...$hands): void
     {
         $this->hands = array_merge($this->hands, array_values($hands));
@@ -66,8 +60,8 @@ class Dealer
     public function removeHands(Hand ...$hands): void
     {
         foreach ($hands as $hand) {
-            $this->handExists($hand);
-            $this->pile->addCards(...$hand);
+            $this->validateHand($hand);
+            $hand->moveAllTo($this->pile);
             $this->hands = array_diff($this->hands, [$hand]);
             unset($hand);
         }
@@ -76,51 +70,93 @@ class Dealer
     public function drawAll(int $num = 1): void
     {
         if (count($this->hands) === 0) {
-            throw new \InvalidArgumentException('No hands provided');
+            throw new DealerException('No hands provided');
         }
 
         if ($num * count($this->hands) > $this->deck->count()) {
-            throw new \InvalidArgumentException('Not enough cards in deck');
+            throw new DealerException('Not enough cards in deck');
         }
 
-        if ($this->drawMode === self::DRAW_ONE_BY_ONE) {
-            for ($i = 0; $i < $num; $i++) {
-                foreach ($this->hands as $hand) {
-                    $hand->addCards(...$this->deck->takeTopCards(1));
-                }
-            }
-        }
-
-        if ($this->drawMode === self::DRAW_SEQUENTIAL) {
-            foreach ($this->hands as $hand) {
-                $hand->addCards(...$this->deck->takeTopCards($num));
-            }
-        }
-
-        if ($this->drawMode === self::DRAW_RANDOM) {
-            for ($i = 0; $i < $num; $i++) {
-                foreach ($this->hands as $hand) {
-                    $hand->addCards($this->deck->takeRandomCard());
-                }
-            }
-        }
+        match ($this->drawMode) {
+            self::DRAW_ONE_BY_ONE => $this->drawOneByOne($num),
+            self::DRAW_SEQUENTIAL => $this->drawSequential($num),
+            self::DRAW_RANDOM => $this->drawRandom($num),
+        };
     }
 
     public function drawToHand(Hand $hand, int $num = 1): void
     {
-        $this->handExists($hand);
+        $this->validateHand($hand);
 
         if ($num > $this->deck->count()) {
-            throw new \InvalidArgumentException('Not enough cards in deck');
+            throw new DealerException('Not enough cards in deck');
         }
 
-        $hand->addCards(...$this->deck->takeTopCards($num));
+        match ($this->drawMode) {
+            self::DRAW_RANDOM => $this->drawRandomToHand($hand, $num),
+            default => $this->deck->moveTo($hand, $num),
+        };
+    }
+
+    private function drawRandomToHand(Hand $hand, int $num): void
+    {
+        for ($i = 0; $i < $num; $i++) {
+            $this->deck->moveCardTo($hand, $this->deck->peekRandom());
+        }
     }
 
     public function discard(Hand $hand, Card ...$cards): void
     {
-        $this->handExists($hand);
-        $hand->removeCards(...$cards);
-        $this->pile->addCards(...$cards);
+        $this->validateHand($hand);
+        $hand->moveAllTo($this->pile);
+    }
+
+    public function resetGame(): void
+    {
+        foreach ($this->hands as $hand) {
+            $hand->moveAllTo($this->deck);
+        }
+        $this->pile->moveAllTo($this->deck);
+        $this->deck->shuffle();
+    }
+
+    private function validateHand(Hand $hand): void
+    {
+        if (!in_array($hand, $this->hands)) {
+            throw new DealerException('Dealer does not have this hand');
+        }
+    }
+
+    private function setDrawMode(int $drawMode): void
+    {
+        if (!in_array($drawMode, self::DRAW_MODES, true)) {
+            throw new DealerException('Invalid draw mode');
+        }
+        $this->drawMode = $drawMode;
+    }
+
+    private function drawOneByOne(int $num): void
+    {
+        for ($i = 0; $i < $num; $i++) {
+            foreach ($this->hands as $hand) {
+                $this->deck->moveTo($hand, 1);
+            }
+        }
+    }
+
+    private function drawSequential(int $num): void
+    {
+        foreach ($this->hands as $hand) {
+            $this->deck->moveTo($hand, $num);
+        }
+    }
+
+    private function drawRandom(int $num): void
+    {
+        for ($i = 0; $i < $num; $i++) {
+            foreach ($this->hands as $hand) {
+                $this->deck->moveCardTo($hand, $this->deck->peekRandom());
+            }
+        }
     }
 }

@@ -49,7 +49,7 @@ enum HandRank: int
      */
     protected static function countHandRanks(PokerHand $hand): array
     {
-        $counts = array_map(fn (array $cards) => count($cards), $hand->rankSets);
+        $counts = array_map(fn(array $cards) => count($cards), $hand->rankSets);
         sort($counts);
 
         return $counts;

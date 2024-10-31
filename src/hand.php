@@ -16,18 +16,18 @@ class Hand extends Stack
 
     public function sortByRank(): void
     {
-        $this->sort(fn (Card $a, Card $b) => $a->rank->value - $b->rank->value);
+        $this->sort(fn(Card $a, Card $b) => $a->rank->value - $b->rank->value);
     }
 
     /** @return list<Rank> */
     public function getRanks(): array
     {
-        return array_map(fn (Card $card) => $card->rank, $this->cards);
+        return array_map(fn(Card $card) => $card->rank, $this->cards);
     }
 
     /** @return list<Suit> */
     public function getSuits(): array
     {
-        return array_map(fn (Card $card) => $card->suit, $this->cards);
+        return array_map(fn(Card $card) => $card->suit, $this->cards);
     }
 }

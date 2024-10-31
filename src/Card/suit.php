@@ -10,6 +10,25 @@ enum Suit: string
     case Clubs = 'clubs';
     case Spades = 'spades';
 
+    /**
+     * @return list<Suit>
+     */
+    public static function casesWithoutJoker(): array
+    {
+        return array_values(array_filter(
+            self::cases(),
+            fn(Suit $suit) => $suit !== self::Joker
+        ));
+    }
+
+    /**
+     * @return list<Suit>
+     */
+    public static function standardSuits(): array
+    {
+        return self::casesWithoutJoker();
+    }
+
     public function getColor(): string
     {
         return match ($this) {
@@ -28,5 +47,13 @@ enum Suit: string
             self::Spades => '♠',
             self::Joker => '🃏',
         };
+    }
+
+    /**
+     * Returns whether the suit is a standard playing card suit
+     */
+    public function isStandard(): bool
+    {
+        return $this !== self::Joker;
     }
 }

@@ -9,11 +9,11 @@ class Deck extends Stack
         protected array $cards = [],
         public readonly int $deckSize = 52,
     ) {
-        parent::__construct($cards, $deckSize);
-    }
+        // Validate deck size
+        if ($deckSize <= 0) {
+            throw new \InvalidArgumentException('Deck size must be positive');
+        }
 
-    public function shuffle(): void
-    {
-        shuffle($this->cards);
+        parent::__construct($cards, $deckSize);
     }
 }

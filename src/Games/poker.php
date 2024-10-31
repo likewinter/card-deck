@@ -6,17 +6,37 @@ use Likewinter\CardDeck\{Dealer, Hand};
 use Likewinter\CardDeck\Games\Poker\PokerDeck;
 use Likewinter\CardDeck\Games\Poker\PokerHand;
 
-class Poker
+readonly class Poker
 {
-    private Dealer $dealer;
+    private const DEFAULT_HAND_SIZE = 5;
+    private const DEFAULT_NUM_HANDS = 3;
+    private const MIN_HANDS = 2;
+    private const MAX_HANDS = 5;
 
     public function __construct(
-        private int $handSize = 5,
-        private int $numHands = 4,
+        private readonly int $handSize = self::DEFAULT_HAND_SIZE,
+        private readonly int $numHands = self::DEFAULT_NUM_HANDS,
+        private readonly Dealer $dealer = new Dealer(deck: new PokerDeck()),
     ) {
-        $this->dealer = new Dealer(deck: new PokerDeck());
+        $this->validateConfig();
+
         for ($i = 0; $i < $this->numHands; $i++) {
             $this->dealer->addHands(new Hand(handSize: $this->handSize));
+        }
+    }
+
+    private function validateConfig(): void
+    {
+        if ($this->numHands < self::MIN_HANDS || $this->numHands > self::MAX_HANDS) {
+            throw new \InvalidArgumentException(
+                sprintf('Number of hands must be between %d and %d', self::MIN_HANDS, self::MAX_HANDS)
+            );
+        }
+
+        if ($this->handSize !== PokerHand::HAND_SIZE) {
+            throw new \InvalidArgumentException(
+                sprintf('Hand size must be %d', PokerHand::HAND_SIZE)
+            );
         }
     }
 
