@@ -14,12 +14,29 @@ function randomCards(int $count = 1): array
     return array_map(fn() => new Card(suit: $suits[array_rand($suits)], rank: $ranks[array_rand($ranks)]), range(1, $count));
 }
 
+dataset('two random cards', function () {
+    return [
+        'two random cards' => [randomCards(2)],
+    ];
+});
+
+dataset('five random cards', function () {
+    return [
+        'five random cards' => [randomCards(5)],
+    ];
+});
+
 dataset('cards and their string representations', function () {
     return [
         'ace of clubs' => [Suit::Clubs, Rank::Ace, 'A♣'],
         'two of diamonds' => [Suit::Diamonds, Rank::Two, '2♦'],
         'three of hearts' => [Suit::Hearts, Rank::Three, '3♥'],
         'four of spades' => [Suit::Spades, Rank::Four, '4♠'],
+        'ten of hearts' => [Suit::Hearts, Rank::Ten, '10♥'],
+        'jack of clubs' => [Suit::Clubs, Rank::Jack, 'J♣'],
+        'queen of diamonds' => [Suit::Diamonds, Rank::Queen, 'Q♦'],
+        'king of spades' => [Suit::Spades, Rank::King, 'K♠'],
+        'joker' => [Suit::Joker, Rank::Joker, '🃏🃏'],
     ];
 });
 
@@ -30,15 +47,11 @@ dataset('invalid joker cards', function () {
     ];
 });
 
-dataset('two random cards', function () {
+dataset('cards to compare', function () {
     return [
-        'two random cards' => [randomCards(2)],
-    ];
-});
-
-dataset('five random cards', function () {
-    return [
-        'five random cards' => [randomCards(5)],
+        'higher rank' => [Card::fromString('J♥'), Card::fromString('10♥'), true, false],
+        'equal rank' => [Card::fromString('J♥'), Card::fromString('J♥'), false, true],
+        'lower rank' => [Card::fromString('2♥'), Card::fromString('J♥'), false, false],
     ];
 });
 

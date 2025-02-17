@@ -10,6 +10,18 @@ enum Suit: string
     case Clubs = 'clubs';
     case Spades = 'spades';
 
+    public static function fromSymbol(string $symbol): self
+    {
+        return match ($symbol) {
+            '♥' => self::Hearts,
+            '♦' => self::Diamonds,
+            '♣' => self::Clubs,
+            '♠' => self::Spades,
+            '🃏' => self::Joker,
+            default => throw new \InvalidArgumentException("Invalid suit symbol: {$symbol}"),
+        };
+    }
+
     /**
      * @return list<Suit>
      */

@@ -19,6 +19,27 @@ enum Rank: int
     case King = 13;
     case Ace = 14;
 
+    public static function fromSymbol(string $symbol): self
+    {
+        return match ($symbol) {
+            'A' => self::Ace,
+            '2' => self::Two,
+            '3' => self::Three,
+            '4' => self::Four,
+            '5' => self::Five,
+            '6' => self::Six,
+            '7' => self::Seven,
+            '8' => self::Eight,
+            '9' => self::Nine,
+            '10' => self::Ten,
+            'J' => self::Jack,
+            'Q' => self::Queen,
+            'K' => self::King,
+            '🃏' => self::Joker,
+            default => throw new \InvalidArgumentException("Invalid rank symbol: {$symbol}"),
+        };
+    }
+
     /**
      * @return list<Rank>
      */

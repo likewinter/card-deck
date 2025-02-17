@@ -19,6 +19,22 @@ class Card
         }
     }
 
+    public static function fromString(string $string): self
+    {
+        if (mb_strlen($string) < 2 || mb_strlen($string) > 3) {
+            throw new \InvalidArgumentException('Invalid card string');
+        }
+        if (mb_strlen($string) === 3) {
+            $rank = mb_substr($string, 0, 2);
+            $suit = mb_substr($string, 2, 1);
+        } else {
+            $rank = mb_substr($string, 0, 1);
+            $suit = mb_substr($string, 1, 1);
+        }
+
+        return new self(suit: Suit::fromSymbol($suit), rank: Rank::fromSymbol($rank));
+    }
+
     public function __toString(): string
     {
         return "{$this->rank->getSymbol()}{$this->suit->getSymbol()}";

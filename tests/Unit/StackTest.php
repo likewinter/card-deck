@@ -1,7 +1,6 @@
 <?php
 
-use Likewinter\CardDeck\{Card, Stack};
-use Likewinter\CardDeck\Card\{Rank, Suit};
+use Likewinter\CardDeck\Stack;
 
 it('can be created', function () {
     $stack = new Stack();

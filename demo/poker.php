@@ -1,6 +1,5 @@
 <?php
 
-use Likewinter\CardDeck\{Dealer,Deck};
 use Likewinter\CardDeck\Games\Poker;
 
 require_once __DIR__ . '/../vendor/autoload.php';
