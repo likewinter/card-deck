@@ -148,9 +148,7 @@ class Stack implements IteratorAggregate, \Countable
         $target->addCards(...$this->cards);
         $this->clear();
     }
-    /**
-     * @param callable(): mixed $callback
-     */
+
     public function sort(callable $callback): void
     {
         usort($this->cards, $callback);
