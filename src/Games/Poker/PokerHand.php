@@ -4,6 +4,8 @@ namespace Likewinter\CardDeck\Games\Poker;
 
 use Likewinter\CardDeck\Card;
 use Likewinter\CardDeck\Hand;
+use Likewinter\CardDeck\RankOrder;
+use Likewinter\CardDeck\Card\Rank;
 
 class PokerHand extends Hand
 {
@@ -14,11 +16,15 @@ class PokerHand extends Hand
     public readonly bool $isSameSuit;
     public readonly bool $isSequentialRank;
 
+    public readonly RankOrder $rankOrder;
+
     public function __construct(
         /** @var list<Card> */
         public array $cards,
+        ?RankOrder $rankOrder = null,
     ) {
         parent::__construct($cards, self::HAND_SIZE);
+        $this->rankOrder = $rankOrder ?? RankOrder::poker();
         $this->sortByRank();
 
         $this->rankSets = $this->getRankSets();
@@ -117,7 +123,7 @@ class PokerHand extends Hand
      */
     private function getSortedUniqueRankValues(): array
     {
-        $values = array_map(fn (Card $card) => $card->rank->value, $this->cards);
+        $values = array_map(fn (Card $card) => $this->rankOrder->value($card->rank), $this->cards);
         sort($values);
 
         return array_values(array_unique($values));
@@ -131,7 +137,7 @@ class PokerHand extends Hand
      */
     private function descendingRankValues(): array
     {
-        $values = array_map(fn (Card $card) => $card->rank->value, $this->cards);
+        $values = array_map(fn (Card $card) => $this->rankOrder->value($card->rank), $this->cards);
         rsort($values);
 
         return $values;
@@ -153,7 +159,7 @@ class PokerHand extends Hand
         // Build [rankValue => count] map
         $counts = [];
         foreach ($this->cards as $card) {
-            $value = $card->rank->value;
+            $value = $this->rankOrder->value($card->rank);
             $counts[$value] = ($counts[$value] ?? 0) + 1;
         }
 

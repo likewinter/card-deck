@@ -5,6 +5,13 @@ namespace Likewinter\CardDeck;
 use Likewinter\CardDeck\Card\Rank;
 use Likewinter\CardDeck\Card\Suit;
 
+/**
+ * A playing card: a rank paired with a suit. Immutable and identity-only.
+ *
+ * Card has no ordering and no game-specific semantics — those live in
+ * RankOrder (for rank comparison) and SuitOrder (for trump/lead-suit
+ * comparison). Use CardInPlay if you need face-up/face-down state.
+ */
 class Card
 {
     public function __construct(
@@ -45,11 +52,6 @@ class Card
         return $this->suit === $other->suit && $this->rank === $other->rank;
     }
 
-    public function isHigherThan(self $other): bool
-    {
-        return $this->rank->isHigherThan($other->rank);
-    }
-
     public function isSameSuitAs(self $other): bool
     {
         return $this->suit === $other->suit;
@@ -63,15 +65,5 @@ class Card
     public function isJoker(): bool
     {
         return $this->rank === Rank::Joker;
-    }
-
-    public function isAce(): bool
-    {
-        return $this->rank === Rank::Ace;
-    }
-
-    public function isFace(): bool
-    {
-        return $this->rank->isFace();
     }
 }

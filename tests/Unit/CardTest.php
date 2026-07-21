@@ -2,6 +2,7 @@
 
 use Likewinter\CardDeck\Card;
 use Likewinter\CardDeck\Card\{Rank, Suit};
+use Likewinter\CardDeck\RankOrder;
 
 it('can be created', function (Suit $suit, Rank $rank) {
     $card = new Card(suit: $suit, rank: $rank);
@@ -23,13 +24,16 @@ it('cant create joker with non-joker rank or suit', function (Suit $suit, Rank $
     new Card(suit: $suit, rank: $rank);
 })->with('invalid joker cards')->throws(\InvalidArgumentException::class);
 
+it('can compare equality', function (Card $card1, Card $card2, bool $expectedHigher, bool $expectedEquals) {
+    expect($card1->equals($card2))->toBe($expectedEquals);
+})->with('cards to compare');
 
-describe('card comparison', function () {
-    it('can compare cards', function (Card $card1, Card $card2, bool $expected) {
-        expect($card1->isHigherThan($card2))->toBe($expected);
-    })->with('cards to compare');
-
-    it('can compare equal cards', function (Card $card1, Card $card2, bool $expectedHigher, bool $expectedEquals) {
-        expect($card1->equals($card2))->toBe($expectedEquals);
-    })->with('cards to compare');
-});
+it('can compare ranks via RankOrder', function (Card $card1, Card $card2, bool $expectedHigher) {
+    $order = RankOrder::poker();
+    if ($expectedHigher) {
+        expect($order->isHigher($card1->rank, $card2->rank))->toBeTrue();
+    } else {
+        // For the "equal rank" and "lower rank" cases, card1 is not higher
+        expect($order->isHigher($card1->rank, $card2->rank))->toBeFalse();
+    }
+})->with('cards to compare');

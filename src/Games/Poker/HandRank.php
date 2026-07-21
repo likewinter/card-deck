@@ -137,6 +137,11 @@ enum HandRank: int
 
     protected static function isRoyalFlush(PokerHand $hand): bool
     {
-        return self::isStraightFlush($hand) && $hand->getHighCardValue() === Rank::Ace->value;
+        // Royal flush: 10-J-Q-K-A all suited. The high card must be Ace
+        // AND the low card must be Ten (excludes the wheel A-2-3-4-5,
+        // which also contains an Ace but is not royal).
+        return self::isStraightFlush($hand)
+            && $hand->rankOrder->isHighest(Rank::Ace)
+            && $hand->getHighCardValue() === $hand->rankOrder->value(Rank::Ace);
     }
 }

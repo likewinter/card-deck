@@ -2,22 +2,29 @@
 
 namespace Likewinter\CardDeck\Card;
 
-enum Rank: int
+/**
+ * A card rank. Pure identity — no intrinsic ordering or value.
+ *
+ * Different games order ranks differently (poker, blackjack, belote, skat,
+ * pinochle all disagree). Use a Likewinter\CardDeck\RankOrder to compare
+ * ranks or get their values within a specific game's rules.
+ */
+enum Rank: string
 {
-    case Joker = 0;
-    case Two = 2;
-    case Three = 3;
-    case Four = 4;
-    case Five = 5;
-    case Six = 6;
-    case Seven = 7;
-    case Eight = 8;
-    case Nine = 9;
-    case Ten = 10;
-    case Jack = 11;
-    case Queen = 12;
-    case King = 13;
-    case Ace = 14;
+    case Joker = 'joker';
+    case Two = '2';
+    case Three = '3';
+    case Four = '4';
+    case Five = '5';
+    case Six = '6';
+    case Seven = '7';
+    case Eight = '8';
+    case Nine = '9';
+    case Ten = '10';
+    case Jack = 'J';
+    case Queen = 'Q';
+    case King = 'K';
+    case Ace = 'A';
 
     public static function fromSymbol(string $symbol): self
     {
@@ -49,7 +56,7 @@ enum Rank: int
     }
 
     /**
-     * Returns the display symbol for the card rank
+     * Returns the display symbol for the card rank.
      */
     public function getSymbol(): string
     {
@@ -68,50 +75,6 @@ enum Rank: int
             self::Queen => 'Q',
             self::King => 'K',
             self::Joker => '🃏',
-        };
-    }
-
-    /**
-     * Determines if the rank is a face card (10 or higher)
-     */
-    public function isFace(): bool
-    {
-        return $this->value >= self::Ten->value;
-    }
-
-    /**
-     * Compares if this rank is higher than another rank
-     */
-    public function isHigherThan(self $other): bool
-    {
-        if ($this === self::Joker || $other === self::Joker) {
-            throw new \InvalidArgumentException('Cannot compare Joker cards');
-        }
-
-        return $this->value > $other->value;
-    }
-
-    /**
-     * Returns the next rank in sequence (null if at Ace)
-     */
-    public function next(): ?self
-    {
-        return match ($this) {
-            self::Ace => null,
-            self::Joker => null,
-            default => self::from($this->value + 1)
-        };
-    }
-
-    /**
-     * Returns the previous rank in sequence (null if at Two)
-     */
-    public function previous(): ?self
-    {
-        return match ($this) {
-            self::Two => null,
-            self::Joker => null,
-            default => self::from($this->value - 1)
         };
     }
 }

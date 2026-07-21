@@ -14,9 +14,10 @@ class Hand extends Stack
         parent::__construct($cards, $handSize);
     }
 
-    public function sortByRank(): void
+    public function sortByRank(?RankOrder $rankOrder = null): void
     {
-        $this->sort(fn(Card $a, Card $b) => $a->rank->value - $b->rank->value);
+        $order = $rankOrder ?? RankOrder::poker();
+        $this->sort(fn(Card $a, Card $b) => $order->compare($a->rank, $b->rank));
     }
 
     /** @return list<Rank> */
