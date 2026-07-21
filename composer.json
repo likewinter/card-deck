@@ -3,7 +3,7 @@
     "description": "Card deck games library",
     "type": "library",
     "require": {
-        "php": "^8.3"
+        "php": "^8.4"
     },
     "require-dev": {
         "phpstan/phpstan": "^1.12",

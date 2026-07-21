@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/likewinter/card-deck/actions/workflows/ci.yml/badge.svg)](https://github.com/likewinter/card-deck/actions/workflows/ci.yml)
 
-A PHP 8.3+ engine for building card games — the primitives, not the UI.
+A PHP 8.4+ engine for building card games — the primitives, not the UI.
 
 `likewinter/card-deck` provides game-agnostic building blocks for playing
 card games: cards, decks, hands, stacks, a dealer, rank/suit ordering,
@@ -15,7 +15,7 @@ flush detection, and full tiebreaker comparison.
 
 ## Requirements
 
-- PHP 8.3 or newer
+- PHP 8.4 or newer
 
 ## Install
 
