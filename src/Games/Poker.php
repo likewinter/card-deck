@@ -46,6 +46,30 @@ readonly class Poker
         $this->dealer->drawAll($this->handSize);
     }
 
+    /**
+     * Returns the current hands as PokerHand objects, in player order.
+     * Hands that have not been dealt yet are returned as empty PokerHands
+     * (their handRank is not meaningful until cards are dealt).
+     *
+     * @return list<PokerHand>
+     */
+    public function hands(): array
+    {
+        return array_map(
+            fn (Hand $hand) => PokerHand::fromHand($hand),
+            $this->dealer->getHands()
+        );
+    }
+
+    /**
+     * Resets the game for a new round: returns all cards from hands and
+     * the pile to the deck and reshuffles. Hands become empty.
+     */
+    public function reset(): void
+    {
+        $this->dealer->resetGame();
+    }
+
     public function gameState(): string
     {
         $state = <<<STATE

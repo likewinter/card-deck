@@ -1,6 +1,7 @@
 <?php
 
 use Likewinter\CardDeck\Games\Poker;
+use Likewinter\CardDeck\Games\Poker\PokerHand;
 
 it('can be created with defaults', function () {
     $poker = new Poker();
@@ -65,4 +66,49 @@ it('winnersState reports a tie when multiple hands tie for best', function () {
     // Either 1 winner or 2+ winners (tie) — both formats must work
     expect(count($winners))->toBeGreaterThanOrEqual(1);
     expect($poker->winnersState())->toBeString();
+});
+
+it('exposes dealt hands as PokerHand objects in player order', function () {
+    $poker = new Poker(handSize: 5, numHands: 3);
+    $poker->deal();
+
+    $hands = $poker->hands();
+    expect($hands)->toHaveCount(3);
+    foreach ($hands as $hand) {
+        expect($hand)->toBeInstanceOf(PokerHand::class)
+            ->and($hand->count())->toBe(5);
+    }
+});
+
+it('returns empty PokerHands before dealing', function () {
+    $poker = new Poker(handSize: 5, numHands: 2);
+    $hands = $poker->hands();
+    expect($hands)->toHaveCount(2);
+    foreach ($hands as $hand) {
+        expect($hand->count())->toBe(0);
+    }
+});
+
+it('can reset and deal a new round', function () {
+    $poker = new Poker(handSize: 5, numHands: 2);
+    $poker->deal();
+    expect($poker->hands()[0]->count())->toBe(5)
+        ->and($poker->winners())->not->toBeEmpty();
+
+    $poker->reset();
+
+    expect($poker->hands()[0]->count())->toBe(0)
+        ->and($poker->winners())->toBeEmpty();
+
+    $poker->deal();
+
+    expect($poker->hands()[0]->count())->toBe(5)
+        ->and($poker->winners())->not->toBeEmpty();
+});
+
+it('reset is idempotent on an undealt game', function () {
+    $poker = new Poker(handSize: 5, numHands: 2);
+    $poker->reset();
+    expect($poker->hands()[0]->count())->toBe(0)
+        ->and($poker->winners())->toBeEmpty();
 });
