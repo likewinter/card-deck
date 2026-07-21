@@ -78,16 +78,16 @@ echo "Alice: {$alice}\n";  // Alice: A♣,K♦,Q♥,J♠,10♣
 
 ## Game fit
 
-The framework supports most popular card games. ✅ = directly possible,
-⚠️ = possible with minor additions, ❌ = not yet.
+The framework supports most popular card games. ✅ = directly possible
+with the current primitives.
 
 | Game | Fit | Notes |
 |------|-----|-------|
 | 5-Card Stud Poker | ✅ | Reference implementation in `src/Games/Poker/` |
-| Texas Hold'em / Omaha | ⚠️ | Needs community-card slots in `Dealer` |
+| Texas Hold'em / Omaha | ✅ | `Dealer::drawAll(2)` for holes + `Stack::takeTop()` for community cards; best-5-from-7 evaluator is game logic |
 | Blackjack | ✅ | `RankOrder::blackjack()` + multi-deck via `DeckBuilder::times(6)` |
 | Bridge / Spades / Hearts | ✅ | `SuitOrder` + `Trick` + `PlayerRing` |
-| Rummy / Gin Rummy | ⚠️ | Needs draw-from-pile API in `Dealer` |
+| Rummy / Gin Rummy | ✅ | `getPile()->takeTop()` to draw discards, `Dealer::discard()` to discard, `Stack` for melds |
 | War | ✅ | `CardInPlay` + `Face::Down` for the face-down war cards |
 | Crazy Eights | ✅ | `Wildcard` for wild 8s |
 | Euchre | ✅ | `DeckBuilder::euchre()` + trump primitives |

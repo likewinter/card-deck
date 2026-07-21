@@ -9,6 +9,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 No changes yet.
 
+## [0.4.0] - 2026-07-22
+
+Architecture polish: fixes a latent identity bug, replaces magic
+constants with enums, removes four shallow modules, rewrites PokerHand
+as an immutable value object, and achieves a clean architecture review.
+
+### Added
+
+- **`PlayableCard::equals()`** — identity contract for Stack membership.
+  Card compares suit+rank, CardInPlay compares card+face, Wildcard
+  compares wild card. Stack uses `equals()` in `isSame`, `hasExactCards`,
+  `removeCards` instead of string comparison.
+- **`DrawMode`** enum — `Sequential`, `OneByOne`, `Random`. Replaces
+  Dealer's int constants.
+- **`HandTest`**, **`RankTest`**, **`SuitTest`** — direct tests for
+  previously untested modules.
+
+### Changed
+
+#### Breaking changes
+- **`PokerHand` is now an immutable value object** — no longer extends
+  `Hand`/`Stack`. Requires exactly 5 `Card`s (enforced). Implements
+  `IteratorAggregate`, `Countable`, `Stringable`. `fromHand()` resolves
+  via `underlyingCard()`. Eliminates the stale-state hazard where
+  inherited Stack mutation silently invalidated the cached `handRank`.
+- **`Poker` simplified** — `handSize` parameter removed (always
+  `PokerHand::HAND_SIZE`). `gameState()`, `handsState()`,
+  `winnersState()` renderers removed. `hands()` returns only dealt
+  hands. `winners()` drops the defensive count filter.
+- **`Hand` default capacity** changed from `5` to `null` (unbounded,
+  like `Stack`). Poker-specific default removed from the generic module.
+- **`Trump` enum deleted** — carried zero information beyond
+  `SuitOrder::$trumpSuit !== null`. `SuitOrder` now takes `?Suit`
+  directly. `SuitOrder::none()` removed.
+- **`DealerException` deleted** — all throw sites now use SPL exceptions
+  (`\InvalidArgumentException`, `\LogicException`) like every other
+  module. `Exceptions/` directory removed.
+- **`Stack` equality** uses `PlayableCard::equals()` instead of string
+  comparison. Face-down `CardInPlay` and `Wildcard` identity bugs fixed.
+- **`Dealer` draw modes** use `DrawMode` enum instead of int constants.
+  `DRAW_SEQUENTIAL`, `DRAW_ONE_BY_ONE`, `DRAW_RANDOM` constants and
+  `setDrawMode()` validation removed.
+
+### Fixed
+
+- **`Rank::casesWithoutJoker()`** returned a non-list array (keys 1–13
+  instead of 0–12) because `array_filter` preserves keys and Joker is
+  case 0. Now wraps in `array_values()`, matching `Suit`'s
+  implementation.
+
+### Removed
+
+- `src/Trump.php` — redundant with `SuitOrder::$trumpSuit`.
+- `src/Exceptions/DealerException.php` — replaced by SPL exceptions.
+- `Trump::isSuit()` — synonym of `hasTrump()`, unused by production.
+- `Card::isSameSuitAs()`, `Card::isSameRankAs()` — never called.
+- `Suit::standardSuits()`, `Suit::isStandard()` — never called.
+- `Poker::gameState()`, `handsState()`, `winnersState()` — contradicted
+  the "No UI" principle, unused by the demo.
+- `Dealer::DRAW_SEQUENTIAL/ONE_BY_ONE/RANDOM` constants, `DRAW_MODES`
+  array, `setDrawMode()` — replaced by `DrawMode` enum.
+
+### Docs
+
+- Game-fit table: Texas Hold'em and Rummy upgraded from ⚠️ to ✅ —
+  both are achievable with current primitives (no engine changes needed).
+- Stale references to deleted modules removed from README, docs/stacks,
+  docs/cards, docs/trick-taking, docs/getting-started.
+
 ## [0.3.0] - 2026-07-22
 
 Architecture deepening: eliminates shallow modules, removes circular
@@ -241,7 +310,8 @@ poker values. Included `Card`, `Rank`, `Suit`, `Stack`, `Deck`, `Hand`,
 `Dealer`, and a basic `Games\Poker` implementation with `PokerHand` and
 `HandRank` (9 ranks, no royal flush, no hand comparison).
 
-[Unreleased]: https://github.com/likewinter/card-deck/compare/0.3.0...HEAD
+[Unreleased]: https://github.com/likewinter/card-deck/compare/0.4.0...HEAD
+[0.4.0]: https://github.com/likewinter/card-deck/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/likewinter/card-deck/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/likewinter/card-deck/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/likewinter/card-deck/releases/tag/0.1.0
