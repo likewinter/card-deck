@@ -29,7 +29,9 @@
     "scripts": {
         "test": ["Composer\\Config::disableProcessTimeout", "pest"],
         "phpstan": "phpstan analyse",
+        "audit": "composer audit --format=plain",
         "ci": [
+            "@audit",
             "@phpstan",
             "@test"
         ]
@@ -37,6 +39,7 @@
     "scripts-descriptions": {
         "test": "Run the Pest test suite",
         "phpstan": "Run PHPStan static analysis at level 8",
-        "ci": "Run all CI checks (phpstan + tests)"
+        "audit": "Check dependencies for known security vulnerabilities",
+        "ci": "Run all CI checks (audit + phpstan + tests)"
     }
 }
