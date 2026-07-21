@@ -32,35 +32,35 @@ it('can check if it is full', function () {
     $stack = Stack::fromString('A♣,2♦,3♥,4♠');
     expect($stack->isFull())->toBeFalse();
 
-    $stack = Stack::fromString('A♣,2♦,3♥,4♠', stackLimit: 4);
+    $stack = Stack::fromString('A♣,2♦,3♥,4♠', capacity: 4);
     expect($stack->isFull())->toBeTrue();
 });
 
 describe('stack limit', function () {
     it('cant be created with negative limit', function () {
-        new Stack(stackLimit: -1);
+        new Stack(capacity: -1);
     })->throws(\InvalidArgumentException::class);
 
     it('cant be created with zero limit', function () {
-        new Stack(stackLimit: 0);
+        new Stack(capacity: 0);
     })->throws(\InvalidArgumentException::class);
 
     it('can be created with positive limit', function () {
-        $stack = new Stack(stackLimit: 1);
+        $stack = new Stack(capacity: 1);
         expect($stack)->toBeInstanceOf(Stack::class);
     });
 
     it('cant be created with cards greater than limit', function (array $cards) {
-        new Stack(cards: $cards, stackLimit: 1);
+        new Stack(cards: $cards, capacity: 1);
     })->with('two random cards')->throws(\InvalidArgumentException::class);
 
     it('can be created with cards equal to limit', function (array $cards) {
-        $stack = new Stack(cards: $cards, stackLimit: 2);
+        $stack = new Stack(cards: $cards, capacity: 2);
         expect($stack)->toBeInstanceOf(Stack::class);
     })->with('two random cards');
 
     it('can be created with cards less than limit', function (array $cards) {
-        $stack = new Stack(cards: $cards, stackLimit: 3);
+        $stack = new Stack(cards: $cards, capacity: 3);
         expect($stack)->toBeInstanceOf(Stack::class);
     })->with('two random cards');
 });
@@ -99,7 +99,7 @@ describe('adding cards', function () {
     })->with('cards to add to the stack');
 
     it('cant add cards to a full stack', function () {
-        $stack = Stack::fromString('A♣,2♦,3♥,4♠', stackLimit: 4);
+        $stack = Stack::fromString('A♣,2♦,3♥,4♠', capacity: 4);
         $stack->addCards(...$stack);
     })->throws(\InvalidArgumentException::class);
 });

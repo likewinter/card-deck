@@ -14,15 +14,15 @@ class Stack implements IteratorAggregate, \Countable
     public function __construct(
         /** @var list<Card> */
         protected array $cards = [],
-        protected readonly ?int $stackLimit = null
+        public readonly ?int $capacity = null
     ) {
-        if ($stackLimit !== null && $stackLimit < 1) {
+        if ($capacity !== null && $capacity < 1) {
             throw new \InvalidArgumentException(
-                "Stack limit must be greater than 0"
+                "Stack capacity must be greater than 0"
             );
         }
-        if ($stackLimit !== null && count($cards) > $stackLimit) {
-            throw new \InvalidArgumentException("Stack limit exceeded");
+        if ($capacity !== null && count($cards) > $capacity) {
+            throw new \InvalidArgumentException("Stack capacity exceeded");
         }
 
         foreach ($cards as $card) {
@@ -34,7 +34,7 @@ class Stack implements IteratorAggregate, \Countable
         }
     }
 
-    public static function fromString(string $string, ?int $stackLimit = null): self
+    public static function fromString(string $string, ?int $capacity = null): self
     {
         if (empty($string)) {
             return new self();
@@ -42,7 +42,7 @@ class Stack implements IteratorAggregate, \Countable
 
         $cards = explode(",", $string);
 
-        return new self(array_map(fn(string $card) => Card::fromString($card), $cards), $stackLimit);
+        return new self(array_map(fn(string $card) => Card::fromString($card), $cards), $capacity);
     }
 
     public function getIterator(): Iterator
@@ -62,8 +62,8 @@ class Stack implements IteratorAggregate, \Countable
 
     public function isFull(): bool
     {
-        return $this->stackLimit !== null &&
-            count($this->cards) === $this->stackLimit;
+        return $this->capacity !== null &&
+            count($this->cards) === $this->capacity;
     }
 
     public function isEmpty(): bool
@@ -136,11 +136,11 @@ class Stack implements IteratorAggregate, \Countable
     public function addCards(Card ...$cards): void
     {
         if (
-            $this->stackLimit !== null &&
-            count($this->cards) + count($cards) > $this->stackLimit
+            $this->capacity !== null &&
+            count($this->cards) + count($cards) > $this->capacity
         ) {
             throw new \InvalidArgumentException(
-                "Adding these cards would exceed stack limit"
+                "Adding these cards would exceed stack capacity"
             );
         }
         $this->cards = array_merge($this->cards, array_values($cards));

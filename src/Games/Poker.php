@@ -22,7 +22,7 @@ readonly class Poker
         $this->validateConfig();
 
         for ($i = 0; $i < $this->numHands; $i++) {
-            $this->dealer->addHands(new Hand(handSize: $this->handSize));
+            $this->dealer->addHands(new Hand(capacity: $this->handSize));
         }
     }
 
@@ -75,7 +75,7 @@ readonly class Poker
         $state = <<<STATE
         Number of hands: {$this->numHands}
         Hand size: {$this->handSize}
-        Deck size: {$this->dealer->getDeck()->deckSize}
+        Deck size: {$this->dealer->getDeck()->capacity}
         Deck: [{$this->dealer->getDeck()}]
         Pile: [{$this->dealer->getPile()}]
 

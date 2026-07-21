@@ -7,8 +7,8 @@ class Deck extends Stack
     public function __construct(
         /** @var list<Card> */
         protected array $cards = [],
-        public readonly int $deckSize = 52,
+        ?int $capacity = 52,
     ) {
-        parent::__construct($cards, $deckSize);
+        parent::__construct($cards, $capacity);
     }
 }

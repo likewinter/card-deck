@@ -7,7 +7,7 @@ use Likewinter\CardDeck\DeckBuilder;
 it('builds a standard 52-card deck', function () {
     $deck = DeckBuilder::standard52()->build();
     expect($deck->count())->toBe(52)
-        ->and($deck->deckSize)->toBe(52);
+        ->and($deck->capacity)->toBe(52);
 });
 
 it('standard52 has 4 suits × 13 ranks with no jokers', function () {
@@ -132,5 +132,5 @@ it('rejects invalid copies count', function () {
 it('build returns a Deck with the correct capacity', function () {
     $deck = DeckBuilder::standard52()->withJokers(2)->build();
     expect($deck->count())->toBe(54)
-        ->and($deck->deckSize)->toBe(54);
+        ->and($deck->capacity)->toBe(54);
 });

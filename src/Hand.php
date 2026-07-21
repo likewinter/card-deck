@@ -9,9 +9,9 @@ class Hand extends Stack
     public function __construct(
         /** @var list<Card> */
         protected array $cards = [],
-        int $handSize = 5,
+        int $capacity = 5,
     ) {
-        parent::__construct($cards, $handSize);
+        parent::__construct($cards, $capacity);
     }
 
     public function sortByRank(?RankOrder $rankOrder = null): void
