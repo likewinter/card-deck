@@ -1,5 +1,7 @@
 # Card Deck
 
+[![CI](https://github.com/likewinter/card-deck/actions/workflows/ci.yml/badge.svg)](https://github.com/likewinter/card-deck/actions/workflows/ci.yml)
+
 A PHP 8.3+ engine for building card games — the primitives, not the UI.
 
 `likewinter/card-deck` provides game-agnostic building blocks for playing
