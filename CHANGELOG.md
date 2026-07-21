@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 No changes yet.
 
+## [0.5.0] - 2026-07-22
+
+Two new reference games demonstrating the engine's versatility across
+game families.
+
+### Added
+
+- **Blackjack** (`src/Games/Blackjack.php`, `src/Games/Blackjack/BlackjackHand.php`)
+  — hand-value game with additive scoring, soft/hard ace logic,
+  multi-deck shoe (6 decks via `DeckBuilder::times()`), dealer AI
+  (stands on 17), outcome determination. Showcases
+  `RankOrder::blackjack()` and a completely different evaluation model
+  from Poker's classificatory approach.
+- **Spades** (`src/Games/Spades.php`) — trick-taking game using
+  `SuitOrder::suit(Spades)`, `Trick` with enforced turn order,
+  `PlayerRing` (via Trick), callback-based card selection, and
+  trick-counting scoring. Showcases the trick-taking primitives that
+  Poker never touches.
+- **Demos**: `demo/blackjack.php` (player vs dealer, ASCII card art,
+  basic strategy), `demo/spades.php` (4 players, 13 tricks, simple AI,
+  trick-count scoreboard).
+- 19 new tests (338 total, 680 assertions).
+
 ## [0.4.0] - 2026-07-22
 
 Architecture polish: fixes a latent identity bug, replaces magic
@@ -310,7 +333,8 @@ poker values. Included `Card`, `Rank`, `Suit`, `Stack`, `Deck`, `Hand`,
 `Dealer`, and a basic `Games\Poker` implementation with `PokerHand` and
 `HandRank` (9 ranks, no royal flush, no hand comparison).
 
-[Unreleased]: https://github.com/likewinter/card-deck/compare/0.4.0...HEAD
+[Unreleased]: https://github.com/likewinter/card-deck/compare/0.5.0...HEAD
+[0.5.0]: https://github.com/likewinter/card-deck/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/likewinter/card-deck/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/likewinter/card-deck/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/likewinter/card-deck/compare/0.1.0...0.2.0
