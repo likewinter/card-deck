@@ -7,11 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-The upcoming 1.0.0 release transforms the library from a poker-specific
-package into a game-agnostic card game framework. It includes breaking
-changes to the core API, new primitives for trick-taking and
-partial-information games, comprehensive bug fixes, and full
-documentation.
+No changes yet.
+
+## [0.2.0] - 2026-07-21
+
+Transforms the library from a poker-specific package into a
+game-agnostic card game framework. Includes breaking changes to the
+core API, new primitives for trick-taking and partial-information
+games, comprehensive bug fixes, and full documentation.
 
 ### Added
 
@@ -179,5 +182,6 @@ poker values. Included `Card`, `Rank`, `Suit`, `Stack`, `Deck`, `Hand`,
 `Dealer`, and a basic `Games\Poker` implementation with `PokerHand` and
 `HandRank` (9 ranks, no royal flush, no hand comparison).
 
-[Unreleased]: https://github.com/likewinter/card-deck/compare/7756a72...HEAD
+[Unreleased]: https://github.com/likewinter/card-deck/compare/0.2.0...HEAD
+[0.2.0]: https://github.com/likewinter/card-deck/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/likewinter/card-deck/releases/tag/0.1.0
