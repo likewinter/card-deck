@@ -24,6 +24,7 @@ class Dealer
         private array $hands = [],
         /** @var value-of<self::DRAW_MODES> */
         private int $drawMode = self::DRAW_SEQUENTIAL,
+        bool $shuffle = false,
     ) {
         $this->setDrawMode($drawMode);
 
@@ -33,7 +34,9 @@ class Dealer
             }
         }
         $this->pile = new Stack();
-        $deck->shuffle();
+        if ($shuffle) {
+            $deck->shuffle();
+        }
     }
 
     public function getDeck(): Deck
@@ -125,7 +128,6 @@ class Dealer
             $hand->moveAllTo($this->deck);
         }
         $this->pile->moveAllTo($this->deck);
-        $this->deck->shuffle();
     }
 
     private function validateHand(Hand $hand): void

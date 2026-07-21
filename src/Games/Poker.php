@@ -17,7 +17,7 @@ readonly class Poker
     public function __construct(
         private readonly int $handSize = self::DEFAULT_HAND_SIZE,
         private readonly int $numHands = self::DEFAULT_NUM_HANDS,
-        private readonly Dealer $dealer = new Dealer(deck: new PokerDeck()),
+        private readonly Dealer $dealer = new Dealer(deck: new PokerDeck(), shuffle: true),
     ) {
         $this->validateConfig();
 
@@ -68,6 +68,7 @@ readonly class Poker
     public function reset(): void
     {
         $this->dealer->resetGame();
+        $this->dealer->getDeck()->shuffle();
     }
 
     public function gameState(): string

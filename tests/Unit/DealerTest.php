@@ -5,6 +5,7 @@ use Likewinter\CardDeck\Deck;
 use Likewinter\CardDeck\Exceptions\DealerException;
 use Likewinter\CardDeck\Games\Poker\PokerDeck;
 use Likewinter\CardDeck\Hand;
+use Likewinter\CardDeck\Stack;
 
 it('can be created with a deck', function () {
     $dealer = new Dealer(deck: new PokerDeck());
@@ -157,7 +158,7 @@ it('discards only the specified cards when provided', function () {
 });
 
 it('resetGame returns all cards to the deck', function () {
-    $dealer = new Dealer(deck: new PokerDeck());
+    $dealer = new Dealer(deck: new PokerDeck(), shuffle: true);
     $hand = new Hand(capacity: 5);
     $dealer->addHands($hand);
     $dealer->drawToHand($hand, 5);
@@ -171,4 +172,57 @@ it('resetGame returns all cards to the deck', function () {
     expect($dealer->getDeck()->count())->toBe(52)
         ->and($dealer->getPile()->count())->toBe(0)
         ->and($hand->count())->toBe(0);
+});
+
+it('does not shuffle the deck by default', function () {
+    $deck = new PokerDeck();
+    $originalFirst = (string) $deck->peek(1);
+
+    new Dealer(deck: $deck);
+
+    // Deck should be unchanged — no shuffle
+    expect((string) $deck->peek(1))->toBe($originalFirst);
+});
+
+it('shuffles the deck when shuffle: true', function () {
+    $deck = new PokerDeck();
+    $originalOrder = (string) $deck;
+
+    new Dealer(deck: $deck, shuffle: true);
+
+    // Very unlikely a shuffle produces the same 52-card order
+    expect((string) $deck)->not->toBe($originalOrder);
+});
+
+it('moveTo rolls back on target capacity exceeded', function () {
+    // Source has 3 cards, target has capacity 2.
+    // Moving 3 cards should fail AND leave the source intact.
+    $source = Stack::fromString('A♣,2♦,3♥');
+    $target = new Stack(capacity: 2);
+
+    try {
+        $source->moveTo($target, 3);
+        expect(false)->toBeTrue('Expected exception was not thrown');
+    } catch (\InvalidArgumentException $e) {
+        // Expected — target can't hold 3 cards
+    }
+
+    // Source should still have all 3 cards (rolled back)
+    expect($source->count())->toBe(3)
+        ->and($target->count())->toBe(0);
+});
+
+it('moveAllTo rolls back on target capacity exceeded', function () {
+    $source = Stack::fromString('A♣,2♦,3♥');
+    $target = new Stack(capacity: 2);
+
+    try {
+        $source->moveAllTo($target);
+        expect(false)->toBeTrue('Expected exception was not thrown');
+    } catch (\InvalidArgumentException $e) {
+        // Expected
+    }
+
+    expect($source->count())->toBe(3)
+        ->and($target->count())->toBe(0);
 });

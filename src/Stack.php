@@ -220,7 +220,17 @@ class Stack implements IteratorAggregate, \Countable
         int $num = 1,
         bool $fromTop = true
     ): void {
-        $target->addCards(...$this->takeCards($num, $fromTop));
+        $cards = $this->takeCards($num, $fromTop);
+        try {
+            $target->addCards(...$cards);
+        } catch (\InvalidArgumentException $e) {
+            // Rollback: return the taken cards to the source so they
+            // aren't lost when the target rejects them (e.g. full stack).
+            $this->cards = $fromTop
+                ? array_merge($cards->cards, $this->cards)
+                : array_merge($this->cards, $cards->cards);
+            throw $e;
+        }
     }
 
     public function moveAllTo(Stack $target): void
