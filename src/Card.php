@@ -12,8 +12,8 @@ class Card
         public readonly Rank $rank,
     ) {
         if (
-            $this->suit === Suit::Joker && $this->rank !== Rank::Joker ||
-            $this->rank === Rank::Joker && $this->suit !== Suit::Joker
+            ($this->suit === Suit::Joker && $this->rank !== Rank::Joker) ||
+            ($this->rank === Rank::Joker && $this->suit !== Suit::Joker)
         ) {
             throw new \InvalidArgumentException('Joker suit must have Joker rank');
         }

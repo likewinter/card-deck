@@ -152,8 +152,21 @@ class Stack implements IteratorAggregate, \Countable
             throw new \InvalidArgumentException("Cards not found in stack");
         }
 
+        $indicesToRemove = [];
         foreach ($cards as $card) {
-            unset($this->cards[array_search($card, $this->cards, true)]);
+            foreach ($this->cards as $index => $existing) {
+                if (isset($indicesToRemove[$index])) {
+                    continue;
+                }
+                if ((string) $existing === (string) $card) {
+                    $indicesToRemove[$index] = true;
+                    break;
+                }
+            }
+        }
+
+        foreach (array_keys($indicesToRemove) as $index) {
+            unset($this->cards[$index]);
         }
         $this->cards = array_values($this->cards);
     }

@@ -47,22 +47,27 @@ class PokerHand extends Hand
 
     protected function isSequentialRank(): bool
     {
-        $ranks = array_map(fn ($rank) => $rank->getSymbol(), $this->getRanks());
-        sort($ranks);
+        $values = array_map(fn (Card $card) => $card->rank->value, $this->cards);
+        sort($values);
+        $values = array_values(array_unique($values));
 
-        return match ($ranks) {
-            ['A', '2', '3', '4', '5'] => true,
-            ['2', '3', '4', '5', '6'] => true,
-            ['3', '4', '5', '6', '7'] => true,
-            ['4', '5', '6', '7', '8'] => true,
-            ['5', '6', '7', '8', '9'] => true,
-            ['6', '7', '8', '9', '10'] => true,
-            ['7', '8', '9', '10', 'J'] => true,
-            ['8', '9', '10', 'J', 'Q'] => true,
-            ['9', '10', 'J', 'Q', 'K'] => true,
-            ['10', 'J', 'Q', 'K', 'A'] => true,
-            default => false,
-        };
+        if (count($values) !== 5) {
+            return false;
+        }
+
+        // Wheel: A-2-3-4-5 (Ace value 14 acts as 1)
+        if ($values === [2, 3, 4, 5, 14]) {
+            return true;
+        }
+
+        // Normal straight: 5 consecutive values
+        for ($i = 1; $i < 5; $i++) {
+            if ($values[$i] !== $values[$i - 1] + 1) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static function fromHand(Hand $hand): self

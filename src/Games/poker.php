@@ -61,10 +61,6 @@ readonly class Poker
 
     public function handsState(): string
     {
-        if ($this->handSize !== PokerHand::HAND_SIZE) {
-            throw new \LogicException('Hand size must be ' . PokerHand::HAND_SIZE);
-        }
-
         $state = 'Hands:' . PHP_EOL;
 
         foreach ($this->dealer->getHands() as $hand) {

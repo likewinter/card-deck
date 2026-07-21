@@ -8,6 +8,10 @@ use Likewinter\CardDeck\Card;
  */
 function randomCards(int $count = 1): array
 {
+    if ($count < 1) {
+        return [];
+    }
+
     $suits = Suit::casesWithoutJoker();
     $ranks = Rank::casesWithoutJoker();
 

@@ -62,8 +62,10 @@ class Dealer
         foreach ($hands as $hand) {
             $this->validateHand($hand);
             $hand->moveAllTo($this->pile);
-            $this->hands = array_diff($this->hands, [$hand]);
-            unset($hand);
+            $this->hands = array_values(array_filter(
+                $this->hands,
+                fn (Hand $existing) => $existing !== $hand
+            ));
         }
     }
 
@@ -108,7 +110,13 @@ class Dealer
     public function discard(Hand $hand, Card ...$cards): void
     {
         $this->validateHand($hand);
-        $hand->moveAllTo($this->pile);
+
+        if (empty($cards)) {
+            $hand->moveAllTo($this->pile);
+            return;
+        }
+
+        $hand->moveCardsTo($this->pile, ...$cards);
     }
 
     public function resetGame(): void
@@ -122,7 +130,7 @@ class Dealer
 
     private function validateHand(Hand $hand): void
     {
-        if (!in_array($hand, $this->hands)) {
+        if (!in_array($hand, $this->hands, true)) {
             throw new DealerException('Dealer does not have this hand');
         }
     }
