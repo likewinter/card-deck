@@ -24,17 +24,12 @@ describe('construction', function () {
             ->and($so->trumpSuit)->toBe(Suit::Spades);
     });
 
-    it('creates none via factory', function () {
-        $so = SuitOrder::none();
-        expect($so->trump)->toBe(Trump::None);
-    });
-
     it('rejects Trump::Suit without a trump suit', function () {
         new SuitOrder(Trump::Suit, null);
     })->throws(\InvalidArgumentException::class);
 
     it('rejects trump suit with non-Suit trump', function () {
-        new SuitOrder(Trump::None, Suit::Spades);
+        new SuitOrder(Trump::NoTrump, Suit::Spades);
     })->throws(\InvalidArgumentException::class);
 
     it('rejects Joker as trump suit', function () {

@@ -6,28 +6,15 @@ use Likewinter\CardDeck\Exceptions\DealerException;
 
 class Dealer
 {
-    public const DRAW_SEQUENTIAL = 0;
-    public const DRAW_ONE_BY_ONE = 1;
-    public const DRAW_RANDOM = 2;
-
-    private const DRAW_MODES = [
-        self::DRAW_SEQUENTIAL,
-        self::DRAW_ONE_BY_ONE,
-        self::DRAW_RANDOM,
-    ];
-
     private Stack $pile;
 
     public function __construct(
         private Stack $deck,
         /** @var list<Hand> */
         private array $hands = [],
-        /** @var value-of<self::DRAW_MODES> */
-        private int $drawMode = self::DRAW_SEQUENTIAL,
+        private DrawMode $drawMode = DrawMode::Sequential,
         bool $shuffle = false,
     ) {
-        $this->setDrawMode($drawMode);
-
         foreach ($hands as $hand) {
             if (!$hand instanceof Hand) {
                 throw new DealerException('Hands must be instances of Hand');
@@ -83,9 +70,9 @@ class Dealer
         }
 
         match ($this->drawMode) {
-            self::DRAW_ONE_BY_ONE => $this->drawOneByOne($num),
-            self::DRAW_SEQUENTIAL => $this->drawSequential($num),
-            self::DRAW_RANDOM => $this->drawRandom($num),
+            DrawMode::OneByOne => $this->drawOneByOne($num),
+            DrawMode::Sequential => $this->drawSequential($num),
+            DrawMode::Random => $this->drawRandom($num),
         };
     }
 
@@ -98,8 +85,8 @@ class Dealer
         }
 
         match ($this->drawMode) {
-            self::DRAW_RANDOM => $this->drawRandomToHand($hand, $num),
-            default => $this->deck->moveTo($hand, $num),
+            DrawMode::Random => $this->drawRandomToHand($hand, $num),
+            DrawMode::Sequential, DrawMode::OneByOne => $this->deck->moveTo($hand, $num),
         };
     }
 
@@ -135,14 +122,6 @@ class Dealer
         if (!in_array($hand, $this->hands, true)) {
             throw new DealerException('Dealer does not have this hand');
         }
-    }
-
-    private function setDrawMode(int $drawMode): void
-    {
-        if (!in_array($drawMode, self::DRAW_MODES, true)) {
-            throw new DealerException('Invalid draw mode');
-        }
-        $this->drawMode = $drawMode;
     }
 
     private function drawOneByOne(int $num): void

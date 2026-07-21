@@ -2,6 +2,7 @@
 
 use Likewinter\CardDeck\Dealer;
 use Likewinter\CardDeck\DeckBuilder;
+use Likewinter\CardDeck\DrawMode;
 use Likewinter\CardDeck\Exceptions\DealerException;
 use Likewinter\CardDeck\Hand;
 use Likewinter\CardDeck\Stack;
@@ -13,11 +14,6 @@ it('can be created with a deck', function () {
         ->and($dealer->getHands())->toBeEmpty()
         ->and($dealer->getPile()->count())->toBe(0);
 });
-
-it('rejects invalid draw mode', function () {
-    // @phpstan-ignore-next-line
-    new Dealer(deck: DeckBuilder::standard52()->build(), drawMode: 99);
-})->throws(DealerException::class);
 
 it('rejects non-Hand entries in constructor hands array', function () {
     // @phpstan-ignore-next-line
@@ -68,7 +64,7 @@ it('rejects removing a hand that was not added', function () {
 })->throws(DealerException::class);
 
 it('draws sequentially by default', function () {
-    $dealer = new Dealer(deck: DeckBuilder::standard52()->build(), drawMode: Dealer::DRAW_SEQUENTIAL);
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build(), drawMode: DrawMode::Sequential);
     $hand1 = new Hand(capacity: 5);
     $hand2 = new Hand(capacity: 5);
     $dealer->addHands($hand1, $hand2);
@@ -80,7 +76,7 @@ it('draws sequentially by default', function () {
 });
 
 it('draws one card per hand per round in DRAW_ONE_BY_ONE mode', function () {
-    $dealer = new Dealer(deck: DeckBuilder::standard52()->build(), drawMode: Dealer::DRAW_ONE_BY_ONE);
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build(), drawMode: DrawMode::OneByOne);
     $hand1 = new Hand(capacity: 5);
     $hand2 = new Hand(capacity: 5);
     $dealer->addHands($hand1, $hand2);
@@ -92,7 +88,7 @@ it('draws one card per hand per round in DRAW_ONE_BY_ONE mode', function () {
 });
 
 it('draws random cards in DRAW_RANDOM mode', function () {
-    $dealer = new Dealer(deck: DeckBuilder::standard52()->build(), drawMode: Dealer::DRAW_RANDOM);
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build(), drawMode: DrawMode::Random);
     $hand1 = new Hand(capacity: 5);
     $hand2 = new Hand(capacity: 5);
     $dealer->addHands($hand1, $hand2);

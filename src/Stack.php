@@ -73,12 +73,20 @@ class Stack implements IteratorAggregate, \Countable
 
     /**
      * Stacks are the same if they have the same number of cards and the same cards in the same order.
-     * 
-     * @param self $other
      */
     public function isSame(self $other): bool
     {
-        return (string)$this === (string)$other;
+        if ($this->count() !== $other->count()) {
+            return false;
+        }
+
+        foreach ($this->cards as $i => $card) {
+            if (!$card->equals($other->cards[$i])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function enoughCards(int $num): bool
@@ -117,12 +125,21 @@ class Stack implements IteratorAggregate, \Countable
             return true;
         }
 
-        $stackFrequency = array_count_values(array_map(fn(PlayableCard $card) => (string)$card, $this->cards));
-        $cardsFrequency = array_count_values(array_map(fn(PlayableCard $card) => (string)$card, $cards));
-
-        foreach ($cardsFrequency as $card => $frequency) {
-            if (!isset($stackFrequency[$card]) || $stackFrequency[$card] < $frequency) {
-                return false; // card not found or not enough of it in the stack
+        $matched = [];
+        foreach ($cards as $card) {
+            $found = false;
+            foreach ($this->cards as $i => $existing) {
+                if (isset($matched[$i])) {
+                    continue;
+                }
+                if ($existing->equals($card)) {
+                    $matched[$i] = true;
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                return false;
             }
         }
 
@@ -154,7 +171,7 @@ class Stack implements IteratorAggregate, \Countable
                 if (isset($indicesToRemove[$index])) {
                     continue;
                 }
-                if ((string) $existing === (string) $card) {
+                if ($existing->equals($card)) {
                     $indicesToRemove[$index] = true;
                     break;
                 }

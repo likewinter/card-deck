@@ -18,5 +18,11 @@ interface PlayableCard
      */
     public function underlyingCard(): Card;
 
+    /**
+     * Identity check: is this the same playable card as $other?
+     * Used by Stack for removal and membership checks.
+     */
+    public function equals(PlayableCard $other): bool;
+
     public function __toString(): string;
 }

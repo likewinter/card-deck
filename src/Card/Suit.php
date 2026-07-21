@@ -33,14 +33,6 @@ enum Suit: string
         ));
     }
 
-    /**
-     * @return list<Suit>
-     */
-    public static function standardSuits(): array
-    {
-        return self::casesWithoutJoker();
-    }
-
     public function getColor(): string
     {
         return match ($this) {
@@ -59,13 +51,5 @@ enum Suit: string
             self::Spades => '♠',
             self::Joker => '🃏',
         };
-    }
-
-    /**
-     * Returns whether the suit is a standard playing card suit
-     */
-    public function isStandard(): bool
-    {
-        return $this !== self::Joker;
     }
 }

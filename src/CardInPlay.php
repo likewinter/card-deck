@@ -76,4 +76,11 @@ final readonly class CardInPlay implements PlayableCard
     {
         return $this->card;
     }
+
+    public function equals(PlayableCard $other): bool
+    {
+        return $other instanceof self
+            && $this->card->equals($other->card)
+            && $this->face === $other->face;
+    }
 }

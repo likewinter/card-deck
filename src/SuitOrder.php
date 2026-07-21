@@ -34,11 +34,6 @@ final readonly class SuitOrder
         return new self(Trump::NoTrump);
     }
 
-    public static function none(): self
-    {
-        return new self(Trump::None);
-    }
-
     public static function suit(Suit $suit): self
     {
         return new self(Trump::Suit, $suit);

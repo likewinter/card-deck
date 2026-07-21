@@ -47,19 +47,11 @@ class Card implements PlayableCard
         return "{$this->rank->getSymbol()}{$this->suit->getSymbol()}";
     }
 
-    public function equals(self $other): bool
+    public function equals(PlayableCard $other): bool
     {
-        return $this->suit === $other->suit && $this->rank === $other->rank;
-    }
-
-    public function isSameSuitAs(self $other): bool
-    {
-        return $this->suit === $other->suit;
-    }
-
-    public function isSameRankAs(self $other): bool
-    {
-        return $this->rank === $other->rank;
+        return $other instanceof self
+            && $this->suit === $other->suit
+            && $this->rank === $other->rank;
     }
 
     public function isJoker(): bool

@@ -226,4 +226,34 @@ describe('PlayableCard support', function () {
             ->and($faceDown->underlyingCard())->toBe($card)
             ->and($wild->underlyingCard())->toBe($card);
     });
+
+    it('distinguishes face-down cards wrapping different cards', function () {
+        $downA = CardInPlay::down(new Card(suit: Suit::Spades, rank: Rank::Ace));
+        $downK = CardInPlay::down(new Card(suit: Suit::Hearts, rank: Rank::King));
+
+        $stack = new Stack(cards: [$downA, $downK]);
+        $stack->removeCards($downA);
+
+        expect($stack->count())->toBe(1)
+            ->and($stack->hasCards($downK))->toBeTrue()
+            ->and($stack->hasCards($downA))->toBeFalse();
+    });
+
+    it('distinguishes face-up and face-down of the same card', function () {
+        $card = new Card(suit: Suit::Spades, rank: Rank::Ace);
+        $up = CardInPlay::up($card);
+        $down = CardInPlay::down($card);
+
+        expect($up->equals($down))->toBeFalse()
+            ->and($down->equals($up))->toBeFalse();
+    });
+
+    it('distinguishes a Wildcard from the card it represents', function () {
+        $joker = new Card(suit: Suit::Joker, rank: Rank::Joker);
+        $wild = (new Wildcard($joker))->assign(new Card(suit: Suit::Spades, rank: Rank::Ace));
+        $real = new Card(suit: Suit::Spades, rank: Rank::Ace);
+
+        expect($wild->equals($real))->toBeFalse()
+            ->and($real->equals($wild))->toBeFalse();
+    });
 });
