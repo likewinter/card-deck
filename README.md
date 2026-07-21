@@ -137,6 +137,10 @@ composer test           # Pest test suite
 composer phpstan        # PHPStan level 8 static analysis
 ```
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for notable changes between releases.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
