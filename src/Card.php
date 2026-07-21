@@ -70,8 +70,8 @@ class Card
         return $this->rank === Rank::Ace;
     }
 
-    public function isFaceCard(): bool
+    public function isFace(): bool
     {
-        return $this->rank->isFaceCard();
+        return $this->rank->isFace();
     }
 }

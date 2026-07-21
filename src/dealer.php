@@ -101,7 +101,7 @@ class Dealer
     private function drawRandomToHand(Hand $hand, int $num): void
     {
         for ($i = 0; $i < $num; $i++) {
-            $this->deck->moveCardTo($hand, $this->deck->peekRandom());
+            $this->deck->moveCardsTo($hand, ...$this->deck->peekRandom());
         }
     }
 
@@ -155,7 +155,7 @@ class Dealer
     {
         for ($i = 0; $i < $num; $i++) {
             foreach ($this->hands as $hand) {
-                $this->deck->moveCardTo($hand, $this->deck->peekRandom());
+                $this->deck->moveCardsTo($hand, ...$this->deck->peekRandom());
             }
         }
     }

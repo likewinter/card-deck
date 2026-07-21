@@ -74,7 +74,7 @@ enum Rank: int
     /**
      * Determines if the rank is a face card (10 or higher)
      */
-    public function isFaceCard(): bool
+    public function isFace(): bool
     {
         return $this->value >= self::Ten->value;
     }

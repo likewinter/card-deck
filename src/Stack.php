@@ -34,6 +34,17 @@ class Stack implements IteratorAggregate, \Countable
         }
     }
 
+    public static function fromString(string $string, ?int $stackLimit = null): self
+    {
+        if (empty($string)) {
+            return new self();
+        }
+
+        $cards = explode(",", $string);
+
+        return new self(array_map(fn(string $card) => Card::fromString($card), $cards), $stackLimit);
+    }
+
     public function getIterator(): Iterator
     {
         return new ArrayIterator($this->cards);
@@ -60,6 +71,16 @@ class Stack implements IteratorAggregate, \Countable
         return empty($this->cards);
     }
 
+    /**
+     * Stacks are the same if they have the same number of cards and the same cards in the same order.
+     * 
+     * @param self $other
+     */
+    public function isSame(self $other): bool
+    {
+        return (string)$this === (string)$other;
+    }
+
     public function enoughCards(int $num): bool
     {
         if ($num < 1) {
@@ -71,9 +92,45 @@ class Stack implements IteratorAggregate, \Countable
         return $this->count() >= $num;
     }
 
+    /**
+     * Check if any of given cards are in the stack, so if there are two duplicates, it will return true beside
+     * the fact that the stack has only one card.
+     * 
+     * @param Card ...$cards
+     */
     public function hasCards(Card ...$cards): bool
     {
-        return count(array_intersect($cards, $this->cards)) === count($cards);
+        foreach ($cards as $card) {
+            if (!in_array($card, $this->cards)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the stack has exactly the given cards, so if there are two of the same card and the stack contains only one,
+     * it will return false.
+     * 
+     * @param Card ...$cards
+     */
+    public function hasExactCards(Card ...$cards): bool
+    {
+        if (empty($cards)) {
+            return true;
+        }
+
+        $stackFrequency = array_count_values(array_map(fn(Card $card) => (string)$card, $this->cards));
+        $cardsFrequency = array_count_values(array_map(fn(Card $card) => (string)$card, $cards));
+
+        foreach ($cardsFrequency as $card => $frequency) {
+            if (!isset($stackFrequency[$card]) || $stackFrequency[$card] < $frequency) {
+                return false; // card not found or not enough of it in the stack
+            }
+        }
+
+        return true;
     }
 
     public function addCards(Card ...$cards): void
@@ -91,14 +148,14 @@ class Stack implements IteratorAggregate, \Countable
 
     public function removeCards(Card ...$cards): void
     {
-        if (!$this->hasCards(...$cards)) {
+        if (!$this->hasExactCards(...$cards)) {
             throw new \InvalidArgumentException("Cards not found in stack");
         }
 
-        $this->cards = array_filter(
-            $this->cards,
-            fn($c) => !in_array($c, $cards)
-        );
+        foreach ($cards as $card) {
+            unset($this->cards[array_search($card, $this->cards, true)]);
+        }
+        $this->cards = array_values($this->cards);
     }
 
     public function peek(int $num = 1, bool $fromTop = true): self
@@ -110,33 +167,47 @@ class Stack implements IteratorAggregate, \Countable
         return new self(array_slice($this->cards, $fromTop ? 0 : -$num, $num));
     }
 
-    public function peekRandom(): Card
+    public function peekRandom(int $num = 1): self
     {
-        if ($this->isEmpty()) {
-            throw new \InvalidArgumentException("Stack is empty");
+        if (!$this->enoughCards($num)) {
+            throw new \InvalidArgumentException("Not enough cards in stack");
         }
 
-        return array_slice($this->cards, array_rand($this->cards), 1)[0];
+        $keys = array_rand($this->cards, $num);
+        if (!is_array($keys)) {
+            $keys = [$keys];
+        }
+
+        return new self(array_map(fn($key) => $this->cards[$key], $keys));
     }
 
-    public function moveCardTo(Stack $target, Card $card): void
+    public function takeCards(int $num = 1, bool $fromTop = true): self
     {
-        if (!$this->hasCards($card)) {
-            throw new \InvalidArgumentException("Card not found in stack");
+        if (!$this->enoughCards($num)) {
+            throw new \InvalidArgumentException("Not enough cards in stack");
         }
 
-        $target->addCards($card);
-        $this->removeCards($card);
+        $cards = array_splice($this->cards, $fromTop ? 0 : -$num, $num);
+
+        return new self($cards);
+    }
+
+    public function takeTop(int $num = 1): self
+    {
+        return $this->takeCards($num, true);
+    }
+
+    public function takeBottom(int $num = 1): self
+    {
+        return $this->takeCards($num, false);
     }
 
     public function moveTo(
-        Stack $target,
+        self $target,
         int $num = 1,
         bool $fromTop = true
     ): void {
-        $cards = $this->peek($num, $fromTop);
-        $target->addCards(...$cards);
-        $this->removeCards(...$cards);
+        $target->addCards(...$this->takeCards($num, $fromTop));
     }
 
     public function moveAllTo(Stack $target): void
@@ -145,8 +216,17 @@ class Stack implements IteratorAggregate, \Countable
             return;
         }
 
-        $target->addCards(...$this->cards);
-        $this->clear();
+        $this->moveTo($target, $this->count());
+    }
+
+    public function moveCardsTo(Stack $target, Card ...$cards): void
+    {
+        if (!$this->hasExactCards(...$cards)) {
+            throw new \InvalidArgumentException("Cards not found in stack");
+        }
+
+        $target->addCards(...$cards);
+        $this->removeCards(...$cards);
     }
 
     public function sort(callable $callback): void

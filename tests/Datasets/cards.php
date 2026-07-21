@@ -74,9 +74,10 @@ dataset('cards to find within', function () {
     $cardsToFind = array_slice($cards, 0, 3);
 
     return [
-        '1 card, 1 to find' => [[$cards[0]], [$cards[0]]],
-        '5 cards, 3 to find' => [$cards, $cardsToFind],
-        '5 cards, 5 to find' => [$cards, $cards],
+        '1 card, 1 to find' => [[$cards[0]], [$cards[0]], true],
+        '5 cards, 3 to find' => [$cards, $cardsToFind, true],
+        '5 cards, 5 to find' => [$cards, $cards, true],
+        '5 cards, 3 to find (with duplicates)' => [$cards, array_merge($cardsToFind, $cardsToFind), false],
     ];
 });
 
@@ -95,5 +96,46 @@ dataset('cards not in stack', function () {
 
     return [
         '5 cards, 3 not in stack' => [$cards, $cardsNotInStack],
+    ];
+});
+
+dataset('cards to add to the stack', function () {
+    return [
+        '0 cards, 0 to add' => [[], []],
+        '0 cards, 1 to add' => [[], randomCards(1)],
+        '1 card, 0 to add' => [randomCards(1), []],
+        '5 cards, 3 to add' => [randomCards(5), randomCards(3)],
+    ];
+});
+
+dataset('cards to remove from the stack', function () {
+    $cards = randomCards(5);
+    $cardsToRemove = array_slice($cards, 0, 3);
+
+    return [
+        '5 cards, 0 to remove' => [$cards, []],
+        '5 cards, 3 to remove' => [$cards, $cardsToRemove],
+        '5 cards, 5 to remove' => [$cards, $cards],
+    ];
+});
+
+dataset('cards to take from the top', function () {
+    return [
+        '5 cards, 3 to take' => [randomCards(5), 3],
+        '5 cards, 5 to take' => [randomCards(5), 5],
+    ];
+});
+
+dataset('not enought cards to take', function () {
+    return [
+        '5 cards, 6 to take' => [randomCards(5), 6],
+        '0 cards, 1 to take' => [randomCards(0), 1],
+    ];
+});
+
+dataset('cards to move', function () {
+    return [
+        '10 cards, 3 to move' => [randomCards(10), 3],
+        '10 cards, 10 to move' => [randomCards(10), 10],
     ];
 });
