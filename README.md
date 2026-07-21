@@ -67,7 +67,7 @@ echo "Alice: {$alice}\n";  // Alice: A♣,K♦,Q♥,J♠,10♣
 
 - [Getting started](docs/getting-started.md) — install, first deal, the mental model
 - [Cards, ranks, and suits](docs/cards.md) — `Card`, `Rank`, `Suit`, string formats
-- [Stacks, decks, and hands](docs/stacks.md) — `Stack` API, `Deck`, `Hand`, capacity
+- [Stacks, decks, and hands](docs/stacks.md) — `Stack` API, `Hand`, capacity, `DeckBuilder` output
 - [Building decks](docs/deck-builder.md) — `DeckBuilder`: standard, short, multi, custom
 - [The dealer](docs/dealer.md) — dealing modes, discarding, resetting
 - [Rank ordering](docs/rank-order.md) — why ranks have no intrinsic value, `RankOrder` presets
@@ -117,8 +117,8 @@ The framework supports most popular card games. ✅ = directly possible,
 The [Poker implementation](src/Games/Poker/) is the proof that the
 primitives fit a real game. It includes:
 
-- `PokerHand` — 5-card hand with rank sets, flush/straight detection,
-  hand classification, and full tiebreaker comparison via `compare()`
+- `PokerHand` — immutable 5-card value object with classification,
+  flush/straight detection, and full tiebreaker comparison via `compare()`
 - `HandRank` — 10 ranks from High Card to Royal Flush (pure enum)
 - `Poker` — game orchestration: deal, hands, winners, multi-round play
 
@@ -131,7 +131,7 @@ php demo/poker.php 5 1          # 5 players, 1 round
 
 ## Testing
 
-The framework has 302 passing tests covering every primitive and the
+The framework has 325 passing tests covering every primitive and the
 reference Poker implementation:
 
 ```bash

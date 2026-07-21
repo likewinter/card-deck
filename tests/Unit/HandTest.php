@@ -12,9 +12,9 @@ it('can be created with a capacity', function () {
         ->and($hand->count())->toBe(0);
 });
 
-it('defaults to capacity 5', function () {
+it('defaults to unbounded capacity', function () {
     $hand = new Hand();
-    expect($hand->capacity)->toBe(5);
+    expect($hand->capacity)->toBeNull();
 });
 
 it('sorts by rank using the given RankOrder', function () {

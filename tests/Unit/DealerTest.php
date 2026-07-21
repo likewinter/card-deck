@@ -3,7 +3,6 @@
 use Likewinter\CardDeck\Dealer;
 use Likewinter\CardDeck\DeckBuilder;
 use Likewinter\CardDeck\DrawMode;
-use Likewinter\CardDeck\Exceptions\DealerException;
 use Likewinter\CardDeck\Hand;
 use Likewinter\CardDeck\Stack;
 
@@ -18,7 +17,7 @@ it('can be created with a deck', function () {
 it('rejects non-Hand entries in constructor hands array', function () {
     // @phpstan-ignore-next-line
     new Dealer(deck: DeckBuilder::standard52()->build(), hands: ['not a hand']);
-})->throws(DealerException::class);
+})->throws(\InvalidArgumentException::class);
 
 it('can add and list hands', function () {
     $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
@@ -61,7 +60,7 @@ it('rejects removing a hand that was not added', function () {
     $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $dealer->addHands(new Hand(capacity: 5));
     $dealer->removeHands(new Hand(capacity: 5));
-})->throws(DealerException::class);
+})->throws(\InvalidArgumentException::class);
 
 it('draws sequentially by default', function () {
     $dealer = new Dealer(deck: DeckBuilder::standard52()->build(), drawMode: DrawMode::Sequential);
@@ -112,19 +111,19 @@ it('drawToHand draws to a specific hand', function () {
 it('drawToHand rejects a hand not managed by the dealer', function () {
     $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $dealer->drawToHand(new Hand(capacity: 5), 1);
-})->throws(DealerException::class);
+})->throws(\InvalidArgumentException::class);
 
 it('drawAll throws when there are no hands', function () {
     $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $dealer->drawAll(1);
-})->throws(DealerException::class);
+})->throws(\LogicException::class);
 
 it('drawAll throws when the deck does not have enough cards', function () {
     $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $dealer->addHands(new Hand(capacity: 5), new Hand(capacity: 5));
     // 52 cards, 2 hands, request 27 each = 54 needed > 52 available
     $dealer->drawAll(27);
-})->throws(DealerException::class);
+})->throws(\LogicException::class);
 
 it('discards the whole hand when no cards are specified', function () {
     $dealer = new Dealer(deck: DeckBuilder::standard52()->build());

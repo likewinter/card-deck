@@ -2,30 +2,56 @@
 
 namespace Likewinter\CardDeck\Games\Poker;
 
+use ArrayIterator;
+use Iterator;
+use IteratorAggregate;
 use Likewinter\CardDeck\Card;
 use Likewinter\CardDeck\Hand;
 use Likewinter\CardDeck\RankOrder;
 use Likewinter\CardDeck\Card\Rank;
 
-class PokerHand extends Hand
+/**
+ * An immutable, classified 5-card poker hand.
+ *
+ * PokerHand is a value object: it holds exactly 5 Cards, computes the
+ * hand rank eagerly, and exposes no mutation. It does NOT extend Hand
+ * or Stack — it is a classified snapshot, not a mutable collection.
+ *
+ * @implements IteratorAggregate<int, Card>
+ */
+final readonly class PokerHand implements IteratorAggregate, \Countable, \Stringable
 {
     public const HAND_SIZE = 5;
-    public readonly HandRank $handRank;
+
+    public HandRank $handRank;
     /** @var array<string, list<Card>> */
-    public readonly array $rankSets;
-    public readonly bool $isSameSuit;
-    public readonly bool $isSequentialRank;
+    public array $rankSets;
+    public bool $isSameSuit;
+    public bool $isSequentialRank;
+    public RankOrder $rankOrder;
 
-    public readonly RankOrder $rankOrder;
+    /** @var list<Card> */
+    private array $cards;
 
+    /**
+     * @param list<Card> $cards Exactly 5 cards.
+     */
     public function __construct(
-        /** @var list<Card> */
-        public array $cards,
+        array $cards,
         ?RankOrder $rankOrder = null,
     ) {
-        parent::__construct($cards, self::HAND_SIZE);
+        if (count($cards) !== self::HAND_SIZE) {
+            throw new \InvalidArgumentException(
+                sprintf('PokerHand requires exactly %d cards, got %d', self::HAND_SIZE, count($cards))
+            );
+        }
+
         $this->rankOrder = $rankOrder ?? RankOrder::poker();
-        $this->sortByRank($this->rankOrder);
+
+        // Sort a copy by rank for classification
+        $sorted = $cards;
+        usort($sorted, fn(Card $a, Card $b) => $this->rankOrder->compare($a->rank, $b->rank));
+        $this->cards = $sorted;
 
         $this->rankSets = $this->buildRankSets();
         $this->isSameSuit = $this->detectSameSuit();
@@ -33,9 +59,18 @@ class PokerHand extends Hand
         $this->handRank = $this->classify();
     }
 
+    /**
+     * Build a PokerHand from a Hand's cards, resolving through
+     * underlyingCard() so CardInPlay/Wildcard are unwrapped.
+     */
     public static function fromHand(Hand $hand): self
     {
-        return new self(array_values([...$hand]));
+        $cards = array_map(
+            fn($card) => $card->underlyingCard(),
+            [...$hand],
+        );
+
+        return new self(array_values($cards));
     }
 
     /**
@@ -72,7 +107,6 @@ class PokerHand extends Hand
     {
         $values = $this->getSortedUniqueRankValues();
 
-        // Wheel: Ace counts as 1, so 5 is the high card
         if ($values === [2, 3, 4, 5, 14]) {
             return 5;
         }
@@ -81,8 +115,7 @@ class PokerHand extends Hand
     }
 
     /**
-     * Returns the ordered list of rank values used to break ties between
-     * hands of the same rank category. Higher-priority values come first.
+     * Returns the ordered list of rank values used to break ties.
      *
      * @return list<int>
      */
@@ -96,9 +129,24 @@ class PokerHand extends Hand
             HandRank::THREE_OF_A_KIND => $this->groupedSignature(3),
             HandRank::TWO_PAIR => $this->groupedSignature(2, 2),
             HandRank::ONE_PAIR => $this->groupedSignature(2),
-            // FLUSH and HIGH_CARD: all 5 ranks, descending
             HandRank::FLUSH, HandRank::HIGH_CARD => $this->descendingRankValues(),
         };
+    }
+
+    /** @return Iterator<int, Card> */
+    public function getIterator(): Iterator
+    {
+        return new ArrayIterator($this->cards);
+    }
+
+    public function count(): int
+    {
+        return count($this->cards);
+    }
+
+    public function __toString(): string
+    {
+        return implode(',', $this->cards);
     }
 
     // ── Classification ──────────────────────────────────────────────────
@@ -189,7 +237,7 @@ class PokerHand extends Hand
 
     private function detectSameSuit(): bool
     {
-        return count(array_unique(array_map(fn (Card $card) => $card->suit->getSymbol(), $this->cards))) === 1;
+        return count(array_unique(array_map(fn(Card $card) => $card->suit->getSymbol(), $this->cards))) === 1;
     }
 
     private function detectSequentialRank(): bool
@@ -200,12 +248,10 @@ class PokerHand extends Hand
             return false;
         }
 
-        // Wheel: A-2-3-4-5 (Ace value 14 acts as 1)
         if ($values === [2, 3, 4, 5, 14]) {
             return true;
         }
 
-        // Normal straight: 5 consecutive values
         for ($i = 1; $i < 5; $i++) {
             if ($values[$i] !== $values[$i - 1] + 1) {
                 return false;
@@ -216,8 +262,6 @@ class PokerHand extends Hand
     }
 
     /**
-     * Sorted list of rank-group sizes. E.g. [1,1,1,2] for one pair.
-     *
      * @return list<int>
      */
     private function countRankGroups(): array
@@ -231,46 +275,32 @@ class PokerHand extends Hand
     // ── Tiebreaker helpers ──────────────────────────────────────────────
 
     /**
-     * Sorted (ascending) unique rank values.
-     *
      * @return list<int>
      */
     private function getSortedUniqueRankValues(): array
     {
-        $values = array_map(fn (Card $card) => $this->rankOrder->value($card->rank), $this->cards);
+        $values = array_map(fn(Card $card) => $this->rankOrder->value($card->rank), $this->cards);
         sort($values);
 
         return array_values(array_unique($values));
     }
 
     /**
-     * All 5 rank values in descending order (highest first). Used for
-     * FLUSH and HIGH_CARD comparisons where every card matters.
-     *
      * @return list<int>
      */
     private function descendingRankValues(): array
     {
-        $values = array_map(fn (Card $card) => $this->rankOrder->value($card->rank), $this->cards);
+        $values = array_map(fn(Card $card) => $this->rankOrder->value($card->rank), $this->cards);
         rsort($values);
 
         return $values;
     }
 
     /**
-     * Build a signature where the groups (pairs, trips, quads) come first
-     * in priority order, followed by kickers in descending order.
-     *
-     * Example for ONE_PAIR of Ks with A-Q-J kickers: [13, 14, 12, 11]
-     * Example for TWO_PAIR (As and Ks) with Q kicker: [14, 13, 12]
-     * Example for FULL_HOUSE (As over Ks): [14, 13]
-     *
-     * @param int ...$groupSizes Priority order of group sizes to extract.
      * @return list<int>
      */
     private function groupedSignature(int ...$groupSizes): array
     {
-        // Build [rankValue => count] map
         $counts = [];
         foreach ($this->cards as $card) {
             $value = $this->rankOrder->value($card->rank);
@@ -280,10 +310,8 @@ class PokerHand extends Hand
         $signature = [];
         $remaining = $counts;
 
-        // Extract each requested group size, picking the highest-ranked
-        // group of that size each time.
         foreach ($groupSizes as $size) {
-            $candidates = array_filter($remaining, fn (int $c) => $c === $size);
+            $candidates = array_filter($remaining, fn(int $c) => $c === $size);
             if (empty($candidates)) {
                 continue;
             }
@@ -293,7 +321,6 @@ class PokerHand extends Hand
             unset($remaining[$keys[0]]);
         }
 
-        // Append remaining kickers in descending order
         $kickers = array_keys($remaining);
         rsort($kickers);
         foreach ($kickers as $k) {

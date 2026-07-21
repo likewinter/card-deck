@@ -7,7 +7,6 @@ use Likewinter\CardDeck\Games\Poker\PokerHand;
 
 readonly class Poker
 {
-    private const DEFAULT_HAND_SIZE = 5;
     private const DEFAULT_NUM_HANDS = 3;
     private const MIN_HANDS = 2;
     private const MAX_HANDS = 5;
@@ -15,7 +14,6 @@ readonly class Poker
     private readonly Dealer $dealer;
 
     public function __construct(
-        private readonly int $handSize = self::DEFAULT_HAND_SIZE,
         private readonly int $numHands = self::DEFAULT_NUM_HANDS,
         ?Dealer $dealer = null,
     ) {
@@ -27,7 +25,7 @@ readonly class Poker
         $this->validateConfig();
 
         for ($i = 0; $i < $this->numHands; $i++) {
-            $this->dealer->addHands(new Hand(capacity: $this->handSize));
+            $this->dealer->addHands(new Hand(capacity: PokerHand::HAND_SIZE));
         }
     }
 
@@ -38,32 +36,30 @@ readonly class Poker
                 sprintf('Number of hands must be between %d and %d', self::MIN_HANDS, self::MAX_HANDS)
             );
         }
-
-        if ($this->handSize !== PokerHand::HAND_SIZE) {
-            throw new \InvalidArgumentException(
-                sprintf('Hand size must be %d', PokerHand::HAND_SIZE)
-            );
-        }
     }
 
     public function deal(): void
     {
-        $this->dealer->drawAll($this->handSize);
+        $this->dealer->drawAll(PokerHand::HAND_SIZE);
     }
 
     /**
-     * Returns the current hands as PokerHand objects, in player order.
-     * Hands that have not been dealt yet are returned as empty PokerHands
-     * (their handRank is not meaningful until cards are dealt).
+     * Returns the current dealt hands as PokerHand objects, in player
+     * order. Only hands with a full 5 cards are included — before
+     * dealing (or after reset), this returns an empty list.
      *
      * @return list<PokerHand>
      */
     public function hands(): array
     {
-        return array_map(
-            fn (Hand $hand) => PokerHand::fromHand($hand),
-            $this->dealer->getHands()
-        );
+        $pokerHands = [];
+        foreach ($this->dealer->getHands() as $hand) {
+            if ($hand->count() === PokerHand::HAND_SIZE) {
+                $pokerHands[] = PokerHand::fromHand($hand);
+            }
+        }
+
+        return $pokerHands;
     }
 
     /**
@@ -76,48 +72,16 @@ readonly class Poker
         $this->dealer->getDeck()->shuffle();
     }
 
-    public function gameState(): string
-    {
-        $state = <<<STATE
-        Number of hands: {$this->numHands}
-        Hand size: {$this->handSize}
-        Deck size: {$this->dealer->getDeck()->capacity}
-        Deck: [{$this->dealer->getDeck()}]
-        Pile: [{$this->dealer->getPile()}]
-
-        STATE;
-
-        return $state;
-    }
-
-    public function handsState(): string
-    {
-        $state = 'Hands:' . PHP_EOL;
-
-        foreach ($this->dealer->getHands() as $hand) {
-            $pokerHand = PokerHand::fromHand($hand);
-            $state .= '  ' . $pokerHand . ' -> ' . $pokerHand->handRank->getName() . PHP_EOL;
-        }
-
-        return $state;
-    }
-
     /**
      * Returns the winning PokerHand(s) from the currently dealt hands.
-     * Empty hands (no cards dealt yet) are skipped. If multiple dealt
-     * hands tie for the best rank, all winners are returned.
+     * If multiple dealt hands tie for the best rank, all winners are
+     * returned.
      *
      * @return list<PokerHand>
      */
     public function winners(): array
     {
-        $pokerHands = [];
-        foreach ($this->dealer->getHands() as $hand) {
-            if ($hand->count() !== PokerHand::HAND_SIZE) {
-                continue;
-            }
-            $pokerHands[] = PokerHand::fromHand($hand);
-        }
+        $pokerHands = $this->hands();
 
         if (empty($pokerHands)) {
             return [];
@@ -137,25 +101,5 @@ readonly class Poker
         }
 
         return $winners;
-    }
-
-    public function winnersState(): string
-    {
-        $winners = $this->winners();
-
-        if (empty($winners)) {
-            return 'No hands dealt.' . PHP_EOL;
-        }
-
-        if (count($winners) === 1) {
-            return 'Winner: ' . $winners[0] . ' (' . $winners[0]->handRank->getName() . ')' . PHP_EOL;
-        }
-
-        $state = 'Tie between:' . PHP_EOL;
-        foreach ($winners as $winner) {
-            $state .= '  ' . $winner . ' (' . $winner->handRank->getName() . ')' . PHP_EOL;
-        }
-
-        return $state;
     }
 }

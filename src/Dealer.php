@@ -2,8 +2,6 @@
 
 namespace Likewinter\CardDeck;
 
-use Likewinter\CardDeck\Exceptions\DealerException;
-
 class Dealer
 {
     private Stack $pile;
@@ -17,7 +15,7 @@ class Dealer
     ) {
         foreach ($hands as $hand) {
             if (!$hand instanceof Hand) {
-                throw new DealerException('Hands must be instances of Hand');
+                throw new \InvalidArgumentException('Hands must be instances of Hand');
             }
         }
         $this->pile = new Stack();
@@ -62,11 +60,11 @@ class Dealer
     public function drawAll(int $num = 1): void
     {
         if (count($this->hands) === 0) {
-            throw new DealerException('No hands provided');
+            throw new \LogicException('No hands provided');
         }
 
         if ($num * count($this->hands) > $this->deck->count()) {
-            throw new DealerException('Not enough cards in deck');
+            throw new \LogicException('Not enough cards in deck');
         }
 
         match ($this->drawMode) {
@@ -81,7 +79,7 @@ class Dealer
         $this->validateHand($hand);
 
         if ($num > $this->deck->count()) {
-            throw new DealerException('Not enough cards in deck');
+            throw new \LogicException('Not enough cards in deck');
         }
 
         match ($this->drawMode) {
@@ -120,7 +118,7 @@ class Dealer
     private function validateHand(Hand $hand): void
     {
         if (!in_array($hand, $this->hands, true)) {
-            throw new DealerException('Dealer does not have this hand');
+            throw new \InvalidArgumentException('Dealer does not have this hand');
         }
     }
 

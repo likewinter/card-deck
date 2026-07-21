@@ -9,7 +9,7 @@ class Hand extends Stack
     public function __construct(
         /** @var list<Card> */
         protected array $cards = [],
-        int $capacity = 5,
+        ?int $capacity = null,
     ) {
         parent::__construct($cards, $capacity);
     }

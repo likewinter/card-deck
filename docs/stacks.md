@@ -68,9 +68,10 @@ original. `fromTop = false` peeks from the bottom.
 | `removeCards(Card ...$c)` | Removes given cards (throws if not present) |
 | `clear()` | Empties the stack |
 
-`removeCards` matches by string equivalence (suit + rank), not by
-instance identity, so you can remove a card using a different `Card`
-object with the same suit and rank.
+`removeCards` matches via `PlayableCard::equals()`, so you can remove a
+card using a different object with the same identity. For `Card`, that
+means same suit and rank. For `CardInPlay`, same card and same face.
+For `Wildcard`, same wild card.
 
 ### Taking and moving
 
@@ -127,12 +128,12 @@ use Likewinter\CardDeck\Hand;
 $hand = new Hand(capacity: 5);
 $hand = new Hand($cards, 13);                // bridge hand
 
-$hand->sortByRank();                         // sorts by RankOrder::poker()
+$hand->sortByRank(RankOrder::poker());       // sorts by poker ordering
 $hand->sortByRank(RankOrder::blackjack());   // sorts by a custom order
 
 $hand->getRanks();                           // list<Rank>
 $hand->getSuits();                           // list<Suit>
 ```
 
-`sortByRank()` accepts an optional `RankOrder` (defaults to `poker()`).
+`sortByRank()` requires a `RankOrder` argument.
 See [Rank ordering](rank-order.md).

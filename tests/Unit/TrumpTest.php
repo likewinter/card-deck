@@ -15,7 +15,7 @@ it('reports hasTrump correctly', function (Trump $trump, bool $hasTrump) {
     'NoTrump' => [Trump::NoTrump, false],
 ]);
 
-it('only Suit is a suit trump', function () {
-    expect(Trump::Suit->isSuit())->toBeTrue()
-        ->and(Trump::NoTrump->isSuit())->toBeFalse();
+it('only Suit has trump', function () {
+    expect(Trump::Suit->hasTrump())->toBeTrue()
+        ->and(Trump::NoTrump->hasTrump())->toBeFalse();
 });

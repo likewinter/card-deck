@@ -13,11 +13,6 @@ enum Trump
     case NoTrump;
     case Suit;
 
-    public function isSuit(): bool
-    {
-        return $this === self::Suit;
-    }
-
     public function hasTrump(): bool
     {
         return $this === self::Suit;

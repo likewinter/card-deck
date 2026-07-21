@@ -92,7 +92,7 @@ echo "{$DIM}  " . str_repeat('─', 46) . "{$RESET}\n";
 // ─────────────────────────────────────────────────────────────────────────────
 
 $scores = array_fill(0, $numHands, 0);
-$poker = new Poker(handSize: 5, numHands: $numHands);
+$poker = new Poker(numHands: $numHands);
 
 for ($round = 1; $round <= $numRounds; $round++) {
     echo "\n{$DIM}  ── Round {$round} of {$numRounds} " . str_repeat('─', 30) . "{$RESET}\n\n";
