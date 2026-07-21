@@ -12,3 +12,4 @@ $poker->deal();
 
 echo $poker->gameState();
 echo $poker->handsState();
+echo $poker->winnersState();

@@ -36,14 +36,24 @@ it('detects every straight sequence', function (string $cards) {
     'broadway 10-J-Q-K-A' => ['10♣,J♦,Q♥,K♠,A♣'],
 ]);
 
-it('detects wheel and broadway straight flushes', function (string $cards) {
+it('detects wheel and mid straight flushes', function (string $cards) {
     $hand = pokerHandFromString($cards);
     expect($hand->handRank)->toBe(HandRank::STRAIGHT_FLUSH)
         ->and($hand->isSequentialRank)->toBeTrue()
         ->and($hand->isSameSuit)->toBeTrue();
 })->with([
     'wheel straight flush' => ['A♣,2♣,3♣,4♣,5♣'],
-    'broadway straight flush' => ['10♠,J♠,Q♠,K♠,A♠'],
+    'mid straight flush' => ['5♠,6♠,7♠,8♠,9♠'],
+]);
+
+it('detects royal flush as distinct rank', function (string $cards) {
+    $hand = pokerHandFromString($cards);
+    expect($hand->handRank)->toBe(HandRank::ROYAL_FLUSH)
+        ->and($hand->isSequentialRank)->toBeTrue()
+        ->and($hand->isSameSuit)->toBeTrue();
+})->with([
+    'royal flush spades' => ['10♠,J♠,Q♠,K♠,A♠'],
+    'royal flush hearts' => ['A♥,K♥,Q♥,J♥,10♥'],
 ]);
 
 it('does not report a straight for non-sequential ranks', function () {

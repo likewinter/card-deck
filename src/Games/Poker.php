@@ -3,6 +3,7 @@
 namespace Likewinter\CardDeck\Games;
 
 use Likewinter\CardDeck\{Dealer, Hand};
+use Likewinter\CardDeck\Games\Poker\HandRank;
 use Likewinter\CardDeck\Games\Poker\PokerDeck;
 use Likewinter\CardDeck\Games\Poker\PokerHand;
 
@@ -66,6 +67,63 @@ readonly class Poker
         foreach ($this->dealer->getHands() as $hand) {
             $pokerHand = PokerHand::fromHand($hand);
             $state .= '  ' . $pokerHand . ' -> ' . $pokerHand->handRank->getName() . PHP_EOL;
+        }
+
+        return $state;
+    }
+
+    /**
+     * Returns the winning PokerHand(s) from the currently dealt hands.
+     * Empty hands (no cards dealt yet) are skipped. If multiple dealt
+     * hands tie for the best rank, all winners are returned.
+     *
+     * @return list<PokerHand>
+     */
+    public function winners(): array
+    {
+        $pokerHands = [];
+        foreach ($this->dealer->getHands() as $hand) {
+            if ($hand->count() !== PokerHand::HAND_SIZE) {
+                continue;
+            }
+            $pokerHands[] = PokerHand::fromHand($hand);
+        }
+
+        if (empty($pokerHands)) {
+            return [];
+        }
+
+        $best = $pokerHands[0];
+        $winners = [$best];
+
+        for ($i = 1, $n = count($pokerHands); $i < $n; $i++) {
+            $cmp = HandRank::compare($pokerHands[$i], $best);
+            if ($cmp > 0) {
+                $best = $pokerHands[$i];
+                $winners = [$best];
+            } elseif ($cmp === 0) {
+                $winners[] = $pokerHands[$i];
+            }
+        }
+
+        return $winners;
+    }
+
+    public function winnersState(): string
+    {
+        $winners = $this->winners();
+
+        if (empty($winners)) {
+            return 'No hands dealt.' . PHP_EOL;
+        }
+
+        if (count($winners) === 1) {
+            return 'Winner: ' . $winners[0] . ' (' . $winners[0]->handRank->getName() . ')' . PHP_EOL;
+        }
+
+        $state = 'Tie between:' . PHP_EOL;
+        foreach ($winners as $winner) {
+            $state .= '  ' . $winner . ' (' . $winner->handRank->getName() . ')' . PHP_EOL;
         }
 
         return $state;

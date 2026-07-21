@@ -16,9 +16,13 @@ dataset('poker hands and ranks', function () {
         'straight 9-10-J-Q-K' => ['9♣,10♦,J♥,Q♠,K♣', HandRank::STRAIGHT],
         'broadway straight 10-J-Q-K-A' => ['10♣,J♦,Q♥,K♠,A♣', HandRank::STRAIGHT],
 
-        // Straight flushes (wheel and broadway)
+        // Straight flushes (wheel and mid)
         'wheel straight flush' => ['A♣,2♣,3♣,4♣,5♣', HandRank::STRAIGHT_FLUSH],
-        'broadway straight flush' => ['10♠,J♠,Q♠,K♠,A♠', HandRank::STRAIGHT_FLUSH],
+        'mid straight flush' => ['5♠,6♠,7♠,8♠,9♠', HandRank::STRAIGHT_FLUSH],
+
+        // Royal flush (A-K-Q-J-10 suited)
+        'royal flush spades' => ['10♠,J♠,Q♠,K♠,A♠', HandRank::ROYAL_FLUSH],
+        'royal flush hearts' => ['A♥,K♥,Q♥,J♥,10♥', HandRank::ROYAL_FLUSH],
 
         // Four of a kind
         'four of a kind aces' => ['A♣,A♦,A♥,A♠,K♣', HandRank::FOUR_OF_A_KIND],
