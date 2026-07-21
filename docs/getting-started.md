@@ -43,7 +43,7 @@ The framework is built around five layers, from generic to specific:
 Layer 1 — Identity       Card, Rank, Suit, PlayableCard
 Layer 2 — Collections    Stack, Hand
 Layer 3 — Orchestration  Dealer, DeckBuilder
-Layer 4 — Game rules     RankOrder, SuitOrder, Trump, Trick, PlayerRing
+Layer 4 — Game rules     RankOrder, SuitOrder, Trick, PlayerRing
 Layer 5 — Your game      (e.g. Games\Poker\Poker)
 ```
 

@@ -57,7 +57,7 @@ echo "Alice: {$alice}\n";  // Alice: A♣,K♦,Q♥,J♠,10♣
 | [`DeckBuilder`](src/DeckBuilder.php) | Fluent factory for standard and custom decks |
 | [`Dealer`](src/Dealer.php) | Orchestrates dealing, discarding, and resetting |
 | [`RankOrder`](src/RankOrder.php) | Game-specific rank values and comparison |
-| [`SuitOrder`](src/SuitOrder.php), [`Trump`](src/Trump.php) | Trick-taking: trump and lead-suit rules |
+| [`SuitOrder`](src/SuitOrder.php) | Trick-taking: trump and lead-suit rules |
 | [`Trick`](src/Trick.php) | One round of play with turn order and winner determination |
 | [`PlayerRing`](src/PlayerRing.php) | Rotating turn order (standalone, also used internally by Trick) |
 | [`CardInPlay`](src/CardInPlay.php), [`Face`](src/Face.php) | Face-up / face-down state |
@@ -71,7 +71,7 @@ echo "Alice: {$alice}\n";  // Alice: A♣,K♦,Q♥,J♠,10♣
 - [Building decks](docs/deck-builder.md) — `DeckBuilder`: standard, short, multi, custom
 - [The dealer](docs/dealer.md) — dealing modes, discarding, resetting
 - [Rank ordering](docs/rank-order.md) — why ranks have no intrinsic value, `RankOrder` presets
-- [Trick-taking](docs/trick-taking.md) — `Trump`, `SuitOrder`, `Trick`, `PlayerRing`
+- [Trick-taking](docs/trick-taking.md) — `SuitOrder`, `Trick`, `PlayerRing`
 - [Face-down cards](docs/face-down.md) — `CardInPlay`, `Face`, when to use them
 - [Wildcards](docs/wildcards.md) — `Wildcard`, jokers, wild 8s, Canasta
 - [Implementing a game](docs/implementing-a-game.md) — walk-through using Poker as the reference
@@ -86,7 +86,7 @@ The framework supports most popular card games. ✅ = directly possible,
 | 5-Card Stud Poker | ✅ | Reference implementation in `src/Games/Poker/` |
 | Texas Hold'em / Omaha | ⚠️ | Needs community-card slots in `Dealer` |
 | Blackjack | ✅ | `RankOrder::blackjack()` + multi-deck via `DeckBuilder::times(6)` |
-| Bridge / Spades / Hearts | ✅ | `Trump` + `SuitOrder` + `Trick` + `PlayerRing` |
+| Bridge / Spades / Hearts | ✅ | `SuitOrder` + `Trick` + `PlayerRing` |
 | Rummy / Gin Rummy | ⚠️ | Needs draw-from-pile API in `Dealer` |
 | War | ✅ | `CardInPlay` + `Face::Down` for the face-down war cards |
 | Crazy Eights | ✅ | `Wildcard` for wild 8s |

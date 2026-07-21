@@ -5,7 +5,6 @@ use Likewinter\CardDeck\Card\{Rank, Suit};
 use Likewinter\CardDeck\RankOrder;
 use Likewinter\CardDeck\SuitOrder;
 use Likewinter\CardDeck\Trick;
-use Likewinter\CardDeck\Trump;
 
 function trickCard(Suit $suit, Rank $rank): Card
 {

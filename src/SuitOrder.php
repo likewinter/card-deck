@@ -15,15 +15,8 @@ use Likewinter\CardDeck\Card\Suit;
 final readonly class SuitOrder
 {
     public function __construct(
-        public Trump $trump,
         public ?Suit $trumpSuit = null,
     ) {
-        if ($trump === Trump::Suit && $trumpSuit === null) {
-            throw new \InvalidArgumentException('Trump::Suit requires a trump suit');
-        }
-        if ($trump !== Trump::Suit && $trumpSuit !== null) {
-            throw new \InvalidArgumentException('trumpSuit can only be set with Trump::Suit');
-        }
         if ($trumpSuit === Suit::Joker) {
             throw new \InvalidArgumentException('Joker cannot be trump');
         }
@@ -31,12 +24,12 @@ final readonly class SuitOrder
 
     public static function noTrump(): self
     {
-        return new self(Trump::NoTrump);
+        return new self(null);
     }
 
     public static function suit(Suit $suit): self
     {
-        return new self(Trump::Suit, $suit);
+        return new self($suit);
     }
 
     public function isTrump(Card $card): bool

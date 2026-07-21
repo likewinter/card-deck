@@ -123,10 +123,8 @@ enum Suit: string
 |--------|---------|-------------|
 | `getSymbol()` | `string` | `♥`, `♦`, `♣`, `♠`, `🃏` |
 | `getColor()` | `string` | `'red'` or `'black'` |
-| `isStandard()` | `bool` | True for Hearts/Diamonds/Clubs/Spades |
 | `Suit::fromSymbol(string)` | `self` | Parse a symbol |
 | `Suit::casesWithoutJoker()` | `list<Suit>` | Standard suits only |
-| `Suit::standardSuits()` | `list<Suit>` | Alias for `casesWithoutJoker()` |
 
 Like `Rank`, `Suit` has no ordering — trump and lead-suit rules live in
 `SuitOrder`. See [Trick-taking](trick-taking.md).

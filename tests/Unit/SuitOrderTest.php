@@ -4,7 +4,6 @@ use Likewinter\CardDeck\Card;
 use Likewinter\CardDeck\Card\{Rank, Suit};
 use Likewinter\CardDeck\RankOrder;
 use Likewinter\CardDeck\SuitOrder;
-use Likewinter\CardDeck\Trump;
 
 function cardOf(Suit $suit, Rank $rank): Card
 {
@@ -14,26 +13,16 @@ function cardOf(Suit $suit, Rank $rank): Card
 describe('construction', function () {
     it('creates no-trump via factory', function () {
         $so = SuitOrder::noTrump();
-        expect($so->trump)->toBe(Trump::NoTrump)
-            ->and($so->trumpSuit)->toBeNull();
+        expect($so->trumpSuit)->toBeNull();
     });
 
     it('creates suit trump via factory', function () {
         $so = SuitOrder::suit(Suit::Spades);
-        expect($so->trump)->toBe(Trump::Suit)
-            ->and($so->trumpSuit)->toBe(Suit::Spades);
+        expect($so->trumpSuit)->toBe(Suit::Spades);
     });
 
-    it('rejects Trump::Suit without a trump suit', function () {
-        new SuitOrder(Trump::Suit, null);
-    })->throws(\InvalidArgumentException::class);
-
-    it('rejects trump suit with non-Suit trump', function () {
-        new SuitOrder(Trump::NoTrump, Suit::Spades);
-    })->throws(\InvalidArgumentException::class);
-
     it('rejects Joker as trump suit', function () {
-        new SuitOrder(Trump::Suit, Suit::Joker);
+        new SuitOrder(Suit::Joker);
     })->throws(\InvalidArgumentException::class);
 });
 

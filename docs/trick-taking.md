@@ -1,37 +1,21 @@
 # Trick-taking
 
 Trick-taking games (Bridge, Spades, Hearts, Euchre, Pinochle, Skat,
-Whist, Belote) share four concepts: trump, suit ordering, tricks, and
-turn order. The framework provides primitives for all four.
-
-## Trump
-
-`Trump` is an enum with three cases:
-
-```php
-use Likewinter\CardDeck\Trump;
-
-Trump::None;      // the game never has trump (e.g. Hearts)
-Trump::Suit;      // a specific suit is trump (requires a Suit)
-Trump::NoTrump;   // this hand has no trump (e.g. a Bridge NT contract)
-```
-
-The distinction between `None` and `NoTrump` is semantic: `None` means
-the game *never* has trump, `NoTrump` means *this particular hand* has
-no trump but others might. `SuitOrder` treats them identically for
-comparison.
+Whist, Belote) share three concepts: suit ordering (with optional
+trump), tricks, and turn order. The framework provides primitives for
+all three.
 
 ## SuitOrder
 
 `SuitOrder` encodes the trump configuration and answers "does card A
-beat card B in this trick?"
+beat card B in this trick?" A `?Suit $trumpSuit` is all it needs —
+`null` means no trump, a `Suit` means that suit is trump.
 
 ```php
 use Likewinter\CardDeck\SuitOrder;
 
 // Factories
-SuitOrder::noTrump();                  // no trump this hand
-SuitOrder::none();                     // game has no trump
+SuitOrder::noTrump();                  // no trump
 SuitOrder::suit(Suit::Spades);         // Spades are trump
 
 // Usage
@@ -42,8 +26,6 @@ $order->beats($a, $b, $leadSuit, $rankOrder);  // bool
 
 ### Construction rules
 
-- `Trump::Suit` requires a `trumpSuit` (throws without one).
-- `trumpSuit` can only be set with `Trump::Suit`.
 - `Suit::Joker` cannot be trump.
 
 ### `beats()` — the trick resolution rule
