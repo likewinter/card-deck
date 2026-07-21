@@ -7,12 +7,12 @@ use Iterator;
 use IteratorAggregate;
 
 /**
- * @implements IteratorAggregate<int, Card>
+ * @implements IteratorAggregate<int, PlayableCard>
  */
 class Stack implements IteratorAggregate, \Countable
 {
     public function __construct(
-        /** @var list<Card> */
+        /** @var list<PlayableCard> */
         protected array $cards = [],
         public readonly ?int $capacity = null
     ) {
@@ -26,9 +26,9 @@ class Stack implements IteratorAggregate, \Countable
         }
 
         foreach ($cards as $card) {
-            if (!$card instanceof Card) {
+            if (!$card instanceof PlayableCard) {
                 throw new \InvalidArgumentException(
-                    "All cards must be instances of Card"
+                    "All cards must implement PlayableCard"
                 );
             }
         }
@@ -95,10 +95,8 @@ class Stack implements IteratorAggregate, \Countable
     /**
      * Check if any of given cards are in the stack, so if there are two duplicates, it will return true beside
      * the fact that the stack has only one card.
-     * 
-     * @param Card ...$cards
      */
-    public function hasCards(Card ...$cards): bool
+    public function hasCards(PlayableCard ...$cards): bool
     {
         foreach ($cards as $card) {
             if (!in_array($card, $this->cards)) {
@@ -112,17 +110,15 @@ class Stack implements IteratorAggregate, \Countable
     /**
      * Check if the stack has exactly the given cards, so if there are two of the same card and the stack contains only one,
      * it will return false.
-     * 
-     * @param Card ...$cards
      */
-    public function hasExactCards(Card ...$cards): bool
+    public function hasExactCards(PlayableCard ...$cards): bool
     {
         if (empty($cards)) {
             return true;
         }
 
-        $stackFrequency = array_count_values(array_map(fn(Card $card) => (string)$card, $this->cards));
-        $cardsFrequency = array_count_values(array_map(fn(Card $card) => (string)$card, $cards));
+        $stackFrequency = array_count_values(array_map(fn(PlayableCard $card) => (string)$card, $this->cards));
+        $cardsFrequency = array_count_values(array_map(fn(PlayableCard $card) => (string)$card, $cards));
 
         foreach ($cardsFrequency as $card => $frequency) {
             if (!isset($stackFrequency[$card]) || $stackFrequency[$card] < $frequency) {
@@ -133,7 +129,7 @@ class Stack implements IteratorAggregate, \Countable
         return true;
     }
 
-    public function addCards(Card ...$cards): void
+    public function addCards(PlayableCard ...$cards): void
     {
         if (
             $this->capacity !== null &&
@@ -146,7 +142,7 @@ class Stack implements IteratorAggregate, \Countable
         $this->cards = array_merge($this->cards, array_values($cards));
     }
 
-    public function removeCards(Card ...$cards): void
+    public function removeCards(PlayableCard ...$cards): void
     {
         if (!$this->hasExactCards(...$cards)) {
             throw new \InvalidArgumentException("Cards not found in stack");
@@ -242,7 +238,7 @@ class Stack implements IteratorAggregate, \Countable
         $this->moveTo($target, $this->count());
     }
 
-    public function moveCardsTo(Stack $target, Card ...$cards): void
+    public function moveCardsTo(Stack $target, PlayableCard ...$cards): void
     {
         if (!$this->hasExactCards(...$cards)) {
             throw new \InvalidArgumentException("Cards not found in stack");

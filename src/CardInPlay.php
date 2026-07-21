@@ -13,7 +13,7 @@ namespace Likewinter\CardDeck;
  * Games that don't need face-down state can use Card directly and ignore
  * this class entirely.
  */
-final readonly class CardInPlay
+final readonly class CardInPlay implements PlayableCard
 {
     public function __construct(
         public Card $card,
@@ -70,5 +70,10 @@ final readonly class CardInPlay
     public function __toString(): string
     {
         return $this->face === Face::Down ? '██' : (string) $this->card;
+    }
+
+    public function underlyingCard(): Card
+    {
+        return $this->card;
     }
 }

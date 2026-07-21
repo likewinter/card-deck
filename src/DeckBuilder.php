@@ -121,12 +121,13 @@ class DeckBuilder
     }
 
     /**
-     * Set ranks to a consecutive range (inclusive), using poker ordering
-     * (2 < 3 < ... < A) to determine what's between $low and $high.
+     * Set ranks to a consecutive range (inclusive), using the given
+     * ordering to determine what's between $low and $high. Defaults to
+     * poker ordering (2 < 3 < ... < A) when no order is supplied.
      */
-    public function range(Rank $low, Rank $high): self
+    public function range(Rank $low, Rank $high, ?RankOrder $rankOrder = null): self
     {
-        $order = RankOrder::poker();
+        $order = $rankOrder ?? RankOrder::poker();
         $ranks = [];
         $current = $low;
         while ($current !== null) {
@@ -183,11 +184,9 @@ class DeckBuilder
     }
 
     /**
-     * Build and return the Deck.
-     *
-     * @return Deck
+     * Build and return the deck as a Stack.
      */
-    public function build(): Deck
+    public function build(): Stack
     {
         $cards = [];
 
@@ -216,11 +215,11 @@ class DeckBuilder
         }
 
         $total = count($cards);
-        return new Deck($cards, $total);
+        return new Stack($cards, $total);
     }
 
     /**
-     * Build and return the deck as a list of Card objects (no Deck wrapper).
+     * Build and return the deck as a list of Card objects (no Stack wrapper).
      *
      * @return list<Card>
      */

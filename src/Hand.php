@@ -14,21 +14,20 @@ class Hand extends Stack
         parent::__construct($cards, $capacity);
     }
 
-    public function sortByRank(?RankOrder $rankOrder = null): void
+    public function sortByRank(RankOrder $rankOrder): void
     {
-        $order = $rankOrder ?? RankOrder::poker();
-        $this->sort(fn(Card $a, Card $b) => $order->compare($a->rank, $b->rank));
+        $this->sort(fn(PlayableCard $a, PlayableCard $b) => $rankOrder->compare($a->underlyingCard()->rank, $b->underlyingCard()->rank));
     }
 
     /** @return list<Rank> */
     public function getRanks(): array
     {
-        return array_map(fn(Card $card) => $card->rank, $this->cards);
+        return array_map(fn(PlayableCard $card) => $card->underlyingCard()->rank, $this->cards);
     }
 
     /** @return list<Suit> */
     public function getSuits(): array
     {
-        return array_map(fn(Card $card) => $card->suit, $this->cards);
+        return array_map(fn(PlayableCard $card) => $card->underlyingCard()->suit, $this->cards);
     }
 }

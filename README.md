@@ -51,14 +51,15 @@ echo "Alice: {$alice}\n";  // Alice: A♣,K♦,Q♥,J♠,10♣
 | Primitive | Purpose |
 |-----------|---------|
 | [`Card`](src/Card.php), [`Rank`](src/Card/Rank.php), [`Suit`](src/Card/Suit.php) | Identity of a playing card |
-| [`Stack`](src/Stack.php) | Ordered collection of cards with capacity |
-| [`Deck`](src/Deck.php), [`Hand`](src/Hand.php) | Specialized stacks |
+| [`PlayableCard`](src/PlayableCard.php) | Interface for anything a Stack can hold (Card, CardInPlay, Wildcard) |
+| [`Stack`](src/Stack.php) | Ordered collection of playable cards with capacity |
+| [`Hand`](src/Hand.php) | Specialized stack for a player's hand |
 | [`DeckBuilder`](src/DeckBuilder.php) | Fluent factory for standard and custom decks |
 | [`Dealer`](src/Dealer.php) | Orchestrates dealing, discarding, and resetting |
 | [`RankOrder`](src/RankOrder.php) | Game-specific rank values and comparison |
 | [`SuitOrder`](src/SuitOrder.php), [`Trump`](src/Trump.php) | Trick-taking: trump and lead-suit rules |
-| [`Trick`](src/Trick.php) | One round of play with winner determination |
-| [`PlayerRing`](src/PlayerRing.php) | Rotating turn order |
+| [`Trick`](src/Trick.php) | One round of play with turn order and winner determination |
+| [`PlayerRing`](src/PlayerRing.php) | Rotating turn order (standalone, also used internally by Trick) |
 | [`CardInPlay`](src/CardInPlay.php), [`Face`](src/Face.php) | Face-up / face-down state |
 | [`Wildcard`](src/Wildcard.php) | Wildcard substitution without mutating cards |
 
@@ -116,10 +117,9 @@ The framework supports most popular card games. ✅ = directly possible,
 The [Poker implementation](src/Games/Poker/) is the proof that the
 primitives fit a real game. It includes:
 
-- `PokerHand` — 5-card hand with rank sets, flush/straight detection
-- `HandRank` — 10 ranks from High Card to Royal Flush, with full
-  tiebreaker comparison via `HandRank::compare()`
-- `PokerDeck` — 52-card deck via `DeckBuilder::standard52()`
+- `PokerHand` — 5-card hand with rank sets, flush/straight detection,
+  hand classification, and full tiebreaker comparison via `compare()`
+- `HandRank` — 10 ranks from High Card to Royal Flush (pure enum)
 - `Poker` — game orchestration: deal, hands, winners, multi-round play
 
 Run the demo:
@@ -131,7 +131,7 @@ php demo/poker.php 5 1          # 5 players, 1 round
 
 ## Testing
 
-The framework has 294 passing tests covering every primitive and the
+The framework has 302 passing tests covering every primitive and the
 reference Poker implementation:
 
 ```bash

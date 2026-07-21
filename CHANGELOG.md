@@ -9,6 +9,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 No changes yet.
 
+## [0.3.0] - 2026-07-22
+
+Architecture deepening: eliminates shallow modules, removes circular
+dependencies, and widens the collection layer to support face-down and
+wild cards. All changes are breaking.
+
+### Added
+
+- **`PlayableCard`** interface — common type for anything a `Stack` can
+  hold. `Card`, `CardInPlay`, and `Wildcard` all implement it via
+  `underlyingCard(): Card` and `__toString(): string`.
+- **`Trick::currentPlayer()`** — returns whose turn it is. Turn order
+  is now enforced internally (playing out of turn throws).
+- **`Trick::clear(?int $nextLeader)`** — optional leader for the next
+  trick (typically the winner of the current one).
+- **`Trick` constructor** accepts `startingPlayer` for non-zero leader.
+- **`DeckBuilder::range()`** accepts an optional `RankOrder` for
+  non-poker rank adjacency.
+- 6 new tests for `PlayableCard` in stacks (302 total, 622 assertions).
+
+### Changed
+
+#### Breaking changes
+- **`Deck` class removed.** `DeckBuilder::build()` returns a `Stack`
+  with capacity equal to the card count. `Dealer` accepts `Stack`.
+- **`PokerDeck` class removed.** Use `DeckBuilder::standard52()->build()`
+  directly.
+- **`HandRank` is now a pure enum** — only cases and `getName()`.
+  Classification (`getRankForHand()`) and comparison (`compare()`) moved
+  into `PokerHand` as `classify()` (private) and `compare()` (public
+  instance method). The circular dependency between `PokerHand` and
+  `HandRank` is eliminated.
+- **`Hand::sortByRank()`** requires a `RankOrder` argument (no longer
+  defaults to `RankOrder::poker()`).
+- **`Trick::play(Card $card)`** replaces `play(int $player, Card $card)`.
+  Turn order is enforced via an internal `PlayerRing` — playing out of
+  turn throws `\LogicException`.
+- **`Trick::players()` removed.** Player order is implicit in play order.
+- **`Stack` type hints widened** from `Card` to `PlayableCard` in
+  `addCards`, `removeCards`, `hasCards`, `hasExactCards`,
+  `moveCardsTo`, and the constructor.
+- **`Dealer::discard()`** accepts `PlayableCard` instead of `Card`.
+- **`Hand::getRanks()` / `getSuits()`** resolve through
+  `underlyingCard()` to support `CardInPlay` and `Wildcard` in hands.
+
+#### Non-breaking changes
+- `PlayerRing::peekNext()` docblock fixed (said "previous", meant
+  "next").
+- `Wildcard` constructor dead code (empty if-block) removed.
+
+### Removed
+
+- `src/Deck.php` — shallow module (12 lines, changed one default).
+- `src/Games/Poker/PokerDeck.php` — shallow module (11 lines, wrapped
+  one `DeckBuilder` expression).
+- `HandRank::getRankForHand()`, `HandRank::compare()`, and all 10
+  `is*()` predicate methods — absorbed into `PokerHand`.
+- `Trick::players()` — player order is implicit in play order.
+
 ## [0.2.0] - 2026-07-21
 
 Transforms the library from a poker-specific package into a
@@ -182,6 +241,7 @@ poker values. Included `Card`, `Rank`, `Suit`, `Stack`, `Deck`, `Hand`,
 `Dealer`, and a basic `Games\Poker` implementation with `PokerHand` and
 `HandRank` (9 ranks, no royal flush, no hand comparison).
 
-[Unreleased]: https://github.com/likewinter/card-deck/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/likewinter/card-deck/compare/0.3.0...HEAD
+[0.3.0]: https://github.com/likewinter/card-deck/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/likewinter/card-deck/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/likewinter/card-deck/releases/tag/0.1.0

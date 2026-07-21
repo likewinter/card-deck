@@ -1,19 +1,20 @@
 # The dealer
 
-`Dealer` orchestrates dealing cards from a `Deck` to `Hand`s, managing
-a discard pile, and resetting the game for a new round.
+`Dealer` orchestrates dealing cards from a `Stack` (the deck) to
+`Hand`s, managing a discard pile, and resetting the game for a new
+round.
 
 ## Construction
 
 ```php
 use Likewinter\CardDeck\Dealer;
-use Likewinter\CardDeck\Games\Poker\PokerDeck;
+use Likewinter\CardDeck\DeckBuilder;
 
-$dealer = new Dealer(deck: new PokerDeck());
+$dealer = new Dealer(deck: DeckBuilder::standard52()->build());
 
 // With options:
 $dealer = new Dealer(
-    deck: new PokerDeck(),
+    deck: DeckBuilder::standard52()->build(),
     hands: [$alice, $bob],              // pre-register hands
     drawMode: Dealer::DRAW_ONE_BY_ONE,
     shuffle: true,                       // shuffle the deck on construction
@@ -24,7 +25,7 @@ $dealer = new Dealer(
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `deck` | (required) | The `Deck` to deal from |
+| `deck` | (required) | The `Stack` to deal from (typically from `DeckBuilder`) |
 | `hands` | `[]` | Initial list of `Hand` objects |
 | `drawMode` | `DRAW_SEQUENTIAL` | How cards are distributed |
 | `shuffle` | `false` | Whether to shuffle the deck on construction |
@@ -46,7 +47,7 @@ $dealer->getHands();              // list<Hand>
 $dealer->removeHands($bob);
 
 // Get the deck and pile
-$dealer->getDeck();               // Deck
+$dealer->getDeck();               // Stack
 $dealer->getPile();               // Stack (the discard pile)
 ```
 

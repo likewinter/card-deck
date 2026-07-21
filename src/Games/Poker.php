@@ -2,9 +2,7 @@
 
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{Dealer, Hand};
-use Likewinter\CardDeck\Games\Poker\HandRank;
-use Likewinter\CardDeck\Games\Poker\PokerDeck;
+use Likewinter\CardDeck\{Dealer, DeckBuilder, Hand};
 use Likewinter\CardDeck\Games\Poker\PokerHand;
 
 readonly class Poker
@@ -14,11 +12,18 @@ readonly class Poker
     private const MIN_HANDS = 2;
     private const MAX_HANDS = 5;
 
+    private readonly Dealer $dealer;
+
     public function __construct(
         private readonly int $handSize = self::DEFAULT_HAND_SIZE,
         private readonly int $numHands = self::DEFAULT_NUM_HANDS,
-        private readonly Dealer $dealer = new Dealer(deck: new PokerDeck(), shuffle: true),
+        ?Dealer $dealer = null,
     ) {
+        $this->dealer = $dealer ?? new Dealer(
+            deck: DeckBuilder::standard52()->build(),
+            shuffle: true,
+        );
+
         $this->validateConfig();
 
         for ($i = 0; $i < $this->numHands; $i++) {
@@ -122,7 +127,7 @@ readonly class Poker
         $winners = [$best];
 
         for ($i = 1, $n = count($pokerHands); $i < $n; $i++) {
-            $cmp = HandRank::compare($pokerHands[$i], $best);
+            $cmp = $pokerHands[$i]->compare($best);
             if ($cmp > 0) {
                 $best = $pokerHands[$i];
                 $winners = [$best];

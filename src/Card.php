@@ -12,7 +12,7 @@ use Likewinter\CardDeck\Card\Suit;
  * RankOrder (for rank comparison) and SuitOrder (for trump/lead-suit
  * comparison). Use CardInPlay if you need face-up/face-down state.
  */
-class Card
+class Card implements PlayableCard
 {
     public function __construct(
         public readonly Suit $suit,
@@ -65,5 +65,10 @@ class Card
     public function isJoker(): bool
     {
         return $this->rank === Rank::Joker;
+    }
+
+    public function underlyingCard(): Card
+    {
+        return $this;
     }
 }

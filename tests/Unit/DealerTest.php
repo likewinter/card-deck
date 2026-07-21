@@ -1,32 +1,31 @@
 <?php
 
 use Likewinter\CardDeck\Dealer;
-use Likewinter\CardDeck\Deck;
+use Likewinter\CardDeck\DeckBuilder;
 use Likewinter\CardDeck\Exceptions\DealerException;
-use Likewinter\CardDeck\Games\Poker\PokerDeck;
 use Likewinter\CardDeck\Hand;
 use Likewinter\CardDeck\Stack;
 
 it('can be created with a deck', function () {
-    $dealer = new Dealer(deck: new PokerDeck());
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     expect($dealer)->toBeInstanceOf(Dealer::class)
-        ->and($dealer->getDeck())->toBeInstanceOf(Deck::class)
+        ->and($dealer->getDeck())->toBeInstanceOf(Stack::class)
         ->and($dealer->getHands())->toBeEmpty()
         ->and($dealer->getPile()->count())->toBe(0);
 });
 
 it('rejects invalid draw mode', function () {
     // @phpstan-ignore-next-line
-    new Dealer(deck: new PokerDeck(), drawMode: 99);
+    new Dealer(deck: DeckBuilder::standard52()->build(), drawMode: 99);
 })->throws(DealerException::class);
 
 it('rejects non-Hand entries in constructor hands array', function () {
     // @phpstan-ignore-next-line
-    new Dealer(deck: new PokerDeck(), hands: ['not a hand']);
+    new Dealer(deck: DeckBuilder::standard52()->build(), hands: ['not a hand']);
 })->throws(DealerException::class);
 
 it('can add and list hands', function () {
-    $dealer = new Dealer(deck: new PokerDeck());
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $hand = new Hand(capacity: 5);
     $dealer->addHands($hand);
     expect($dealer->getHands())->toHaveCount(1)
@@ -34,7 +33,7 @@ it('can add and list hands', function () {
 });
 
 it('can remove a hand and dump its cards onto the pile', function () {
-    $dealer = new Dealer(deck: new PokerDeck());
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $hand1 = new Hand(capacity: 5);
     $hand2 = new Hand(capacity: 5);
     $dealer->addHands($hand1, $hand2);
@@ -51,7 +50,7 @@ it('can remove a hand and dump its cards onto the pile', function () {
 it('removes only the targeted hand when two empty hands exist', function () {
     // Regression: previously array_diff compared by string, so two empty
     // hands (both stringify to "") were both removed.
-    $dealer = new Dealer(deck: new PokerDeck());
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $hand1 = new Hand(capacity: 5);
     $hand2 = new Hand(capacity: 5);
     $dealer->addHands($hand1, $hand2);
@@ -63,13 +62,13 @@ it('removes only the targeted hand when two empty hands exist', function () {
 });
 
 it('rejects removing a hand that was not added', function () {
-    $dealer = new Dealer(deck: new PokerDeck());
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $dealer->addHands(new Hand(capacity: 5));
     $dealer->removeHands(new Hand(capacity: 5));
 })->throws(DealerException::class);
 
 it('draws sequentially by default', function () {
-    $dealer = new Dealer(deck: new PokerDeck(), drawMode: Dealer::DRAW_SEQUENTIAL);
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build(), drawMode: Dealer::DRAW_SEQUENTIAL);
     $hand1 = new Hand(capacity: 5);
     $hand2 = new Hand(capacity: 5);
     $dealer->addHands($hand1, $hand2);
@@ -81,7 +80,7 @@ it('draws sequentially by default', function () {
 });
 
 it('draws one card per hand per round in DRAW_ONE_BY_ONE mode', function () {
-    $dealer = new Dealer(deck: new PokerDeck(), drawMode: Dealer::DRAW_ONE_BY_ONE);
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build(), drawMode: Dealer::DRAW_ONE_BY_ONE);
     $hand1 = new Hand(capacity: 5);
     $hand2 = new Hand(capacity: 5);
     $dealer->addHands($hand1, $hand2);
@@ -93,7 +92,7 @@ it('draws one card per hand per round in DRAW_ONE_BY_ONE mode', function () {
 });
 
 it('draws random cards in DRAW_RANDOM mode', function () {
-    $dealer = new Dealer(deck: new PokerDeck(), drawMode: Dealer::DRAW_RANDOM);
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build(), drawMode: Dealer::DRAW_RANDOM);
     $hand1 = new Hand(capacity: 5);
     $hand2 = new Hand(capacity: 5);
     $dealer->addHands($hand1, $hand2);
@@ -105,7 +104,7 @@ it('draws random cards in DRAW_RANDOM mode', function () {
 });
 
 it('drawToHand draws to a specific hand', function () {
-    $dealer = new Dealer(deck: new PokerDeck());
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $hand = new Hand(capacity: 5);
     $dealer->addHands($hand);
     $dealer->drawToHand($hand, 4);
@@ -115,24 +114,24 @@ it('drawToHand draws to a specific hand', function () {
 });
 
 it('drawToHand rejects a hand not managed by the dealer', function () {
-    $dealer = new Dealer(deck: new PokerDeck());
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $dealer->drawToHand(new Hand(capacity: 5), 1);
 })->throws(DealerException::class);
 
 it('drawAll throws when there are no hands', function () {
-    $dealer = new Dealer(deck: new PokerDeck());
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $dealer->drawAll(1);
 })->throws(DealerException::class);
 
 it('drawAll throws when the deck does not have enough cards', function () {
-    $dealer = new Dealer(deck: new PokerDeck());
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $dealer->addHands(new Hand(capacity: 5), new Hand(capacity: 5));
     // 52 cards, 2 hands, request 27 each = 54 needed > 52 available
     $dealer->drawAll(27);
 })->throws(DealerException::class);
 
 it('discards the whole hand when no cards are specified', function () {
-    $dealer = new Dealer(deck: new PokerDeck());
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $hand = new Hand(capacity: 5);
     $dealer->addHands($hand);
     $dealer->drawToHand($hand, 3);
@@ -144,7 +143,7 @@ it('discards the whole hand when no cards are specified', function () {
 });
 
 it('discards only the specified cards when provided', function () {
-    $dealer = new Dealer(deck: new PokerDeck());
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build());
     $hand = new Hand(capacity: 5);
     $dealer->addHands($hand);
     $dealer->drawToHand($hand, 4);
@@ -158,7 +157,7 @@ it('discards only the specified cards when provided', function () {
 });
 
 it('resetGame returns all cards to the deck', function () {
-    $dealer = new Dealer(deck: new PokerDeck(), shuffle: true);
+    $dealer = new Dealer(deck: DeckBuilder::standard52()->build(), shuffle: true);
     $hand = new Hand(capacity: 5);
     $dealer->addHands($hand);
     $dealer->drawToHand($hand, 5);
@@ -175,7 +174,7 @@ it('resetGame returns all cards to the deck', function () {
 });
 
 it('does not shuffle the deck by default', function () {
-    $deck = new PokerDeck();
+    $deck = DeckBuilder::standard52()->build();
     $originalFirst = (string) $deck->peek(1);
 
     new Dealer(deck: $deck);
@@ -185,7 +184,7 @@ it('does not shuffle the deck by default', function () {
 });
 
 it('shuffles the deck when shuffle: true', function () {
-    $deck = new PokerDeck();
+    $deck = DeckBuilder::standard52()->build();
     $originalOrder = (string) $deck;
 
     new Dealer(deck: $deck, shuffle: true);

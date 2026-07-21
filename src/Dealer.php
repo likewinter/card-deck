@@ -19,7 +19,7 @@ class Dealer
     private Stack $pile;
 
     public function __construct(
-        private Deck $deck,
+        private Stack $deck,
         /** @var list<Hand> */
         private array $hands = [],
         /** @var value-of<self::DRAW_MODES> */
@@ -29,7 +29,7 @@ class Dealer
         $this->setDrawMode($drawMode);
 
         foreach ($hands as $hand) {
-            if (!is_a($hand, Hand::class)) {
+            if (!$hand instanceof Hand) {
                 throw new DealerException('Hands must be instances of Hand');
             }
         }
@@ -39,7 +39,7 @@ class Dealer
         }
     }
 
-    public function getDeck(): Deck
+    public function getDeck(): Stack
     {
         return $this->deck;
     }
@@ -110,7 +110,7 @@ class Dealer
         }
     }
 
-    public function discard(Hand $hand, Card ...$cards): void
+    public function discard(Hand $hand, PlayableCard ...$cards): void
     {
         $this->validateHand($hand);
 

@@ -8,10 +8,10 @@ use Likewinter\CardDeck\Card\Suit;
  * A single trick in a trick-taking game: the cards played by each player
  * in one round of play, plus the rules to determine the winner.
  *
- * A trick starts when the first player leads a card. Each subsequent
- * player plays a card in turn order (tracked via PlayerRing). When all
- * players have played, winner() returns the index of the player whose
- * card won the trick, determined by SuitOrder + RankOrder.
+ * A trick starts when the current player leads a card. Each subsequent
+ * player plays in turn order (enforced internally via PlayerRing). When
+ * all players have played, winner() returns the index of the player
+ * whose card won the trick, determined by SuitOrder + RankOrder.
  *
  * Trump and rank ordering are supplied at construction so the same Trick
  * works for Bridge, Spades, Hearts, Euchre, Pinochle, etc.
@@ -26,24 +26,26 @@ final class Trick
 
     private ?Suit $leadSuit = null;
 
+    private PlayerRing $ring;
+
     public function __construct(
         private readonly SuitOrder $suitOrder,
         private readonly RankOrder $rankOrder,
         private readonly int $numPlayers,
+        int $startingPlayer = 0,
     ) {
         if ($numPlayers < 2) {
             throw new \InvalidArgumentException('Trick requires at least 2 players');
         }
+        $this->ring = new PlayerRing($numPlayers, $startingPlayer);
     }
 
     /**
-     * A player plays a card. The first card sets the lead suit.
+     * The current player plays a card. Turn order is enforced — playing
+     * out of turn throws. The first card sets the lead suit.
      */
-    public function play(int $player, Card $card): void
+    public function play(Card $card): void
     {
-        if ($player < 0 || $player >= $this->numPlayers) {
-            throw new \InvalidArgumentException("Player {$player} out of range");
-        }
         if (count($this->cards) >= $this->numPlayers) {
             throw new \LogicException('Trick is complete; no more cards can be played');
         }
@@ -52,7 +54,16 @@ final class Trick
         }
 
         $this->cards[] = $card;
-        $this->players[] = $player;
+        $this->players[] = $this->ring->current();
+        $this->ring->next();
+    }
+
+    /**
+     * Returns the index of the player whose turn it is.
+     */
+    public function currentPlayer(): int
+    {
+        return $this->ring->current();
     }
 
     /**
@@ -116,23 +127,20 @@ final class Trick
     }
 
     /**
-     * Returns the player indices who have played, in play order.
-     *
-     * @return list<int>
-     */
-    public function players(): array
-    {
-        return $this->players;
-    }
-
-    /**
      * Reset the trick for reuse (keeps the same suit/rank orders and
      * player count). The next call to play() starts a new lead.
+     *
+     * Pass $nextLeader to set who leads the next trick (typically the
+     * winner of this trick). Defaults to player 0.
      */
-    public function clear(): void
+    public function clear(?int $nextLeader = null): void
     {
         $this->cards = [];
         $this->players = [];
         $this->leadSuit = null;
+        $this->ring->reset();
+        if ($nextLeader !== null) {
+            $this->ring->setCurrent($nextLeader);
+        }
     }
 }

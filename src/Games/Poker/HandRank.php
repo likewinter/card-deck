@@ -2,8 +2,6 @@
 
 namespace Likewinter\CardDeck\Games\Poker;
 
-use Likewinter\CardDeck\Card\Rank;
-
 enum HandRank: int
 {
     case HIGH_CARD = 0;
@@ -31,117 +29,5 @@ enum HandRank: int
             self::ONE_PAIR => 'One Pair',
             default => 'High Card',
         };
-    }
-
-    public static function getRankForHand(PokerHand $hand): self
-    {
-        return match (true) {
-            self::isRoyalFlush($hand) => self::ROYAL_FLUSH,
-            self::isStraightFlush($hand) => self::STRAIGHT_FLUSH,
-            self::isFourOfAKind($hand) => self::FOUR_OF_A_KIND,
-            self::isFullHouse($hand) => self::FULL_HOUSE,
-            self::isFlush($hand) => self::FLUSH,
-            self::isStraight($hand) => self::STRAIGHT,
-            self::isThreeOfAKind($hand) => self::THREE_OF_A_KIND,
-            self::isTwoPair($hand) => self::TWO_PAIR,
-            self::isPair($hand) => self::ONE_PAIR,
-            default => self::HIGH_CARD,
-        };
-    }
-
-    /**
-     * Compare two poker hands. Returns:
-     *   -1 if $a loses to $b
-     *    0 if they tie
-     *    1 if $a beats $b
-     *
-     * Within the same hand rank, kickers and the relevant primary ranks
-     * are compared in standard poker order.
-     */
-    public static function compare(PokerHand $a, PokerHand $b): int
-    {
-        if ($a->handRank !== $b->handRank) {
-            return $a->handRank->value <=> $b->handRank->value;
-        }
-
-        $sa = $a->getTiebreakerSignature();
-        $sb = $b->getTiebreakerSignature();
-
-        for ($i = 0, $n = max(count($sa), count($sb)); $i < $n; $i++) {
-            $va = $sa[$i] ?? 0;
-            $vb = $sb[$i] ?? 0;
-            if ($va !== $vb) {
-                return $va <=> $vb;
-            }
-        }
-
-        return 0;
-    }
-
-    /**
-     * @return array<int>
-     */
-    protected static function countHandRanks(PokerHand $hand): array
-    {
-        $counts = array_map(fn(array $cards) => count($cards), $hand->rankSets);
-        sort($counts);
-
-        return $counts;
-    }
-
-    protected static function isFourOfAKind(PokerHand $hand): bool
-    {
-        $counts = self::countHandRanks($hand);
-
-        return !empty($counts) && max($counts) === 4;
-    }
-
-    protected static function isThreeOfAKind(PokerHand $hand): bool
-    {
-        $counts = self::countHandRanks($hand);
-
-        return !empty($counts) && max($counts) === 3;
-    }
-
-    protected static function isPair(PokerHand $hand): bool
-    {
-        $counts = self::countHandRanks($hand);
-
-        return !empty($counts) && max($counts) === 2;
-    }
-
-    protected static function isFullHouse(PokerHand $hand): bool
-    {
-        return self::countHandRanks($hand) === [2, 3];
-    }
-
-    protected static function isTwoPair(PokerHand $hand): bool
-    {
-        return self::countHandRanks($hand) === [1, 2, 2];
-    }
-
-    protected static function isFlush(PokerHand $hand): bool
-    {
-        return $hand->isSameSuit;
-    }
-
-    protected static function isStraight(PokerHand $hand): bool
-    {
-        return $hand->isSequentialRank;
-    }
-
-    protected static function isStraightFlush(PokerHand $hand): bool
-    {
-        return $hand->isSequentialRank && $hand->isSameSuit;
-    }
-
-    protected static function isRoyalFlush(PokerHand $hand): bool
-    {
-        // Royal flush: 10-J-Q-K-A all suited. The high card must be Ace
-        // AND the low card must be Ten (excludes the wheel A-2-3-4-5,
-        // which also contains an Ace but is not royal).
-        return self::isStraightFlush($hand)
-            && $hand->rankOrder->isHighest(Rank::Ace)
-            && $hand->getHighCardValue() === $hand->rankOrder->value(Rank::Ace);
     }
 }

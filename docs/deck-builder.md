@@ -94,16 +94,16 @@ $deck = (new DeckBuilder())
 | `withJokers(int $n = 2)` | Add $n jokers (added once, not multiplied) |
 | `times(int $n)` | Repeat the base deck $n times |
 | `addExtra(Card ...$c)` | Add specific extra cards |
-| `build()` | Returns a `Deck` with capacity = card count |
-| `buildCards()` | Returns a `list<Card>` without the Deck wrapper |
+| `build()` | Returns a `Stack` with capacity = card count |
+| `buildCards()` | Returns a `list<Card>` without the Stack wrapper |
 
 ## Build output
 
-`build()` returns a `Deck` whose capacity equals the number of cards.
+`build()` returns a `Stack` whose capacity equals the number of cards.
 `buildCards()` returns a raw `list<Card>` if you want to construct the
-`Deck` yourself (e.g. with a different capacity).
+`Stack` yourself (e.g. with a different capacity).
 
 ```php
 $cards = DeckBuilder::standard52()->buildCards();
-$deck = new Deck($cards, 60);  // 52 cards but room for 60 (e.g. Canasta)
+$deck = new Stack($cards, 60);  // 52 cards but room for 60 (e.g. Canasta)
 ```

@@ -1,6 +1,12 @@
 <?php
 
+use Likewinter\CardDeck\Card;
+use Likewinter\CardDeck\CardInPlay;
+use Likewinter\CardDeck\Face;
 use Likewinter\CardDeck\Stack;
+use Likewinter\CardDeck\Wildcard;
+use Likewinter\CardDeck\Card\Rank;
+use Likewinter\CardDeck\Card\Suit;
 
 it('can be created', function () {
     $stack = new Stack();
@@ -154,4 +160,70 @@ describe('moving cards', function () {
         expect($source->count())->toBe(count($cards) - $num);
         expect($target->count())->toBe($num);
     })->with('cards to move');
+});
+
+describe('PlayableCard support', function () {
+    it('holds CardInPlay alongside plain Cards', function () {
+        $ace = new Card(suit: Suit::Spades, rank: Rank::Ace);
+        $faceDown = CardInPlay::down(new Card(suit: Suit::Hearts, rank: Rank::King));
+
+        $stack = new Stack(cards: [$ace, $faceDown]);
+
+        expect($stack->count())->toBe(2)
+            ->and((string) $stack)->toBe('A♠,██');
+    });
+
+    it('holds Wildcard alongside plain Cards', function () {
+        $joker = new Card(suit: Suit::Joker, rank: Rank::Joker);
+        $wild = new Wildcard($joker);
+        $ace = new Card(suit: Suit::Spades, rank: Rank::Ace);
+
+        $stack = new Stack(cards: [$wild, $ace]);
+
+        expect($stack->count())->toBe(2)
+            ->and($stack->hasCards($wild))->toBeTrue();
+    });
+
+    it('removes CardInPlay by identity', function () {
+        $faceDown = CardInPlay::down(new Card(suit: Suit::Hearts, rank: Rank::King));
+        $ace = new Card(suit: Suit::Spades, rank: Rank::Ace);
+
+        $stack = new Stack(cards: [$faceDown, $ace]);
+        $stack->removeCards($faceDown);
+
+        expect($stack->count())->toBe(1)
+            ->and((string) $stack)->toBe('A♠');
+    });
+
+    it('moves CardInPlay between stacks', function () {
+        $faceDown = CardInPlay::down(new Card(suit: Suit::Hearts, rank: Rank::King));
+        $source = new Stack(cards: [$faceDown]);
+        $target = new Stack();
+
+        $source->moveAllTo($target);
+
+        expect($source->count())->toBe(0)
+            ->and($target->count())->toBe(1);
+    });
+
+    it('assigned Wildcard shows its effective card in string', function () {
+        $joker = new Card(suit: Suit::Joker, rank: Rank::Joker);
+        $wild = (new Wildcard($joker))->assign(new Card(suit: Suit::Spades, rank: Rank::Ace));
+
+        $stack = new Stack(cards: [$wild]);
+
+        expect((string) $stack)->toBe('A♠')
+            ->and($stack->count())->toBe(1);
+    });
+
+    it('underlyingCard resolves through wrappers', function () {
+        $card = new Card(suit: Suit::Hearts, rank: Rank::Queen);
+        $faceDown = CardInPlay::down($card);
+        $joker = new Card(suit: Suit::Joker, rank: Rank::Joker);
+        $wild = (new Wildcard($joker))->assign($card);
+
+        expect($card->underlyingCard())->toBe($card)
+            ->and($faceDown->underlyingCard())->toBe($card)
+            ->and($wild->underlyingCard())->toBe($card);
+    });
 });

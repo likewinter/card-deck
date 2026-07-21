@@ -6,7 +6,7 @@
 It's an ordered, countable, iterable collection of `Card` objects with
 an optional capacity limit.
 
-`Deck` and `Hand` both extend `Stack`. The `Dealer`'s pile is a `Stack`.
+`Hand` extends `Stack`. The `Dealer`'s pile is a `Stack`.
 Any custom collection you build (a tableau column, a meld, a crib) can
 be a `Stack` too.
 
@@ -103,22 +103,18 @@ echo $stack;                  // A♣,2♦,3♥,4♠
 Stack::fromString('A♣,2♦');   // round-trip
 ```
 
-## Deck
+## Decks
 
-`Deck` is a `Stack` with a non-null capacity (defaults to 52). That's
-it — no extra methods. The capacity distinguishes "this is a 52-card
-deck" from "this is an arbitrary pile of cards."
+A "deck" is just a `Stack` with a capacity. Use
+[`DeckBuilder`](deck-builder.md) to construct decks with standard
+compositions (52-card, euchre, pinochle, multi-deck, etc.) — it returns
+a `Stack` whose capacity equals the card count.
 
 ```php
-use Likewinter\CardDeck\Deck;
-
-$deck = new Deck();                          // empty, capacity 52
-$deck = new Deck($cards, 24);                // pre-filled, capacity 24
-echo $deck->capacity;                        // 24
+$deck = DeckBuilder::standard52()->build();   // Stack with capacity 52
+$deck = DeckBuilder::euchre()->build();       // Stack with capacity 24
+echo $deck->capacity;                         // 24
 ```
-
-Use [`DeckBuilder`](deck-builder.md) to construct decks with standard
-compositions (52-card, euchre, pinochle, multi-deck, etc.).
 
 ## Hand
 

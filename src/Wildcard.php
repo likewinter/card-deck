@@ -15,19 +15,12 @@ namespace Likewinter\CardDeck;
  * Eights with wild 8s, Rummy variants) use Wildcard to track the
  * substitution without mutating the underlying Card.
  */
-final readonly class Wildcard
+final readonly class Wildcard implements PlayableCard
 {
     public function __construct(
         public Card $wild,
         public ?Card $assigned = null,
-    ) {
-        if (!$wild->isJoker() && $assigned === null) {
-            // Allow non-joker wildcards (e.g. Crazy Eights 8s) but they
-            // only make sense if assigned immediately or by the game.
-            // This is a soft constraint — the game decides what counts
-            // as wild. We only enforce that the constructor is callable.
-        }
-    }
+    ) {}
 
     /**
      * Returns a new Wildcard with the assigned substitution card.
@@ -69,5 +62,10 @@ final readonly class Wildcard
             return (string) $this->assigned;
         }
         return (string) $this->wild;
+    }
+
+    public function underlyingCard(): Card
+    {
+        return $this->assigned ?? $this->wild;
     }
 }

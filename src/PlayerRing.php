@@ -52,7 +52,7 @@ final class PlayerRing
     }
 
     /**
-     * Returns the index of the previous player (without moving the pointer).
+     * Returns the index of the next player (without moving the pointer).
      */
     public function peekNext(): int
     {

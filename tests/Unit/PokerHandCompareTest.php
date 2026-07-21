@@ -1,7 +1,6 @@
 <?php
 
 use Likewinter\CardDeck\Card;
-use Likewinter\CardDeck\Games\Poker\HandRank;
 use Likewinter\CardDeck\Games\Poker\PokerHand;
 
 function pokerHandFromStringForCompare(string $cards): PokerHand
@@ -77,21 +76,21 @@ it('declares the winner correctly', function (string $winnerCards, string $loser
     $winner = pokerHandFromStringForCompare($winnerCards);
     $loser = pokerHandFromStringForCompare($loserCards);
 
-    expect(HandRank::compare($winner, $loser))->toBe(1)
-        ->and(HandRank::compare($loser, $winner))->toBe(-1);
+    expect($winner->compare($loser))->toBe(1)
+        ->and($loser->compare($winner))->toBe(-1);
 })->with('hand comparison winner beats loser');
 
 it('declares ties correctly', function (string $cardsA, string $cardsB) {
     $a = pokerHandFromStringForCompare($cardsA);
     $b = pokerHandFromStringForCompare($cardsB);
 
-    expect(HandRank::compare($a, $b))->toBe(0)
-        ->and(HandRank::compare($b, $a))->toBe(0);
+    expect($a->compare($b))->toBe(0)
+        ->and($b->compare($a))->toBe(0);
 })->with('hand comparison ties');
 
 it('compare is reflexive', function (string $cards) {
     $hand = pokerHandFromStringForCompare($cards);
-    expect(HandRank::compare($hand, $hand))->toBe(0);
+    expect($hand->compare($hand))->toBe(0);
 })->with('poker hands and ranks');
 
 it('royal flush is the highest rank and ties with any other royal flush', function () {
@@ -99,8 +98,8 @@ it('royal flush is the highest rank and ties with any other royal flush', functi
     $hearts = pokerHandFromStringForCompare('10♥,J♥,Q♥,K♥,A♥');
     $fourAces = pokerHandFromStringForCompare('A♣,A♦,A♥,A♠,K♣');
 
-    expect(HandRank::compare($spades, $hearts))->toBe(0)
-        ->and(HandRank::compare($spades, $fourAces))->toBe(1);
+    expect($spades->compare($hearts))->toBe(0)
+        ->and($spades->compare($fourAces))->toBe(1);
 });
 
 it('wheel straight uses 5 as high card for comparison', function () {
@@ -110,5 +109,5 @@ it('wheel straight uses 5 as high card for comparison', function () {
 
     expect($wheel->getHighCardValue())->toBe(5)
         ->and($sixHigh->getHighCardValue())->toBe(6)
-        ->and(HandRank::compare($wheel, $sixHigh))->toBe(-1);
+        ->and($wheel->compare($sixHigh))->toBe(-1);
 });
