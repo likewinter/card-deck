@@ -3,5 +3,6 @@
     "allow": [
       "Bash(git push *)"
     ]
-  }
+  },
+  "$version": 4
 }
