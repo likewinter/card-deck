@@ -257,3 +257,33 @@ describe('PlayableCard support', function () {
             ->and($real->equals($wild))->toBeFalse();
     });
 });
+
+it('moveTo rolls back on target capacity exceeded', function () {
+    $source = Stack::fromString('A♣,2♦,3♥');
+    $target = new Stack(capacity: 2);
+
+    try {
+        $source->moveTo($target, 3);
+        expect(false)->toBeTrue('Expected exception was not thrown');
+    } catch (\InvalidArgumentException $e) {
+        // Expected — target can't hold 3 cards
+    }
+
+    expect($source->count())->toBe(3)
+        ->and($target->count())->toBe(0);
+});
+
+it('moveAllTo rolls back on target capacity exceeded', function () {
+    $source = Stack::fromString('A♣,2♦,3♥');
+    $target = new Stack(capacity: 2);
+
+    try {
+        $source->moveAllTo($target);
+        expect(false)->toBeTrue('Expected exception was not thrown');
+    } catch (\InvalidArgumentException $e) {
+        // Expected
+    }
+
+    expect($source->count())->toBe(3)
+        ->and($target->count())->toBe(0);
+});

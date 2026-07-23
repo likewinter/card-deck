@@ -2,7 +2,7 @@
 
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{Dealer, DeckBuilder, Hand, RankOrder, SuitOrder, Trick};
+use Likewinter\CardDeck\{DeckBuilder, Hand, RankOrder, SuitOrder, Table, Trick};
 use Likewinter\CardDeck\Card\{Rank, Suit};
 
 /**
@@ -19,19 +19,19 @@ readonly class Spades
     public const NUM_PLAYERS = 4;
     public const CARDS_PER_PLAYER = 13;
 
-    private readonly Dealer $dealer;
+    private readonly Table $table;
     private readonly SuitOrder $suitOrder;
     private readonly RankOrder $rankOrder;
 
-    public function __construct(?Dealer $dealer = null)
+    public function __construct(?Table $table = null)
     {
-        $this->dealer = $dealer ?? new Dealer(
+        $this->table = $table ?? new Table(
             deck: DeckBuilder::standard52()->build(),
             shuffle: true,
         );
 
         for ($i = 0; $i < self::NUM_PLAYERS; $i++) {
-            $this->dealer->addHands(new Hand(capacity: self::CARDS_PER_PLAYER));
+            $this->table->addHand("player-{$i}", new Hand(capacity: self::CARDS_PER_PLAYER));
         }
 
         $this->suitOrder = SuitOrder::suit(Suit::Spades);
@@ -43,7 +43,7 @@ readonly class Spades
      */
     public function deal(): void
     {
-        $this->dealer->drawAll(self::CARDS_PER_PLAYER);
+        $this->table->drawAll(self::CARDS_PER_PLAYER);
     }
 
     /**
@@ -51,7 +51,7 @@ readonly class Spades
      */
     public function hand(int $player): Hand
     {
-        return $this->dealer->getHands()[$player];
+        return $this->table->hand("player-{$player}");
     }
 
     /**
@@ -90,8 +90,7 @@ readonly class Spades
             $tricksWon[$winner]++;
             $leader = $winner;
 
-            // Collect played cards into the pile so resetGame can recover them
-            $this->dealer->getPile()->addCards(...$trick->cards());
+            $this->table->collectToPile(...$trick->cards());
         }
 
         return $tricksWon;
@@ -102,7 +101,7 @@ readonly class Spades
      */
     public function reset(): void
     {
-        $this->dealer->resetGame();
-        $this->dealer->getDeck()->shuffle();
+        $this->table->reset();
+        $this->table->shuffle();
     }
 }

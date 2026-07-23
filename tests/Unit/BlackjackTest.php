@@ -1,9 +1,9 @@
 <?php
 
 use Likewinter\CardDeck\Card;
-use Likewinter\CardDeck\Dealer;
 use Likewinter\CardDeck\DeckBuilder;
 use Likewinter\CardDeck\Hand;
+use Likewinter\CardDeck\Table;
 use Likewinter\CardDeck\Games\Blackjack;
 use Likewinter\CardDeck\Card\{Rank, Suit};
 
@@ -34,8 +34,8 @@ it('dealerPlay draws until 17 or higher', function () {
 it('determines outcome correctly', function () {
     // Build a deterministic scenario
     $deck = DeckBuilder::standard52()->build();
-    $dealer = new Dealer(deck: $deck);
-    $bj = new Blackjack(numPlayers: 1, dealer: $dealer);
+    $table = new Table(deck: $deck);
+    $bj = new Blackjack(numPlayers: 1, table: $table);
 
     $bj->deal();
     $bj->dealerPlay();

@@ -6,7 +6,7 @@
 It's an ordered, countable, iterable collection of `Card` objects with
 an optional capacity limit.
 
-`Hand` extends `Stack`. The `Dealer`'s pile is a `Stack`.
+`Hand` extends `Stack`. The `Table`'s deck and pile are `Stack`s.
 Any custom collection you build (a tableau column, a meld, a crib) can
 be a `Stack` too.
 

@@ -12,27 +12,26 @@ Requires PHP 8.3 or newer.
 
 ```php
 use Likewinter\CardDeck\DeckBuilder;
-use Likewinter\CardDeck\Dealer;
+use Likewinter\CardDeck\Table;
 use Likewinter\CardDeck\Hand;
 
 // 1. Build a deck
 $deck = DeckBuilder::standard52()->build();
 
-// 2. Create a dealer (pass shuffle: true to shuffle on construction)
-$dealer = new Dealer(deck: $deck, shuffle: true);
+// 2. Create a table (pass shuffle: true to shuffle on construction)
+$table = new Table(deck: $deck, shuffle: true);
 
-// 3. Create hands and register them with the dealer
-$alice = new Hand(capacity: 5);
-$bob   = new Hand(capacity: 5);
-$dealer->addHands($alice, $bob);
+// 3. Create hands and register them with the table
+$table->addHand('alice', new Hand(capacity: 5));
+$table->addHand('bob', new Hand(capacity: 5));
 
 // 4. Deal 5 cards to each hand
-$dealer->drawAll(5);
+$table->drawAll(5);
 
 // 5. Inspect the results
-echo "Alice: {$alice}\n";  // Alice: A♣,K♦,Q♥,J♠,10♣
-echo "Bob:   {$bob}\n";    // Bob:   9♥,8♦,7♠,6♣,5♥
-echo "Deck:  {$deck}\n";   // remaining 42 cards
+echo "Alice: {$table->hand('alice')}\n";  // Alice: A♣,K♦,Q♥,J♠,10♣
+echo "Bob:   {$table->hand('bob')}\n";    // Bob:   9♥,8♦,7♠,6♣,5♥
+echo "Deck:  {$table->deckCount()} cards remaining\n";
 ```
 
 ## The mental model
@@ -42,7 +41,7 @@ The framework is built around five layers, from generic to specific:
 ```
 Layer 1 — Identity       Card, Rank, Suit, PlayableCard
 Layer 2 — Collections    Stack, Hand
-Layer 3 — Orchestration  Dealer, DeckBuilder
+Layer 3 — Orchestration  Table, DeckBuilder
 Layer 4 — Game rules     RankOrder, SuitOrder, Trick, PlayerRing
 Layer 5 — Your game      (e.g. Games\Poker\Poker)
 ```
@@ -82,6 +81,6 @@ trick-taking games.
 
 - [Cards, ranks, and suits](cards.md) — the identity layer
 - [Stacks, decks, and hands](stacks.md) — the collection layer
-- [The dealer](dealer.md) — dealing and discarding
+- [The table](table.md) — dealing and discarding
 - [Rank ordering](rank-order.md) — game-specific rank values
 - [Implementing a game](implementing-a-game.md) — full walk-through

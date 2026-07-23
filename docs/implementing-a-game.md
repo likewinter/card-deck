@@ -9,10 +9,10 @@ as the example. The same pattern applies to any game.
 1. **Identify your game's needs.** What deck? How many cards per hand?
    How are ranks ordered? Is there trump? Are there wildcards?
 2. **Compose the primitives.** Use `DeckBuilder` for the deck, `Hand`
-   for player hands, `Dealer` for dealing, `RankOrder` for rank values.
+   for player hands, `Table` for dealing, `RankOrder` for rank values.
 3. **Add game-specific classes.** A `GameHand` (extending `Hand`), a
    `HandRank` enum or similar, a `Game` orchestration class.
-4. **Wire it up.** The `Game` class constructs the dealer, manages
+4. **Wire it up.** The `Game` class constructs the table, manages
    rounds, and exposes state.
 
 ## Example: Poker
@@ -95,37 +95,37 @@ the dependency one-directional.
 // src/Games/Poker.php (simplified)
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{Dealer, DeckBuilder, Hand};
+use Likewinter\CardDeck\{DeckBuilder, Hand, Table};
 use Likewinter\CardDeck\Games\Poker\PokerHand;
 
 readonly class Poker
 {
-    private readonly Dealer $dealer;
+    private readonly Table $table;
 
     public function __construct(
         private readonly int $handSize = 5,
         private readonly int $numHands = 3,
-        ?Dealer $dealer = null,
+        ?Table $table = null,
     ) {
-        $this->dealer = $dealer ?? new Dealer(
+        $this->table = $table ?? new Table(
             deck: DeckBuilder::standard52()->build(),
             shuffle: true,
         );
         for ($i = 0; $i < $this->numHands; $i++) {
-            $this->dealer->addHands(new Hand(capacity: $this->handSize));
+            $this->table->addHand("hand-{$i}", new Hand(capacity: $this->handSize));
         }
     }
 
-    public function deal(): void { $this->dealer->drawAll($this->handSize); }
+    public function deal(): void { $this->table->drawAll($this->handSize); }
 
     public function winners(): array { /* uses PokerHand::compare() */ }
-    public function reset(): void { $this->dealer->resetGame(); $this->dealer->getDeck()->shuffle(); }
+    public function reset(): void { $this->table->reset(); $this->table->shuffle(); }
 }
 ```
 
-The `Poker` class composes the primitives: a `Dealer` with a shuffled
-deck from `DeckBuilder`, a fixed number of `Hand`s, and game-specific
-methods (`deal`, `winners`, `reset`) that use `PokerHand`.
+The `Poker` class composes the primitives: a `Table` with a shuffled
+deck from `DeckBuilder`, a fixed number of named `Hand`s, and
+game-specific methods (`deal`, `winners`, `reset`) that use `PokerHand`.
 
 ## Applying the pattern to other games
 
@@ -156,8 +156,12 @@ function handValue(Hand $hand, RankOrder $order): int {
 ```php
 // Standard deck, 4 players, 13 cards each
 $deck = DeckBuilder::standard52()->build();
-$dealer = new Dealer(deck: $deck, shuffle: true);
-// ... deal 13 to each of 4 hands ...
+$table = new Table(deck: $deck, shuffle: true);
+$table->addHand('north', new Hand(capacity: 13));
+$table->addHand('east', new Hand(capacity: 13));
+$table->addHand('south', new Hand(capacity: 13));
+$table->addHand('west', new Hand(capacity: 13));
+$table->drawAll(13);
 
 // Trump for this hand
 $suitOrder = SuitOrder::suit(Suit::Spades);

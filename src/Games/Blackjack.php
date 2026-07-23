@@ -2,7 +2,7 @@
 
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{Dealer, DeckBuilder, Hand};
+use Likewinter\CardDeck\{DeckBuilder, Hand, Table};
 use Likewinter\CardDeck\Games\Blackjack\BlackjackHand;
 
 /**
@@ -18,24 +18,22 @@ readonly class Blackjack
     private const DEFAULT_NUM_DECKS = 6;
     private const DEALER_STANDS_ON = 17;
 
-    private readonly Dealer $dealer;
-    private readonly Hand $dealerHand;
+    private readonly Table $table;
 
     public function __construct(
         private readonly int $numPlayers = 1,
         int $numDecks = self::DEFAULT_NUM_DECKS,
-        ?Dealer $dealer = null,
+        ?Table $table = null,
     ) {
-        $this->dealer = $dealer ?? new Dealer(
+        $this->table = $table ?? new Table(
             deck: DeckBuilder::standard52()->times($numDecks)->build(),
             shuffle: true,
         );
 
-        $this->dealerHand = new Hand();
-        $this->dealer->addHands($this->dealerHand);
+        $this->table->addHand('dealer', new Hand());
 
         for ($i = 0; $i < $this->numPlayers; $i++) {
-            $this->dealer->addHands(new Hand());
+            $this->table->addHand("player-{$i}", new Hand());
         }
     }
 
@@ -44,7 +42,7 @@ readonly class Blackjack
      */
     public function deal(): void
     {
-        $this->dealer->drawAll(2);
+        $this->table->drawAll(2);
     }
 
     /**
@@ -52,8 +50,7 @@ readonly class Blackjack
      */
     public function hit(int $player): void
     {
-        $hand = $this->playerHand($player);
-        $this->dealer->drawToHand($hand, 1);
+        $this->table->draw("player-{$player}", 1);
     }
 
     /**
@@ -61,8 +58,8 @@ readonly class Blackjack
      */
     public function dealerPlay(): void
     {
-        while (BlackjackHand::fromHand($this->dealerHand)->value() < self::DEALER_STANDS_ON) {
-            $this->dealer->drawToHand($this->dealerHand, 1);
+        while (BlackjackHand::fromHand($this->table->hand('dealer'))->value() < self::DEALER_STANDS_ON) {
+            $this->table->draw('dealer', 1);
         }
     }
 
@@ -71,7 +68,7 @@ readonly class Blackjack
      */
     public function dealerCards(): BlackjackHand
     {
-        return BlackjackHand::fromHand($this->dealerHand);
+        return BlackjackHand::fromHand($this->table->hand('dealer'));
     }
 
     /**
@@ -79,7 +76,7 @@ readonly class Blackjack
      */
     public function playerCards(int $player): BlackjackHand
     {
-        return BlackjackHand::fromHand($this->playerHand($player));
+        return BlackjackHand::fromHand($this->table->hand("player-{$player}"));
     }
 
     /**
@@ -123,20 +120,7 @@ readonly class Blackjack
      */
     public function reset(): void
     {
-        $this->dealer->resetGame();
-        $this->dealer->getDeck()->shuffle();
-    }
-
-    private function playerHand(int $player): Hand
-    {
-        // +1 because the dealer hand is at index 0
-        $hands = $this->dealer->getHands();
-        $index = $player + 1;
-
-        if ($index < 0 || $index >= count($hands)) {
-            throw new \InvalidArgumentException("Player {$player} does not exist");
-        }
-
-        return $hands[$index];
+        $this->table->reset();
+        $this->table->shuffle();
     }
 }

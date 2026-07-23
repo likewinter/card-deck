@@ -2,7 +2,7 @@
 
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{Dealer, DeckBuilder, Hand};
+use Likewinter\CardDeck\{DeckBuilder, Hand, Table};
 use Likewinter\CardDeck\Games\Poker\PokerHand;
 
 readonly class Poker
@@ -11,13 +11,13 @@ readonly class Poker
     private const MIN_HANDS = 2;
     private const MAX_HANDS = 5;
 
-    private readonly Dealer $dealer;
+    private readonly Table $table;
 
     public function __construct(
         private readonly int $numHands = self::DEFAULT_NUM_HANDS,
-        ?Dealer $dealer = null,
+        ?Table $table = null,
     ) {
-        $this->dealer = $dealer ?? new Dealer(
+        $this->table = $table ?? new Table(
             deck: DeckBuilder::standard52()->build(),
             shuffle: true,
         );
@@ -25,7 +25,7 @@ readonly class Poker
         $this->validateConfig();
 
         for ($i = 0; $i < $this->numHands; $i++) {
-            $this->dealer->addHands(new Hand(capacity: PokerHand::HAND_SIZE));
+            $this->table->addHand("hand-{$i}", new Hand(capacity: PokerHand::HAND_SIZE));
         }
     }
 
@@ -40,7 +40,7 @@ readonly class Poker
 
     public function deal(): void
     {
-        $this->dealer->drawAll(PokerHand::HAND_SIZE);
+        $this->table->drawAll(PokerHand::HAND_SIZE);
     }
 
     /**
@@ -53,7 +53,8 @@ readonly class Poker
     public function hands(): array
     {
         $pokerHands = [];
-        foreach ($this->dealer->getHands() as $hand) {
+        foreach ($this->table->handNames() as $name) {
+            $hand = $this->table->hand($name);
             if ($hand->count() === PokerHand::HAND_SIZE) {
                 $pokerHands[] = PokerHand::fromHand($hand);
             }
@@ -68,8 +69,8 @@ readonly class Poker
      */
     public function reset(): void
     {
-        $this->dealer->resetGame();
-        $this->dealer->getDeck()->shuffle();
+        $this->table->reset();
+        $this->table->shuffle();
     }
 
     /**
