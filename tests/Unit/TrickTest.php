@@ -13,8 +13,7 @@ function trickCard(Suit $suit, Rank $rank): Card
 
 it('records played cards in order', function () {
     $trick = new Trick(
-        suitOrder: SuitOrder::noTrump(),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
         numPlayers: 3,
     );
 
@@ -28,8 +27,7 @@ it('records played cards in order', function () {
 
 it('sets lead suit from the first card played', function () {
     $trick = new Trick(
-        suitOrder: SuitOrder::noTrump(),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
         numPlayers: 2,
     );
 
@@ -41,8 +39,7 @@ it('sets lead suit from the first card played', function () {
 
 it('is empty before any play and complete after all players play', function () {
     $trick = new Trick(
-        suitOrder: SuitOrder::noTrump(),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
         numPlayers: 2,
     );
 
@@ -59,8 +56,7 @@ it('is empty before any play and complete after all players play', function () {
 
 it('rejects play after the trick is complete', function () {
     $trick = new Trick(
-        suitOrder: SuitOrder::noTrump(),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
         numPlayers: 2,
     );
     $trick->play(trickCard(Suit::Hearts, Rank::Two));
@@ -71,8 +67,7 @@ it('rejects play after the trick is complete', function () {
 
 it('rejects winner determination on an incomplete trick', function () {
     $trick = new Trick(
-        suitOrder: SuitOrder::noTrump(),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
         numPlayers: 2,
     );
     $trick->play(trickCard(Suit::Hearts, Rank::Two));
@@ -81,8 +76,7 @@ it('rejects winner determination on an incomplete trick', function () {
 
 it('tracks current player and enforces turn order', function () {
     $trick = new Trick(
-        suitOrder: SuitOrder::noTrump(),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
         numPlayers: 3,
     );
 
@@ -100,8 +94,7 @@ it('tracks current player and enforces turn order', function () {
 
 it('starts from a custom starting player', function () {
     $trick = new Trick(
-        suitOrder: SuitOrder::noTrump(),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
         numPlayers: 3,
         startingPlayer: 2,
     );
@@ -114,8 +107,7 @@ it('starts from a custom starting player', function () {
 
 it('determines winner — highest card in led suit (no trump)', function () {
     $trick = new Trick(
-        suitOrder: SuitOrder::noTrump(),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
         numPlayers: 4,
     );
 
@@ -129,8 +121,7 @@ it('determines winner — highest card in led suit (no trump)', function () {
 
 it('determines winner — trump beats non-trump', function () {
     $trick = new Trick(
-        suitOrder: SuitOrder::suit(Suit::Spades),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::suit(Suit::Spades, RankOrder::poker()),
         numPlayers: 4,
     );
 
@@ -145,8 +136,7 @@ it('determines winner — trump beats non-trump', function () {
 
 it('determines winner — higher trump beats lower trump', function () {
     $trick = new Trick(
-        suitOrder: SuitOrder::suit(Suit::Spades),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::suit(Suit::Spades, RankOrder::poker()),
         numPlayers: 3,
     );
 
@@ -159,8 +149,7 @@ it('determines winner — higher trump beats lower trump', function () {
 
 it('determines winner — first player wins when no one follows or trumps', function () {
     $trick = new Trick(
-        suitOrder: SuitOrder::noTrump(),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
         numPlayers: 3,
     );
 
@@ -174,8 +163,7 @@ it('determines winner — first player wins when no one follows or trumps', func
 
 it('clear resets the trick for reuse', function () {
     $trick = new Trick(
-        suitOrder: SuitOrder::noTrump(),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
         numPlayers: 2,
     );
     $trick->play(trickCard(Suit::Hearts, Rank::Two));
@@ -192,8 +180,7 @@ it('clear resets the trick for reuse', function () {
 
 it('clear with nextLeader sets who leads the next trick', function () {
     $trick = new Trick(
-        suitOrder: SuitOrder::noTrump(),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
         numPlayers: 4,
     );
 
@@ -211,8 +198,7 @@ it('clear with nextLeader sets who leads the next trick', function () {
 
 it('rejects fewer than 2 players', function () {
     new Trick(
-        suitOrder: SuitOrder::noTrump(),
-        rankOrder: RankOrder::poker(),
+        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
         numPlayers: 1,
     );
 })->throws(\InvalidArgumentException::class);

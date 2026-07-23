@@ -11,10 +11,10 @@ use Likewinter\CardDeck\Card\Suit;
  * A trick starts when the current player leads a card. Each subsequent
  * player plays in turn order (enforced internally via PlayerRing). When
  * all players have played, winner() returns the index of the player
- * whose card won the trick, determined by SuitOrder + RankOrder.
+ * whose card won the trick, determined by the SuitOrder.
  *
- * Trump and rank ordering are supplied at construction so the same Trick
- * works for Bridge, Spades, Hearts, Euchre, Pinochle, etc.
+ * Trump rules, lead-suit rules, and rank ordering are all carried by
+ * the SuitOrder supplied at construction.
  */
 final class Trick
 {
@@ -30,7 +30,6 @@ final class Trick
 
     public function __construct(
         private readonly SuitOrder $suitOrder,
-        private readonly RankOrder $rankOrder,
         private readonly int $numPlayers,
         int $startingPlayer = 0,
     ) {
@@ -106,8 +105,7 @@ final class Trick
             if ($this->suitOrder->beats(
                 $this->cards[$i],
                 $this->cards[$winnerIdx],
-                $this->leadSuit,
-                $this->rankOrder
+                $this->leadSuit
             )) {
                 $winnerIdx = $i;
             }

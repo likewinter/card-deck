@@ -8,20 +8,22 @@ all three.
 ## SuitOrder
 
 `SuitOrder` encodes the trump configuration and answers "does card A
-beat card B in this trick?" A `?Suit $trumpSuit` is all it needs —
-`null` means no trump, a `Suit` means that suit is trump.
+beat card B in this trick?" It takes a `?Suit $trumpSuit` (`null` means
+no trump, a `Suit` means that suit is trump) and a `RankOrder` for
+rank comparisons.
 
 ```php
 use Likewinter\CardDeck\SuitOrder;
+use Likewinter\CardDeck\RankOrder;
 
 // Factories
-SuitOrder::noTrump();                  // no trump
-SuitOrder::suit(Suit::Spades);         // Spades are trump
+SuitOrder::noTrump(RankOrder::poker());                  // no trump
+SuitOrder::suit(Suit::Spades, RankOrder::poker());       // Spades are trump
 
 // Usage
-$order = SuitOrder::suit(Suit::Spades);
+$order = SuitOrder::suit(Suit::Spades, RankOrder::poker());
 $order->isTrump($card);                // bool
-$order->beats($a, $b, $leadSuit, $rankOrder);  // bool
+$order->beats($a, $b, $leadSuit);      // bool
 ```
 
 ### Construction rules
@@ -30,12 +32,12 @@ $order->beats($a, $b, $leadSuit, $rankOrder);  // bool
 
 ### `beats()` — the trick resolution rule
 
-`SuitOrder::beats(Card $a, Card $b, ?Suit $leadSuit, RankOrder $rankOrder)`
+`SuitOrder::beats(Card $a, Card $b, ?Suit $leadSuit)`
 implements the standard trick-taking comparison:
 
 1. **Trump beats non-trump.** Any trump card beats any non-trump card.
-2. **Higher trump beats lower trump.** Compared via the supplied
-   `RankOrder`.
+2. **Higher trump beats lower trump.** Compared via the `RankOrder`
+   supplied at construction.
 3. **Led-suit follower beats off-suit.** A card following the lead suit
    beats a card in a different non-trump suit.
 4. **Higher rank wins within the same suit.** Compared via `RankOrder`.
@@ -54,16 +56,15 @@ determines the winner.
 use Likewinter\CardDeck\Trick;
 
 $trick = new Trick(
-    suitOrder: SuitOrder::suit(Suit::Spades),
-    rankOrder: RankOrder::poker(),
+    suitOrder: SuitOrder::suit(Suit::Spades, RankOrder::poker()),
     numPlayers: 4,
 );
 
-// Players play in turn
-$trick->play(0, $card0);   // player 0 leads (sets the lead suit)
-$trick->play(1, $card1);
-$trick->play(2, $card2);
-$trick->play(3, $card3);
+// Players play in turn (turn order enforced internally)
+$trick->play($card0);   // player 0 leads (sets the lead suit)
+$trick->play($card1);
+$trick->play($card2);
+$trick->play($card3);
 
 // Determine the winner
 $trick->isComplete();      // true (all 4 played)
@@ -78,13 +79,12 @@ $trick->clear();
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `play(int $player, Card $card)` | `void` | A player plays a card |
+| `play(Card $card)` | `void` | Current player plays a card (turn order enforced) |
 | `isComplete()` | `bool` | All players have played |
 | `isEmpty()` | `bool` | No cards played yet |
 | `winner()` | `int` | Player index who won (throws if incomplete) |
 | `leadSuit()` | `?Suit` | The suit that was led |
 | `cards()` | `list<Card>` | Cards in play order |
-| `players()` | `list<int>` | Player indices in play order |
 | `clear()` | `void` | Reset for reuse |
 
 ## PlayerRing
@@ -125,19 +125,14 @@ $ring->advance(3);         // jump 3 steps (wraps)
 A minimal trick-taking round:
 
 ```php
-$suitOrder = SuitOrder::suit(Suit::Spades);
-$rankOrder = RankOrder::poker();
-$ring = new PlayerRing(numPlayers: 4);
-$trick = new Trick($suitOrder, $rankOrder, numPlayers: 4);
+$suitOrder = SuitOrder::suit(Suit::Spades, RankOrder::poker());
+$trick = new Trick($suitOrder, numPlayers: 4);
 
 for ($i = 0; $i < 4; $i++) {
-    $player = $ring->current();
-    $card = $hands[$player]->takeTop();   // your game's logic
-    $trick->play($player, $card);
-    $ring->next();
+    $card = $hands[$i]->takeTop();   // your game's logic
+    $trick->play($card);
 }
 
 $winner = $trick->winner();
 $trick->clear();
-$ring->setCurrent($winner);  // winner leads the next trick
 ```

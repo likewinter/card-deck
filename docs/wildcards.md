@@ -73,22 +73,27 @@ echo $wild;                   // A♣
 
 ## Using Wildcard in a game
 
-`Wildcard` doesn't integrate with `Stack` directly — those
-hold `Card` objects. Your game logic decides how to handle wildcards:
+`Wildcard` implements `PlayableCard`, so it works directly in `Stack`
+alongside regular cards:
 
 ```php
-// A hand that may contain wildcards
-$hand = [...];  // list<Card|Wildcard>
+$hand = new Stack();
+$hand->addCards($aceOfSpades, new Wildcard($joker));
+```
 
-function effectiveCard(Card|Wildcard $c): Card {
+Your game logic decides how to resolve wildcards to their effective
+card:
+
+```php
+function effectiveCard(PlayableCard $c): Card {
     return $c instanceof Wildcard && $c->effective() !== null
         ? $c->effective()
         : ($c instanceof Wildcard ? $c->wild : $c);
 }
 
 // Check if a hand contains a specific effective card
-function hasEffectiveCard(array $hand, Card $target): bool {
-    foreach ($hand as $item) {
+function hasEffectiveCard(Stack $hand, Card $target): bool {
+    foreach ($hand->cards() as $item) {
         if (effectiveCard($item)->equals($target)) {
             return true;
         }

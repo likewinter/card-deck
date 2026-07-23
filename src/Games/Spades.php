@@ -8,9 +8,9 @@ use Likewinter\CardDeck\Card\{Rank, Suit};
 /**
  * Spades — a trick-taking game where spades are always trump.
  *
- * Demonstrates: SuitOrder with a trump suit, Trick with enforced
- * turn order, PlayerRing (via Trick), RankOrder::poker() for
- * within-suit comparison, and trick-counting scoring.
+ * Demonstrates: SuitOrder with a trump suit and rank ordering, Trick
+ * with enforced turn order, PlayerRing (via Trick), and trick-counting
+ * scoring.
  *
  * 4 players, 13 cards each, 13 tricks per hand.
  */
@@ -21,7 +21,6 @@ readonly class Spades
 
     private readonly Table $table;
     private readonly SuitOrder $suitOrder;
-    private readonly RankOrder $rankOrder;
 
     public function __construct(?Table $table = null)
     {
@@ -34,8 +33,7 @@ readonly class Spades
             $this->table->addHand("player-{$i}", new Stack(capacity: self::CARDS_PER_PLAYER));
         }
 
-        $this->suitOrder = SuitOrder::suit(Suit::Spades);
-        $this->rankOrder = RankOrder::poker();
+        $this->suitOrder = SuitOrder::suit(Suit::Spades, RankOrder::poker());
     }
 
     /**
@@ -71,7 +69,6 @@ readonly class Spades
         for ($t = 0; $t < self::CARDS_PER_PLAYER; $t++) {
             $trick = new Trick(
                 suitOrder: $this->suitOrder,
-                rankOrder: $this->rankOrder,
                 numPlayers: self::NUM_PLAYERS,
                 startingPlayer: $leader,
             );

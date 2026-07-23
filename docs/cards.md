@@ -59,8 +59,6 @@ See [Rank ordering](rank-order.md) for why this design exists.
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `equals(Card $other)` | `bool` | Same suit and rank |
-| `isSameSuitAs(Card $other)` | `bool` | Same suit |
-| `isSameRankAs(Card $other)` | `bool` | Same rank |
 | `isJoker()` | `bool` | Rank is Joker |
 | `__toString()` | `string` | e.g. `A♥` |
 | `Card::fromString(string)` | `self` | Parse `A♥` → Card |

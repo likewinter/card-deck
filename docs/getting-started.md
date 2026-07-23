@@ -6,7 +6,7 @@
 composer require likewinter/card-deck
 ```
 
-Requires PHP 8.3 or newer.
+Requires PHP 8.4 or newer.
 
 ## Your first deal
 

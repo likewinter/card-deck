@@ -78,14 +78,12 @@ makes orientation opt-in.
 
 ## Using CardInPlay in a stack
 
-`Stack` is typed for `Card`, not `CardInPlay`. If your game needs a
-stack of face-down cards, you have two options:
+`Stack` holds any `PlayableCard`, and `CardInPlay` implements that
+interface — so face-down cards work directly in stacks:
 
-1. **Keep two parallel arrays** — one of `Card` (for logic), one of
-   `CardInPlay` (for display). Simple, but duplicated state.
-2. **Build a FaceStack** — a small class wrapping `list<CardInPlay>`
-   with similar methods to `Stack`. The framework doesn't provide this
-   yet, but it's a natural extension.
+```php
+$stack = new Stack();
+$stack->addCards(CardInPlay::down($card1), CardInPlay::up($card2));
+```
 
-For most games, option 1 is sufficient — the logic operates on `Card`
-values, and the display layer tracks orientation separately.
+No wrapper class or parallel arrays needed.
