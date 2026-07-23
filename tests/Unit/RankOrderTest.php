@@ -14,8 +14,7 @@ describe('poker ordering', function () {
 
     it('treats Ace as the highest rank', function () {
         $order = RankOrder::poker();
-        expect($order->highest)->toBe(Rank::Ace)
-            ->and($order->isHighest(Rank::Ace))->toBeTrue()
+        expect($order->isHighest(Rank::Ace))->toBeTrue()
             ->and($order->isHighest(Rank::King))->toBeFalse();
     });
 
@@ -42,7 +41,7 @@ describe('pokerLowAce ordering', function () {
         $order = RankOrder::pokerLowAce();
         expect($order->value(Rank::Ace))->toBe(1)
             ->and($order->value(Rank::Two))->toBe(2)
-            ->and($order->highest)->toBe(Rank::King);
+            ->and($order->isHighest(Rank::King))->toBeTrue();
     });
 
     it('Ace is the lowest in this ordering', function () {
@@ -65,6 +64,33 @@ describe('blackjack ordering', function () {
         expect($order->value(Rank::Ace))->toBe(11)
             ->and($order->value(Rank::Ten))->toBe(10);
     });
+});
+
+describe('fromRanks', function () {
+    it('builds an ordering from a list of ranks (lowest first)', function () {
+        $order = RankOrder::fromRanks(Rank::Nine, Rank::Jack, Rank::Queen, Rank::King, Rank::Ten, Rank::Ace);
+        expect($order->value(Rank::Nine))->toBe(1)
+            ->and($order->value(Rank::Ace))->toBe(6)
+            ->and($order->isHighest(Rank::Ace))->toBeTrue()
+            ->and($order->compare(Rank::Ace, Rank::Nine))->toBe(1);
+    });
+
+    it('walks next and previous through the custom ordering', function () {
+        $order = RankOrder::fromRanks(Rank::Nine, Rank::Jack, Rank::Queen, Rank::King, Rank::Ten, Rank::Ace);
+        expect($order->next(Rank::Nine))->toBe(Rank::Jack)
+            ->and($order->next(Rank::Ace))->toBeNull()
+            ->and($order->previous(Rank::Nine))->toBeNull()
+            ->and($order->previous(Rank::Ace))->toBe(Rank::Ten);
+    });
+
+    it('rejects an empty rank list', function () {
+        RankOrder::fromRanks();
+    })->throws(\InvalidArgumentException::class);
+
+    it('rejects ranks not in the order', function () {
+        $order = RankOrder::fromRanks(Rank::Nine, Rank::Ten);
+        $order->value(Rank::Ace);
+    })->throws(\InvalidArgumentException::class);
 });
 
 it('throws when asking for value of a rank not in the order', function () {

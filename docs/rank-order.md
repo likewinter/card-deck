@@ -52,32 +52,26 @@ Ace=1 if you need soft totals.
 
 ### Custom orderings
 
-Construct a `RankOrder` with any value map:
+Use `fromRanks()` with the ranks listed lowest-first:
 
 ```php
 use Likewinter\CardDeck\RankOrder;
 use Likewinter\CardDeck\Card\Rank;
 
-// Belote: J=20, 9=14, A=11, 10=10, K=4, Q=3, 8=0, 7=0
-$belote = new RankOrder(
-    values: [
-        Rank::Seven->name => 0,
-        Rank::Eight->name => 0,
-        Rank::Queen->name => 3,
-        Rank::King->name => 4,
-        Rank::Ten->name => 10,
-        Rank::Ace->name => 11,
-        Rank::Nine->name => 14,
-        Rank::Jack->name => 20,
-    ],
-    highest: Rank::Jack,
+// Belote: 7 < 8 < Q < K < 10 < A < 9 < J
+$belote = RankOrder::fromRanks(
+    Rank::Seven, Rank::Eight, Rank::Queen, Rank::King,
+    Rank::Ten, Rank::Ace, Rank::Nine, Rank::Jack,
 );
 
-$belote->isHigher(Rank::Jack, Rank::Ace);  // true (20 > 11)
+$belote->isHigher(Rank::Jack, Rank::Ace);  // true
+$belote->next(Rank::Ace);                  // Nine
+$belote->isHighest(Rank::Jack);            // true
 ```
 
-The values map is keyed by `Rank::name` (the enum case name, like
-`'Jack'`), not by the enum instance — PHP array keys can't be enums.
+`fromRanks()` assigns positional values (1, 2, 3, …) internally.
+The values are only meaningful for comparison — if your game needs
+specific scoring values, that's game logic, not a RankOrder concern.
 
 ### API reference
 
