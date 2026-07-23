@@ -8,10 +8,10 @@ as the example. The same pattern applies to any game.
 
 1. **Identify your game's needs.** What deck? How many cards per hand?
    How are ranks ordered? Is there trump? Are there wildcards?
-2. **Compose the primitives.** Use `DeckBuilder` for the deck, `Hand`
+2. **Compose the primitives.** Use `DeckBuilder` for the deck, `Stack`
    for player hands, `Table` for dealing, `RankOrder` for rank values.
-3. **Add game-specific classes.** A `GameHand` (extending `Hand`), a
-   `HandRank` enum or similar, a `Game` orchestration class.
+3. **Add game-specific classes.** A value object for evaluated hands,
+   a `HandRank` enum or similar, a `Game` orchestration class.
 4. **Wire it up.** The `Game` class constructs the table, manages
    rounds, and exposes state.
 
@@ -36,37 +36,34 @@ Poker uses a standard 52-card deck. `DeckBuilder::standard52()` handles
 the composition and returns a `Stack` with capacity 52. No wrapper class
 needed.
 
-### Step 2: The hand
+### Step 2: The hand value object
 
 ```php
 // src/Games/Poker/PokerHand.php (simplified)
 namespace Likewinter\CardDeck\Games\Poker;
 
-use Likewinter\CardDeck\Hand;
+use Likewinter\CardDeck\Stack;
 use Likewinter\CardDeck\RankOrder;
 
-class PokerHand extends Hand
+final readonly class PokerHand
 {
     public const HAND_SIZE = 5;
-    public readonly HandRank $handRank;
-    public readonly bool $isSameSuit;
-    public readonly bool $isSequentialRank;
+    public HandRank $handRank;
 
     public function __construct(array $cards, ?RankOrder $rankOrder = null)
     {
-        parent::__construct($cards, self::HAND_SIZE);
-        $this->rankOrder = $rankOrder ?? RankOrder::poker();
-        $this->sortByRank($this->rankOrder);
-        // ... compute properties, classify hand ...
+        // ... sort, compute properties, classify hand ...
         $this->handRank = $this->classify();
     }
 
+    public static function fromHand(Stack $hand): self { /* unwrap cards */ }
     public function compare(self $other): int { /* tiebreaker logic */ }
 }
 ```
 
-`PokerHand` extends `Hand` and computes poker-specific properties
-(rank sets, flush/straight detection, hand rank) in the constructor.
+`PokerHand` is an immutable value object that classifies 5 cards.
+It does not extend `Stack` — it's a classified snapshot, not a mutable
+collection. `fromHand()` builds one from a `Stack` of dealt cards.
 Classification and comparison live inside `PokerHand` — the `HandRank`
 enum is a pure value it returns, not a collaborator.
 
@@ -95,7 +92,7 @@ the dependency one-directional.
 // src/Games/Poker.php (simplified)
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{DeckBuilder, Hand, Table};
+use Likewinter\CardDeck\{DeckBuilder, Stack, Table};
 use Likewinter\CardDeck\Games\Poker\PokerHand;
 
 readonly class Poker
@@ -112,7 +109,7 @@ readonly class Poker
             shuffle: true,
         );
         for ($i = 0; $i < $this->numHands; $i++) {
-            $this->table->addHand("hand-{$i}", new Hand(capacity: $this->handSize));
+            $this->table->addHand("hand-{$i}", new Stack(capacity: $this->handSize));
         }
     }
 
@@ -124,7 +121,7 @@ readonly class Poker
 ```
 
 The `Poker` class composes the primitives: a `Table` with a shuffled
-deck from `DeckBuilder`, a fixed number of named `Hand`s, and
+deck from `DeckBuilder`, a fixed number of named `Stack`s, and
 game-specific methods (`deal`, `winners`, `reset`) that use `PokerHand`.
 
 ## Applying the pattern to other games
@@ -139,7 +136,7 @@ $deck = DeckBuilder::standard52()->times(6)->build();
 $order = RankOrder::blackjack();
 
 // Hand value: sum of card values, with Ace soft/hard logic
-function handValue(Hand $hand, RankOrder $order): int {
+function handValue(Stack $hand, RankOrder $order): int {
     $total = 0;
     $aces = 0;
     foreach ($hand as $card) {
@@ -157,10 +154,10 @@ function handValue(Hand $hand, RankOrder $order): int {
 // Standard deck, 4 players, 13 cards each
 $deck = DeckBuilder::standard52()->build();
 $table = new Table(deck: $deck, shuffle: true);
-$table->addHand('north', new Hand(capacity: 13));
-$table->addHand('east', new Hand(capacity: 13));
-$table->addHand('south', new Hand(capacity: 13));
-$table->addHand('west', new Hand(capacity: 13));
+$table->addHand('north', new Stack(capacity: 13));
+$table->addHand('east', new Stack(capacity: 13));
+$table->addHand('south', new Stack(capacity: 13));
+$table->addHand('west', new Stack(capacity: 13));
 $table->drawAll(13);
 
 // Trump for this hand

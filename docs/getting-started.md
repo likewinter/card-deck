@@ -13,7 +13,7 @@ Requires PHP 8.3 or newer.
 ```php
 use Likewinter\CardDeck\DeckBuilder;
 use Likewinter\CardDeck\Table;
-use Likewinter\CardDeck\Hand;
+use Likewinter\CardDeck\Stack;
 
 // 1. Build a deck
 $deck = DeckBuilder::standard52()->build();
@@ -22,8 +22,8 @@ $deck = DeckBuilder::standard52()->build();
 $table = new Table(deck: $deck, shuffle: true);
 
 // 3. Create hands and register them with the table
-$table->addHand('alice', new Hand(capacity: 5));
-$table->addHand('bob', new Hand(capacity: 5));
+$table->addHand('alice', new Stack(capacity: 5));
+$table->addHand('bob', new Stack(capacity: 5));
 
 // 4. Deal 5 cards to each hand
 $table->drawAll(5);
@@ -40,7 +40,7 @@ The framework is built around five layers, from generic to specific:
 
 ```
 Layer 1 — Identity       Card, Rank, Suit, PlayableCard
-Layer 2 — Collections    Stack, Hand
+Layer 2 — Collections    Stack
 Layer 3 — Orchestration  Table, DeckBuilder
 Layer 4 — Game rules     RankOrder, SuitOrder, Trick, PlayerRing
 Layer 5 — Your game      (e.g. Games\Poker\Poker)

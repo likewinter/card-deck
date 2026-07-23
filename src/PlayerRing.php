@@ -10,7 +10,7 @@ namespace Likewinter\CardDeck;
  * games query 'whose turn is it?' and 'advance to the next player'.
  *
  * Players are identified by integer index (0-based). Games map these to
- * their own player representation (names, Hand objects, etc.).
+ * their own player representation (names, Stack objects, etc.).
  */
 final class PlayerRing
 {

@@ -2,7 +2,7 @@
 
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{DeckBuilder, Hand, RankOrder, SuitOrder, Table, Trick};
+use Likewinter\CardDeck\{DeckBuilder, RankOrder, Stack, SuitOrder, Table, Trick};
 use Likewinter\CardDeck\Card\{Rank, Suit};
 
 /**
@@ -31,7 +31,7 @@ readonly class Spades
         );
 
         for ($i = 0; $i < self::NUM_PLAYERS; $i++) {
-            $this->table->addHand("player-{$i}", new Hand(capacity: self::CARDS_PER_PLAYER));
+            $this->table->addHand("player-{$i}", new Stack(capacity: self::CARDS_PER_PLAYER));
         }
 
         $this->suitOrder = SuitOrder::suit(Suit::Spades);
@@ -49,7 +49,7 @@ readonly class Spades
     /**
      * Returns a player's hand.
      */
-    public function hand(int $player): Hand
+    public function hand(int $player): Stack
     {
         return $this->table->hand("player-{$player}");
     }
@@ -59,7 +59,7 @@ readonly class Spades
      * one card from their hand. The winner of each trick leads the
      * next. Returns the tricks-won count per player.
      *
-     * @param callable(int $player, Hand $hand, ?Suit $leadSuit): \Likewinter\CardDeck\Card $chooseCard
+     * @param callable(int $player, Stack $hand, ?Suit $leadSuit): \Likewinter\CardDeck\Card $chooseCard
      *        A callback that picks a card for the given player.
      * @return array<int, int> Tricks won per player.
      */

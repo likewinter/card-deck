@@ -73,7 +73,7 @@ echo $wild;                   // A♣
 
 ## Using Wildcard in a game
 
-`Wildcard` doesn't integrate with `Stack` or `Hand` directly — those
+`Wildcard` doesn't integrate with `Stack` directly — those
 hold `Card` objects. Your game logic decides how to handle wildcards:
 
 ```php

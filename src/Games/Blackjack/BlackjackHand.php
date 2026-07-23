@@ -6,8 +6,8 @@ use ArrayIterator;
 use Iterator;
 use IteratorAggregate;
 use Likewinter\CardDeck\Card;
-use Likewinter\CardDeck\Hand;
 use Likewinter\CardDeck\RankOrder;
+use Likewinter\CardDeck\Stack;
 use Likewinter\CardDeck\Card\Rank;
 
 /**
@@ -35,7 +35,7 @@ final readonly class BlackjackHand implements IteratorAggregate, \Countable, \St
         $this->rankOrder = $rankOrder ?? RankOrder::blackjack();
     }
 
-    public static function fromHand(Hand $hand): self
+    public static function fromHand(Stack $hand): self
     {
         $cards = array_map(
             fn($card) => $card->underlyingCard(),

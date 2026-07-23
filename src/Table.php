@@ -11,8 +11,8 @@ namespace Likewinter\CardDeck;
  * private; games interact only through Table's behavioral methods.
  *
  * Hands are keyed by string identifiers chosen by the game:
- *   $table->addHand('dealer', new Hand());
- *   $table->addHand('north', new Hand(capacity: 13));
+ *   $table->addHand('dealer', new Stack());
+ *   $table->addHand('north', new Stack(capacity: 13));
  *   $table->draw('north', 5);
  */
 class Table
@@ -20,7 +20,7 @@ class Table
     private Stack $deck;
     private Stack $pile;
 
-    /** @var array<string, Hand> */
+    /** @var array<string, Stack> */
     private array $hands = [];
 
     public function __construct(
@@ -37,7 +37,7 @@ class Table
 
     // ── Hand registry ────────────────────────────────────────────────────
 
-    public function addHand(string $name, Hand $hand): void
+    public function addHand(string $name, Stack $hand): void
     {
         if (isset($this->hands[$name])) {
             throw new \InvalidArgumentException("Hand '{$name}' already exists");
@@ -55,7 +55,7 @@ class Table
         unset($this->hands[$name]);
     }
 
-    public function hand(string $name): Hand
+    public function hand(string $name): Stack
     {
         return $this->hands[$name]
             ?? throw new \InvalidArgumentException("Hand '{$name}' does not exist");
@@ -196,7 +196,7 @@ class Table
         }
     }
 
-    private function drawRandomToHand(Hand $hand, int $num): void
+    private function drawRandomToHand(Stack $hand, int $num): void
     {
         for ($i = 0; $i < $num; $i++) {
             $this->deck->moveCardsTo($hand, ...$this->deck->peekRandom());

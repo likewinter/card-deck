@@ -1,7 +1,7 @@
 <?php
 
 use Likewinter\CardDeck\Card;
-use Likewinter\CardDeck\Hand;
+use Likewinter\CardDeck\Stack;
 use Likewinter\CardDeck\Games\Spades;
 use Likewinter\CardDeck\Card\{Rank, Suit};
 
@@ -19,7 +19,7 @@ it('plays a full hand of 13 tricks', function () {
     $spades->deal();
 
     $scores = $spades->playHand(
-        function (int $player, Hand $hand, ?Suit $leadSuit): Card {
+        function (int $player, Stack $hand, ?Suit $leadSuit): Card {
             $cards = [...$hand];
             if ($leadSuit !== null) {
                 $suited = array_filter($cards, fn(Card $c) => $c->suit === $leadSuit);
@@ -40,7 +40,7 @@ it('empties all hands after playing', function () {
     $spades->deal();
 
     $spades->playHand(
-        fn(int $player, Hand $hand, ?Suit $leadSuit): Card => [...$hand][0]
+        fn(int $player, Stack $hand, ?Suit $leadSuit): Card => [...$hand][0]
     );
 
     for ($p = 0; $p < 4; $p++) {
@@ -53,7 +53,7 @@ it('reset restores the deck for a new hand', function () {
     $spades->deal();
 
     $spades->playHand(
-        fn(int $player, Hand $hand, ?Suit $leadSuit): Card => [...$hand][0]
+        fn(int $player, Stack $hand, ?Suit $leadSuit): Card => [...$hand][0]
     );
 
     $spades->reset();

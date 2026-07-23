@@ -1,7 +1,7 @@
 <?php
 
 use Likewinter\CardDeck\Card;
-use Likewinter\CardDeck\Hand;
+use Likewinter\CardDeck\Stack;
 use Likewinter\CardDeck\RankOrder;
 use Likewinter\CardDeck\Games\Spades;
 use Likewinter\CardDeck\Card\{Rank, Suit};
@@ -34,7 +34,7 @@ $RESET  = $color ? "\033[0m"  : '';
 
 $rankOrder = RankOrder::poker();
 
-function chooseCard(int $player, Hand $hand, ?Suit $leadSuit, RankOrder $rankOrder): Card
+function chooseCard(int $player, Stack $hand, ?Suit $leadSuit, RankOrder $rankOrder): Card
 {
     $cards = [...$hand];
 
@@ -107,7 +107,7 @@ for ($h = 1; $h <= $numHands; $h++) {
 
     // Play the hand
     $scores = $spades->playHand(
-        fn(int $player, Hand $hand, ?Suit $leadSuit) =>
+        fn(int $player, Stack $hand, ?Suit $leadSuit) =>
             chooseCard($player, $hand, $leadSuit, $rankOrder)
     );
 

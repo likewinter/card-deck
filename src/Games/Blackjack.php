@@ -2,7 +2,7 @@
 
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{DeckBuilder, Hand, Table};
+use Likewinter\CardDeck\{DeckBuilder, Stack, Table};
 use Likewinter\CardDeck\Games\Blackjack\BlackjackHand;
 
 /**
@@ -30,10 +30,10 @@ readonly class Blackjack
             shuffle: true,
         );
 
-        $this->table->addHand('dealer', new Hand());
+        $this->table->addHand('dealer', new Stack());
 
         for ($i = 0; $i < $this->numPlayers; $i++) {
-            $this->table->addHand("player-{$i}", new Hand());
+            $this->table->addHand("player-{$i}", new Stack());
         }
     }
 

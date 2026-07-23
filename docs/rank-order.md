@@ -93,20 +93,18 @@ The values map is keyed by `Rank::name` (the enum case name, like
 `value()` throws `InvalidArgumentException` if the rank isn't in the
 order (e.g. `Rank::Joker` in `RankOrder::poker()`).
 
-## Using RankOrder with Hand
-
-`Hand::sortByRank()` accepts an optional `RankOrder`:
-
-```php
-$hand->sortByRank();                          // uses poker() by default
-$hand->sortByRank(RankOrder::blackjack());    // custom order
-```
-
 ## Using RankOrder with Stack
 
-For custom sorting, use `Stack::sort()` with a closure:
+`Stack::sortByRank()` sorts cards by a `RankOrder`:
 
 ```php
-$order = RankOrder::belote();
+$stack->sortByRank(RankOrder::poker());       // poker ordering
+$stack->sortByRank(RankOrder::blackjack());   // custom order
+```
+
+For more control, use `Stack::sort()` with a closure:
+
+```php
+$order = RankOrder::poker();
 $stack->sort(fn(Card $a, Card $b) => $order->compare($a->rank, $b->rank));
 ```

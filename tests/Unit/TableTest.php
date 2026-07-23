@@ -2,7 +2,6 @@
 
 use Likewinter\CardDeck\DeckBuilder;
 use Likewinter\CardDeck\DrawMode;
-use Likewinter\CardDeck\Hand;
 use Likewinter\CardDeck\Stack;
 use Likewinter\CardDeck\Table;
 
@@ -36,7 +35,7 @@ it('shuffles the deck when shuffle: true', function () {
 
 it('can add and retrieve hands by name', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build());
-    $hand = new Hand(capacity: 5);
+    $hand = new Stack(capacity: 5);
     $table->addHand('player-0', $hand);
 
     expect($table->hand('player-0'))->toBe($hand)
@@ -46,8 +45,8 @@ it('can add and retrieve hands by name', function () {
 
 it('rejects duplicate hand names', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build());
-    $table->addHand('player-0', new Hand());
-    $table->addHand('player-0', new Hand());
+    $table->addHand('player-0', new Stack());
+    $table->addHand('player-0', new Stack());
 })->throws(\InvalidArgumentException::class);
 
 it('throws when accessing a non-existent hand', function () {
@@ -57,8 +56,8 @@ it('throws when accessing a non-existent hand', function () {
 
 it('can remove a hand and dump its cards onto the pile', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build());
-    $table->addHand('player-0', new Hand(capacity: 5));
-    $table->addHand('player-1', new Hand(capacity: 5));
+    $table->addHand('player-0', new Stack(capacity: 5));
+    $table->addHand('player-1', new Stack(capacity: 5));
     $table->draw('player-0', 3);
 
     $table->removeHand('player-0');
@@ -72,8 +71,8 @@ it('can remove a hand and dump its cards onto the pile', function () {
 
 it('draws sequentially by default', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build(), drawMode: DrawMode::Sequential);
-    $table->addHand('p0', new Hand(capacity: 5));
-    $table->addHand('p1', new Hand(capacity: 5));
+    $table->addHand('p0', new Stack(capacity: 5));
+    $table->addHand('p1', new Stack(capacity: 5));
     $table->drawAll(3);
 
     expect($table->hand('p0')->count())->toBe(3)
@@ -83,8 +82,8 @@ it('draws sequentially by default', function () {
 
 it('draws one card per hand per round in OneByOne mode', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build(), drawMode: DrawMode::OneByOne);
-    $table->addHand('p0', new Hand(capacity: 5));
-    $table->addHand('p1', new Hand(capacity: 5));
+    $table->addHand('p0', new Stack(capacity: 5));
+    $table->addHand('p1', new Stack(capacity: 5));
     $table->drawAll(2);
 
     expect($table->hand('p0')->count())->toBe(2)
@@ -94,8 +93,8 @@ it('draws one card per hand per round in OneByOne mode', function () {
 
 it('draws random cards in Random mode', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build(), drawMode: DrawMode::Random);
-    $table->addHand('p0', new Hand(capacity: 5));
-    $table->addHand('p1', new Hand(capacity: 5));
+    $table->addHand('p0', new Stack(capacity: 5));
+    $table->addHand('p1', new Stack(capacity: 5));
     $table->drawAll(2);
 
     expect($table->hand('p0')->count())->toBe(2)
@@ -105,7 +104,7 @@ it('draws random cards in Random mode', function () {
 
 it('draws to a specific hand', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build());
-    $table->addHand('p0', new Hand(capacity: 5));
+    $table->addHand('p0', new Stack(capacity: 5));
     $table->draw('p0', 4);
 
     expect($table->hand('p0')->count())->toBe(4)
@@ -124,14 +123,14 @@ it('drawAll throws when there are no hands', function () {
 
 it('drawAll throws when the deck does not have enough cards', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build());
-    $table->addHand('p0', new Hand());
-    $table->addHand('p1', new Hand());
+    $table->addHand('p0', new Stack());
+    $table->addHand('p1', new Stack());
     $table->drawAll(27);
 })->throws(\LogicException::class);
 
 it('draw throws when the deck does not have enough cards', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build());
-    $table->addHand('p0', new Hand());
+    $table->addHand('p0', new Stack());
     $table->draw('p0', 53);
 })->throws(\LogicException::class);
 
@@ -139,7 +138,7 @@ it('draw throws when the deck does not have enough cards', function () {
 
 it('discards the whole hand when no cards are specified', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build());
-    $table->addHand('p0', new Hand(capacity: 5));
+    $table->addHand('p0', new Stack(capacity: 5));
     $table->draw('p0', 3);
 
     $table->discard('p0');
@@ -150,7 +149,7 @@ it('discards the whole hand when no cards are specified', function () {
 
 it('discards only the specified cards when provided', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build());
-    $table->addHand('p0', new Hand(capacity: 5));
+    $table->addHand('p0', new Stack(capacity: 5));
     $table->draw('p0', 4);
     $cards = [...$table->hand('p0')];
     $cardsToDiscard = array_slice($cards, 0, 2);
@@ -174,7 +173,7 @@ it('collects external cards into the pile', function () {
 
 it('reset returns all cards to the deck', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build(), shuffle: true);
-    $table->addHand('p0', new Hand(capacity: 5));
+    $table->addHand('p0', new Stack(capacity: 5));
     $table->draw('p0', 5);
     $table->discard('p0');
 
@@ -190,7 +189,7 @@ it('reset returns all cards to the deck', function () {
 
 it('reset recovers collected pile cards', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build());
-    $table->addHand('p0', new Hand());
+    $table->addHand('p0', new Stack());
     $table->draw('p0', 5);
 
     $playedCards = [...$table->hand('p0')->takeTop(3)];
@@ -209,7 +208,7 @@ it('reset recovers collected pile cards', function () {
 
 it('shuffle randomizes the deck', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build());
-    $table->addHand('p0', new Hand());
+    $table->addHand('p0', new Stack());
     $table->draw('p0', 52);
     $originalOrder = (string) $table->hand('p0');
     $table->reset();

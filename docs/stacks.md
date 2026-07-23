@@ -6,7 +6,7 @@
 It's an ordered, countable, iterable collection of `Card` objects with
 an optional capacity limit.
 
-`Hand` extends `Stack`. The `Table`'s deck and pile are `Stack`s.
+The `Table`'s deck, pile, and hands are all `Stack`s.
 Any custom collection you build (a tableau column, a meld, a crib) can
 be a `Stack` too.
 
@@ -117,22 +117,16 @@ $deck = DeckBuilder::euchre()->build();       // Stack with capacity 24
 echo $deck->capacity;                         // 24
 ```
 
-## Hand
+## Rank and suit helpers
 
-`Hand` is a `Stack` with a capacity (defaults to 5) and two helpers for
-rank/suit inspection:
+`Stack` includes helpers for rank/suit inspection and sorting:
 
 ```php
-use Likewinter\CardDeck\Hand;
+$stack->sortByRank(RankOrder::poker());       // sorts by poker ordering
+$stack->sortByRank(RankOrder::blackjack());   // sorts by a custom order
 
-$hand = new Hand(capacity: 5);
-$hand = new Hand($cards, 13);                // bridge hand
-
-$hand->sortByRank(RankOrder::poker());       // sorts by poker ordering
-$hand->sortByRank(RankOrder::blackjack());   // sorts by a custom order
-
-$hand->getRanks();                           // list<Rank>
-$hand->getSuits();                           // list<Suit>
+$stack->getRanks();                           // list<Rank>
+$stack->getSuits();                           // list<Suit>
 ```
 
 `sortByRank()` requires a `RankOrder` argument.

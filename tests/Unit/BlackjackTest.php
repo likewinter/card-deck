@@ -2,7 +2,6 @@
 
 use Likewinter\CardDeck\Card;
 use Likewinter\CardDeck\DeckBuilder;
-use Likewinter\CardDeck\Hand;
 use Likewinter\CardDeck\Table;
 use Likewinter\CardDeck\Games\Blackjack;
 use Likewinter\CardDeck\Card\{Rank, Suit};

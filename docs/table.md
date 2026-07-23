@@ -39,12 +39,12 @@ Hands are keyed by string identifiers chosen by the game:
 
 ```php
 // Add hands
-$table->addHand('dealer', new Hand());
-$table->addHand('north', new Hand(capacity: 13));
-$table->addHand('south', new Hand(capacity: 13));
+$table->addHand('dealer', new Stack());
+$table->addHand('north', new Stack(capacity: 13));
+$table->addHand('south', new Stack(capacity: 13));
 
 // Retrieve a hand
-$table->hand('north');            // Hand
+$table->hand('north');            // Stack
 
 // Check existence
 $table->hasHand('north');         // true

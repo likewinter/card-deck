@@ -3,6 +3,7 @@
 use Likewinter\CardDeck\Card;
 use Likewinter\CardDeck\CardInPlay;
 use Likewinter\CardDeck\Face;
+use Likewinter\CardDeck\RankOrder;
 use Likewinter\CardDeck\Stack;
 use Likewinter\CardDeck\Wildcard;
 use Likewinter\CardDeck\Card\Rank;
@@ -286,4 +287,48 @@ it('moveAllTo rolls back on target capacity exceeded', function () {
 
     expect($source->count())->toBe(3)
         ->and($target->count())->toBe(0);
+});
+
+it('sorts by rank using the given RankOrder', function () {
+    $stack = new Stack(cards: [
+        new Card(suit: Suit::Hearts, rank: Rank::King),
+        new Card(suit: Suit::Spades, rank: Rank::Two),
+        new Card(suit: Suit::Clubs, rank: Rank::Ace),
+    ], capacity: 5);
+
+    $stack->sortByRank(RankOrder::poker());
+
+    $ranks = array_map(fn(Card $c) => $c->rank, [...$stack]);
+    expect($ranks)->toBe([Rank::Two, Rank::King, Rank::Ace]);
+});
+
+it('sorts by a custom RankOrder', function () {
+    $stack = new Stack(cards: [
+        new Card(suit: Suit::Hearts, rank: Rank::King),
+        new Card(suit: Suit::Spades, rank: Rank::Two),
+        new Card(suit: Suit::Clubs, rank: Rank::Ace),
+    ], capacity: 5);
+
+    $stack->sortByRank(RankOrder::pokerLowAce());
+
+    $ranks = array_map(fn(Card $c) => $c->rank, [...$stack]);
+    expect($ranks)->toBe([Rank::Ace, Rank::Two, Rank::King]);
+});
+
+it('extracts ranks from all cards', function () {
+    $stack = new Stack(cards: [
+        new Card(suit: Suit::Hearts, rank: Rank::Ace),
+        new Card(suit: Suit::Spades, rank: Rank::King),
+    ], capacity: 5);
+
+    expect($stack->getRanks())->toBe([Rank::Ace, Rank::King]);
+});
+
+it('extracts suits from all cards', function () {
+    $stack = new Stack(cards: [
+        new Card(suit: Suit::Hearts, rank: Rank::Ace),
+        new Card(suit: Suit::Spades, rank: Rank::King),
+    ], capacity: 5);
+
+    expect($stack->getSuits())->toBe([Suit::Hearts, Suit::Spades]);
 });

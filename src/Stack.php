@@ -5,6 +5,8 @@ namespace Likewinter\CardDeck;
 use ArrayIterator;
 use Iterator;
 use IteratorAggregate;
+use Likewinter\CardDeck\Card\Rank;
+use Likewinter\CardDeck\Card\Suit;
 
 /**
  * @implements IteratorAggregate<int, PlayableCard>
@@ -263,6 +265,23 @@ class Stack implements IteratorAggregate, \Countable
 
         $target->addCards(...$cards);
         $this->removeCards(...$cards);
+    }
+
+    public function sortByRank(RankOrder $rankOrder): void
+    {
+        $this->sort(fn(PlayableCard $a, PlayableCard $b) => $rankOrder->compare($a->underlyingCard()->rank, $b->underlyingCard()->rank));
+    }
+
+    /** @return list<Rank> */
+    public function getRanks(): array
+    {
+        return array_map(fn(PlayableCard $card) => $card->underlyingCard()->rank, $this->cards);
+    }
+
+    /** @return list<Suit> */
+    public function getSuits(): array
+    {
+        return array_map(fn(PlayableCard $card) => $card->underlyingCard()->suit, $this->cards);
     }
 
     public function sort(callable $callback): void

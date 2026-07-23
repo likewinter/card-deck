@@ -2,7 +2,7 @@
 
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{DeckBuilder, Hand, Table};
+use Likewinter\CardDeck\{DeckBuilder, Stack, Table};
 use Likewinter\CardDeck\Games\Poker\PokerHand;
 
 readonly class Poker
@@ -25,7 +25,7 @@ readonly class Poker
         $this->validateConfig();
 
         for ($i = 0; $i < $this->numHands; $i++) {
-            $this->table->addHand("hand-{$i}", new Hand(capacity: PokerHand::HAND_SIZE));
+            $this->table->addHand("hand-{$i}", new Stack(capacity: PokerHand::HAND_SIZE));
         }
     }
 
