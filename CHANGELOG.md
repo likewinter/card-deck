@@ -9,6 +9,85 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 No changes yet.
 
+## [0.6.0] - 2026-07-23
+
+Architecture deepening: replaces the shallow Dealer orchestrator with a
+deep Table module, dissolves the Hand subclass into Stack, encapsulates
+RankOrder's internals, fixes a latent equality bug, and adds primitives
+for Durak-style attack/defense games.
+
+### Added
+
+- **`Table`** (`src/Table.php`) — deep orchestration module replacing
+  `Dealer`. String-keyed named hands (`addHand('dealer', ...)`,
+  `hand('player-0')`), full Stack encapsulation (no `getDeck()` /
+  `getPile()`), `collectToPile()` for external cards (e.g. played
+  tricks), `drawUpTo()` for draw-to-target with deck exhaustion,
+  `peekDeck()` for non-destructive deck inspection (e.g. Durak trump
+  determination). Inspection via `deckCount()` / `pileCount()`.
+- **`Stack::hasRank(Rank): bool`** — one-call rank membership check.
+  Enables Durak's "can I add this card to the attack?" without
+  `in_array($rank, $stack->getRanks())`.
+- **`Stack::sortByRank()`, `getRanks()`, `getSuits()`** — moved from
+  the deleted `Hand` class. Work on any `PlayableCard` via
+  `underlyingCard()`.
+- **`RankOrder::fromRanks(Rank ...$ordered)`** — builds a custom
+  ordering from a lowest-first rank list. Expresses intent ("order
+  these ranks") instead of requiring knowledge of the internal array
+  format.
+- **`PlayableCard::equals()` contract documented** — per-implementation
+  identity semantics (Card: suit+rank, CardInPlay: card+face, Wildcard:
+  wild card only) and the type-narrowing rule are now specified in the
+  interface docblock.
+- 11 new tests (349 total, 711 assertions).
+
+### Changed
+
+#### Breaking changes
+- **`Dealer` removed.** Replaced by `Table`. Games construct
+  `new Table(deck: ..., drawMode: ..., shuffle: ...)` and register
+  named hands via `addHand(string, Stack)`. All three reference games
+  (Poker, Blackjack, Spades) updated.
+- **`Hand` removed.** Dissolved into `Stack`. `Table` accepts `Stack`.
+  `PokerHand::fromHand()` and `BlackjackHand::fromHand()` accept
+  `Stack`. The "hand-ness" of a Stack is conveyed by its string key
+  in the Table registry, not by a subclass.
+- **`RankOrder` constructor is now private.** Use the static factories
+  (`poker()`, `pokerLowAce()`, `blackjack()`) or `fromRanks()`. The
+  `values` and `highest` properties are no longer public — the
+  interface is purely behavioral (`value()`, `compare()`, `isHigher()`,
+  `isHighest()`, `next()`, `previous()`).
+- **`RankOrder::next()` / `previous()`** are now O(1) via precomputed
+  lookup maps (was O(n) iterating all `Rank::cases()` per call).
+- **`Spades::hand()`** returns `Stack` instead of `Hand`. The
+  `playHand()` callback signature changes from
+  `callable(int, Hand, ?Suit)` to `callable(int, Stack, ?Suit)`.
+
+### Fixed
+
+- **`Stack::hasCards()`** used PHP's `==` (loose object comparison)
+  instead of `PlayableCard::equals()`. For `Wildcard`, these diverge:
+  `==` compares all properties (including `assigned`), while `equals()`
+  compares only the wild card. Two wildcards wrapping the same joker
+  but assigned to different cards were `hasCards()`-false but
+  `hasExactCards()`-true. Now both methods use `equals()` consistently.
+
+### Removed
+
+- `src/Dealer.php` — replaced by `Table`.
+- `src/Hand.php` — dissolved into `Stack`.
+- `tests/Unit/DealerTest.php` — replaced by `TableTest.php` (rollback
+  tests moved to `StackTest.php`).
+- `tests/Unit/HandTest.php` — merged into `StackTest.php`.
+- `docs/dealer.md` — replaced by `docs/table.md`.
+
+### Docs
+
+- All documentation updated: `getting-started.md`, `implementing-a-game.md`,
+  `stacks.md`, `rank-order.md`, `table.md`, `wildcards.md`.
+- Layer 2 in the mental model is now just `Stack` (was `Stack, Hand`).
+- `rank-order.md` custom orderings section rewritten for `fromRanks()`.
+
 ## [0.5.0] - 2026-07-22
 
 Two new reference games demonstrating the engine's versatility across
@@ -333,7 +412,8 @@ poker values. Included `Card`, `Rank`, `Suit`, `Stack`, `Deck`, `Hand`,
 `Dealer`, and a basic `Games\Poker` implementation with `PokerHand` and
 `HandRank` (9 ranks, no royal flush, no hand comparison).
 
-[Unreleased]: https://github.com/likewinter/card-deck/compare/0.5.0...HEAD
+[Unreleased]: https://github.com/likewinter/card-deck/compare/0.6.0...HEAD
+[0.6.0]: https://github.com/likewinter/card-deck/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/likewinter/card-deck/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/likewinter/card-deck/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/likewinter/card-deck/compare/0.2.0...0.3.0
