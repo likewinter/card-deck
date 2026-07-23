@@ -7,7 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-No changes yet.
+### Changed
+
+#### Breaking changes
+- **`SuitOrder` absorbed `RankOrder`.** The constructor is now
+  `new SuitOrder(?Suit $trumpSuit, RankOrder $rankOrder)` — `RankOrder`
+  is required. Factories: `SuitOrder::noTrump(RankOrder $rankOrder)`,
+  `SuitOrder::suit(Suit $suit, RankOrder $rankOrder)`.
+  `SuitOrder::beats(Card $a, Card $b, ?Suit $leadSuit)` no longer
+  accepts a `RankOrder` parameter (it uses the one supplied at
+  construction).
+- **`Trick` constructor** drops the `$rankOrder` parameter:
+  `new Trick(SuitOrder $suitOrder, int $numPlayers, int $startingPlayer = 0)`.
+  The `RankOrder` lives inside `SuitOrder` now.
+
+### Added
+
+- **Solitaire** (`src/Games/Solitaire.php`) — Klondike solitaire
+  reference game validating the `CardInPlay`/`Face` seam for face-down
+  tableau management.
+- Solitaire constructor no longer mutates the input deck.
+- **JokerPoker** (`src/Games/JokerPoker.php`) — 5-card poker with
+  jokers as wildcards, validating the `Wildcard` seam: assign/unassign,
+  `underlyingCard()` resolving to the assigned card for `PokerHand`
+  classification, and Wildcard equality in Stack operations.
+
+### Removed
+
+- **`Trick::clear()`** — no reference game used it. Create a new `Trick`
+  per trick instead (the Spades pattern).
+
+### Docs
+
+- Stale documentation fixed throughout: `implementing-a-game.md`,
+  `wildcards.md`, `trick-taking.md`, `stacks.md`, `table.md`, README.
 
 ## [0.6.0] - 2026-07-23
 

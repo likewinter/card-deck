@@ -26,19 +26,21 @@ readonly class Solitaire
 
     public function __construct(?Stack $deck = null, bool $shuffle = true)
     {
-        $deck = $deck ?? DeckBuilder::standard52()->build();
+        $cards = [...($deck ?? DeckBuilder::standard52()->build())];
         if ($shuffle) {
-            $deck->shuffle();
+            shuffle($cards);
         }
 
         $this->rankOrder = RankOrder::poker();
 
+        $offset = 0;
         $tableau = [];
         for ($i = 0; $i < 7; $i++) {
-            $taken = $deck->takeTop($i + 1);
-            $cards = array_reverse([...$taken]);
+            $count = $i + 1;
+            $slice = array_reverse(array_slice($cards, $offset, $count));
+            $offset += $count;
             $pile = [];
-            foreach ($cards as $j => $card) {
+            foreach ($slice as $j => $card) {
                 $pile[] = new CardInPlay(
                     $card->underlyingCard(),
                     $j === 0 ? Face::Up : Face::Down,
@@ -50,7 +52,7 @@ readonly class Solitaire
 
         $stockCards = array_map(
             fn($c) => CardInPlay::down($c->underlyingCard()),
-            [...$deck],
+            array_slice($cards, $offset),
         );
         $this->stock = new Stack($stockCards);
         $this->waste = new Stack();

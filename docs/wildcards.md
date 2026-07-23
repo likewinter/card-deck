@@ -93,7 +93,7 @@ function effectiveCard(PlayableCard $c): Card {
 
 // Check if a hand contains a specific effective card
 function hasEffectiveCard(Stack $hand, Card $target): bool {
-    foreach ($hand->cards() as $item) {
+    foreach ($hand as $item) {
         if (effectiveCard($item)->equals($target)) {
             return true;
         }

@@ -5,6 +5,12 @@ It is the single orchestration point for card movement — games register
 named hands, draw cards into them, discard back to the pile, and reset
 for a new round.
 
+> **Scope:** `Table` is designed for dealer-pattern games — deck → named
+> hands → pile lifecycle (Poker, Blackjack, Spades). Solitaire-style
+> games with non-standard pile topologies (tableau columns, foundations,
+> a stock/waste pair) should manage `Stack`s directly rather than
+> forcing them into the Table model.
+
 ## Construction
 
 ```php

@@ -30,6 +30,7 @@
         "test": ["Composer\\Config::disableProcessTimeout", "pest"],
         "phpstan": "phpstan analyse",
         "audit": "composer audit --format=plain",
+        "coverage": ["Composer\\Config::disableProcessTimeout", "pest --coverage"],
         "ci": [
             "@audit",
             "@phpstan",
@@ -40,6 +41,7 @@
         "test": "Run the Pest test suite",
         "phpstan": "Run PHPStan static analysis at level 8",
         "audit": "Check dependencies for known security vulnerabilities",
+        "coverage": "Run tests with PCOV coverage report",
         "ci": "Run all CI checks (audit + phpstan + tests)"
     }
 }

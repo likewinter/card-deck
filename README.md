@@ -1,6 +1,8 @@
 # Card Deck
 
 [![CI](https://github.com/likewinter/card-deck/actions/workflows/ci.yml/badge.svg)](https://github.com/likewinter/card-deck/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/likewinter/card-deck/graph/badge.svg)](https://codecov.io/gh/likewinter/card-deck)
+[![PHPStan](https://img.shields.io/badge/PHPStan-level%208-brightgreen)](https://phpstan.org/)
 
 A PHP 8.4+ engine for building card games — the primitives, not the UI.
 
@@ -9,9 +11,12 @@ card games: cards, decks, stacks, a table, rank/suit ordering,
 trick-taking primitives, deck builders, wildcards, and face-down state.
 You bring the rules; the framework brings the table.
 
-A reference [Poker](src/Games/Poker.php) implementation proves the
-primitives fit a real, non-trivial game — including hand ranking, royal
-flush detection, and full tiebreaker comparison.
+Five reference games prove the primitives fit real, non-trivial games:
+[Poker](src/Games/Poker.php) (hand ranking and tiebreakers),
+[Blackjack](src/Games/Blackjack.php) (additive scoring with soft/hard
+aces), [Spades](src/Games/Spades.php) (trick-taking with trump),
+[Solitaire](src/Games/Solitaire.php) (face-down tableau management), and
+[JokerPoker](src/Games/JokerPoker.php) (wildcard substitution with jokers).
 
 ## Requirements
 
@@ -106,27 +111,38 @@ with the current primitives.
 5. **Honest about limits.** Capacity is enforced. Failed moves roll back.
    Cards can't be lost to a thrown exception.
 
-## Reference game: Poker
+## Reference games
 
-The [Poker implementation](src/Games/Poker/) is the proof that the
-primitives fit a real game. It includes:
+Five reference implementations prove the primitives fit real games:
 
-- `PokerHand` — immutable 5-card value object with classification,
-  flush/straight detection, and full tiebreaker comparison via `compare()`
-- `HandRank` — 10 ranks from High Card to Royal Flush (pure enum)
-- `Poker` — game orchestration: deal, hands, winners, multi-round play
+- **[Poker](src/Games/Poker/)** — `PokerHand` (immutable 5-card value
+  object with classification, flush/straight detection, and full
+  tiebreaker comparison), `HandRank` (10 ranks, pure enum), `Poker`
+  (game orchestration: deal, hands, winners, multi-round play)
+- **[Blackjack](src/Games/Blackjack.php)** — hand-value game with
+  additive scoring, soft/hard ace logic, multi-deck shoe, dealer AI
+- **[Spades](src/Games/Spades.php)** — trick-taking game using
+  `SuitOrder`, `Trick` with enforced turn order, trick-counting scoring
+- **[Solitaire](src/Games/Solitaire.php)** — Klondike solitaire with
+  face-down tableau columns via `CardInPlay`/`Face`
+- **[JokerPoker](src/Games/JokerPoker.php)** — 5-card poker with jokers
+  as wildcards via `Wildcard` (assign/unassign, `underlyingCard()`
+  resolving to the assigned card for classification)
 
-Run the demo:
+Run the demos:
 
 ```bash
 php demo/poker.php              # 3 players, 3 rounds
 php demo/poker.php 5 1          # 5 players, 1 round
+php demo/blackjack.php          # player vs dealer
+php demo/spades.php             # 4 players, 13 tricks
+php demo/solitaire.php          # Klondike solitaire
+php demo/joker-poker.php        # poker with wild jokers
 ```
 
 ## Testing
 
-The framework has 325 passing tests covering every primitive and the
-reference Poker implementation:
+Tests cover every primitive and all five reference games:
 
 ```bash
 composer test           # Pest test suite

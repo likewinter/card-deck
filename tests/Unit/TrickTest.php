@@ -161,41 +161,6 @@ it('determines winner — first player wins when no one follows or trumps', func
     expect($trick->winner())->toBe(0);
 });
 
-it('clear resets the trick for reuse', function () {
-    $trick = new Trick(
-        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
-        numPlayers: 2,
-    );
-    $trick->play(trickCard(Suit::Hearts, Rank::Two));
-    $trick->play(trickCard(Suit::Hearts, Rank::King));
-    expect($trick->isComplete())->toBeTrue();
-
-    $trick->clear();
-
-    expect($trick->isEmpty())->toBeTrue()
-        ->and($trick->leadSuit())->toBeNull()
-        ->and($trick->isComplete())->toBeFalse()
-        ->and($trick->currentPlayer())->toBe(0);
-});
-
-it('clear with nextLeader sets who leads the next trick', function () {
-    $trick = new Trick(
-        suitOrder: SuitOrder::noTrump(RankOrder::poker()),
-        numPlayers: 4,
-    );
-
-    $trick->play(trickCard(Suit::Hearts, Rank::Two));
-    $trick->play(trickCard(Suit::Hearts, Rank::King));
-    $trick->play(trickCard(Suit::Hearts, Rank::Ace));
-    $trick->play(trickCard(Suit::Hearts, Rank::Three));
-
-    $winner = $trick->winner();
-    expect($winner)->toBe(2); // Ace wins
-
-    $trick->clear(nextLeader: $winner);
-    expect($trick->currentPlayer())->toBe(2);
-});
-
 it('rejects fewer than 2 players', function () {
     new Trick(
         suitOrder: SuitOrder::noTrump(RankOrder::poker()),

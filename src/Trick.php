@@ -123,22 +123,4 @@ final class Trick
     {
         return $this->cards;
     }
-
-    /**
-     * Reset the trick for reuse (keeps the same suit/rank orders and
-     * player count). The next call to play() starts a new lead.
-     *
-     * Pass $nextLeader to set who leads the next trick (typically the
-     * winner of this trick). Defaults to player 0.
-     */
-    public function clear(?int $nextLeader = null): void
-    {
-        $this->cards = [];
-        $this->players = [];
-        $this->leadSuit = null;
-        $this->ring->reset();
-        if ($nextLeader !== null) {
-            $this->ring->setCurrent($nextLeader);
-        }
-    }
 }

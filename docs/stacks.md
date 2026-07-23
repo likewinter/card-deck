@@ -54,6 +54,7 @@ $stack->isFull();             // bool (false if no capacity set)
 | `peekRandom(int $n = 1)` | Returns a new Stack with $n random cards |
 | `hasCards(Card ...$c)` | True if all given cards are present (duplicates ignored) |
 | `hasExactCards(Card ...$c)` | True if all given cards are present with correct multiplicities |
+| `hasRank(Rank $rank)` | True if any card in the stack has the given rank |
 | `enoughCards(int $n)` | True if the stack has at least $n cards |
 | `isSame(Stack $other)` | True if same cards in same order |
 

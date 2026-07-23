@@ -100,7 +100,6 @@ readonly class Poker
     private readonly Table $table;
 
     public function __construct(
-        private readonly int $handSize = 5,
         private readonly int $numHands = 3,
         ?Table $table = null,
     ) {
@@ -109,11 +108,11 @@ readonly class Poker
             shuffle: true,
         );
         for ($i = 0; $i < $this->numHands; $i++) {
-            $this->table->addHand("hand-{$i}", new Stack(capacity: $this->handSize));
+            $this->table->addHand("hand-{$i}", new Stack(capacity: PokerHand::HAND_SIZE));
         }
     }
 
-    public function deal(): void { $this->table->drawAll($this->handSize); }
+    public function deal(): void { $this->table->drawAll(PokerHand::HAND_SIZE); }
 
     public function winners(): array { /* uses PokerHand::compare() */ }
     public function reset(): void { $this->table->reset(); $this->table->shuffle(); }
@@ -161,9 +160,8 @@ $table->addHand('west', new Stack(capacity: 13));
 $table->drawAll(13);
 
 // Trump for this hand
-$suitOrder = SuitOrder::suit(Suit::Spades);
-$rankOrder = RankOrder::poker();
-$trick = new Trick($suitOrder, $rankOrder, numPlayers: 4);
+$suitOrder = SuitOrder::suit(Suit::Spades, RankOrder::poker());
+$trick = new Trick($suitOrder, numPlayers: 4);
 
 // Play a trick — turn order is enforced automatically
 for ($i = 0; $i < 4; $i++) {
@@ -172,8 +170,8 @@ for ($i = 0; $i < 4; $i++) {
 }
 $winner = $trick->winner();
 
-// Winner leads the next trick
-$trick->clear(nextLeader: $winner);
+// Winner leads the next trick — create a new Trick
+$trick = new Trick($suitOrder, numPlayers: 4, startingPlayer: $winner);
 ```
 
 ### Solitaire (face-down)

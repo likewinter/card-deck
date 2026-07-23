@@ -70,9 +70,6 @@ $trick->play($card3);
 $trick->isComplete();      // true (all 4 played)
 $trick->winner();          // int — the player index who won
 $trick->leadSuit();        // the suit that was led
-
-// Reset for the next trick
-$trick->clear();
 ```
 
 ### Methods
@@ -85,7 +82,6 @@ $trick->clear();
 | `winner()` | `int` | Player index who won (throws if incomplete) |
 | `leadSuit()` | `?Suit` | The suit that was led |
 | `cards()` | `list<Card>` | Cards in play order |
-| `clear()` | `void` | Reset for reuse |
 
 ## PlayerRing
 
@@ -134,5 +130,7 @@ for ($i = 0; $i < 4; $i++) {
 }
 
 $winner = $trick->winner();
-$trick->clear();
+
+// Create a new Trick for the next round, with the winner leading
+$trick = new Trick($suitOrder, numPlayers: 4, startingPlayer: $winner);
 ```
