@@ -103,13 +103,22 @@ class Stack implements IteratorAggregate, \Countable
     }
 
     /**
-     * Check if any of given cards are in the stack, so if there are two duplicates, it will return true beside
-     * the fact that the stack has only one card.
+     * Check if the stack contains at least one match for each given card
+     * (using equals()). A single stack card can satisfy multiple query
+     * cards — use hasExactCards() when duplicates must match distinct
+     * stack entries.
      */
     public function hasCards(PlayableCard ...$cards): bool
     {
         foreach ($cards as $card) {
-            if (!in_array($card, $this->cards)) {
+            $found = false;
+            foreach ($this->cards as $existing) {
+                if ($existing->equals($card)) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
                 return false;
             }
         }

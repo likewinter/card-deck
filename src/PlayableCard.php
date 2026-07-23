@@ -21,6 +21,16 @@ interface PlayableCard
     /**
      * Identity check: is this the same playable card as $other?
      * Used by Stack for removal and membership checks.
+     *
+     * Each implementation defines identity differently:
+     * - Card: same suit and rank.
+     * - CardInPlay: same underlying card AND same face state
+     *   (a face-up A♠ is not equal to a face-down A♠).
+     * - Wildcard: same wild card, regardless of assignment
+     *   (an assigned joker equals an unassigned joker).
+     *
+     * Equality is type-narrowing: a Card never equals a CardInPlay
+     * wrapping the same card, and vice versa.
      */
     public function equals(PlayableCard $other): bool;
 
