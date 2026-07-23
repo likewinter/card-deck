@@ -332,3 +332,13 @@ it('extracts suits from all cards', function () {
 
     expect($stack->getSuits())->toBe([Suit::Hearts, Suit::Spades]);
 });
+
+it('checks rank membership with hasRank', function () {
+    $stack = Stack::fromString('A♣,K♦,7♥');
+
+    expect($stack->hasRank(Rank::Ace))->toBeTrue()
+        ->and($stack->hasRank(Rank::King))->toBeTrue()
+        ->and($stack->hasRank(Rank::Seven))->toBeTrue()
+        ->and($stack->hasRank(Rank::Two))->toBeFalse()
+        ->and($stack->hasRank(Rank::Joker))->toBeFalse();
+});

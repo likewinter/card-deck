@@ -112,6 +112,30 @@ class Table
         };
     }
 
+    /**
+     * Draw cards into a named hand until it reaches $target cards,
+     * or the deck runs out — whichever comes first.
+     *
+     * Returns the number of cards actually drawn.
+     */
+    public function drawUpTo(string $name, int $target): int
+    {
+        $hand = $this->hand($name);
+        $needed = $target - $hand->count();
+
+        if ($needed <= 0) {
+            return 0;
+        }
+
+        $available = min($needed, $this->deck->count());
+
+        if ($available > 0) {
+            $this->draw($name, $available);
+        }
+
+        return $available;
+    }
+
     // ── Discarding ───────────────────────────────────────────────────────
 
     /**
@@ -167,6 +191,14 @@ class Table
     public function pileCount(): int
     {
         return $this->pile->count();
+    }
+
+    /**
+     * Peek at cards in the deck without removing them.
+     */
+    public function peekDeck(int $num = 1, bool $fromTop = true): Stack
+    {
+        return $this->deck->peek($num, $fromTop);
     }
 
     // ── Private draw strategies ──────────────────────────────────────────

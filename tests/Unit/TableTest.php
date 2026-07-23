@@ -218,3 +218,64 @@ it('shuffle randomizes the deck', function () {
 
     expect((string) $table->hand('p0'))->not->toBe($originalOrder);
 });
+
+// ── drawUpTo ────────────────────────────────────────────────────────────
+
+it('drawUpTo fills a hand to the target count', function () {
+    $table = new Table(deck: DeckBuilder::standard52()->build());
+    $table->addHand('p0', new Stack());
+    $table->draw('p0', 3);
+
+    $drawn = $table->drawUpTo('p0', 6);
+
+    expect($drawn)->toBe(3)
+        ->and($table->hand('p0')->count())->toBe(6)
+        ->and($table->deckCount())->toBe(52 - 6);
+});
+
+it('drawUpTo draws nothing when hand already meets target', function () {
+    $table = new Table(deck: DeckBuilder::standard52()->build());
+    $table->addHand('p0', new Stack());
+    $table->draw('p0', 6);
+
+    $drawn = $table->drawUpTo('p0', 6);
+
+    expect($drawn)->toBe(0)
+        ->and($table->hand('p0')->count())->toBe(6);
+});
+
+it('drawUpTo draws only what the deck has when it runs short', function () {
+    $deck = DeckBuilder::standard52()->build();
+    $table = new Table(deck: $deck);
+    $table->addHand('p0', new Stack());
+    $table->draw('p0', 50);
+
+    $drawn = $table->drawUpTo('p0', 55);
+
+    expect($drawn)->toBe(2)
+        ->and($table->hand('p0')->count())->toBe(52)
+        ->and($table->deckCount())->toBe(0);
+});
+
+it('drawUpTo returns 0 on an empty deck', function () {
+    $table = new Table(deck: new Stack());
+    $table->addHand('p0', new Stack());
+
+    $drawn = $table->drawUpTo('p0', 6);
+
+    expect($drawn)->toBe(0)
+        ->and($table->hand('p0')->count())->toBe(0);
+});
+
+// ── peekDeck ────────────────────────────────────────────────────────────
+
+it('peekDeck shows cards without removing them', function () {
+    $table = new Table(deck: DeckBuilder::standard52()->build());
+
+    $top = $table->peekDeck(1);
+    $bottom = $table->peekDeck(1, fromTop: false);
+
+    expect($top->count())->toBe(1)
+        ->and($bottom->count())->toBe(1)
+        ->and($table->deckCount())->toBe(52);
+});

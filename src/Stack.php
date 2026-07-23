@@ -287,6 +287,17 @@ class Stack implements IteratorAggregate, \Countable
         return array_map(fn(PlayableCard $card) => $card->underlyingCard()->rank, $this->cards);
     }
 
+    public function hasRank(Rank $rank): bool
+    {
+        foreach ($this->cards as $card) {
+            if ($card->underlyingCard()->rank === $rank) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /** @return list<Suit> */
     public function getSuits(): array
     {
