@@ -143,7 +143,34 @@ jobs:
       - name: Generate coverage
         run: vendor/bin/pest --coverage-clover=coverage.xml
 
-      - name: Upload to Codecov
-        uses: codecov/codecov-action@v5
+      - name: Generate badge
+        run: |
+          COVERAGE=$(php -r "
+            \$m = simplexml_load_file('coverage.xml')->project->metrics;
+            echo round((int)\$m['coveredelements'] / (int)\$m['elements'] * 100, 1);
+          ")
+          if   (( $(echo "$COVERAGE >= 80" | bc -l) )); then COLOR="#4c1"
+          elif (( $(echo "$COVERAGE >= 60" | bc -l) )); then COLOR="#dfb317"
+          else COLOR="#e05d44"; fi
+          mkdir -p badges
+          cat > badges/coverage.svg << SVGEOF
+          <svg xmlns="http://www.w3.org/2000/svg" width="120" height="20" role="img" aria-label="coverage: ${COVERAGE}%">
+            <title>coverage: ${COVERAGE}%</title>
+            <linearGradient id="s" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient>
+            <clipPath id="r"><rect width="120" height="20" rx="3" fill="#fff"/></clipPath>
+            <g clip-path="url(#r)"><rect width="62" height="20" fill="#555"/><rect x="62" width="58" height="20" fill="${COLOR}"/><rect width="120" height="20" fill="url(#s)"/></g>
+            <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,sans-serif" font-size="110">
+              <text x="310" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="520">coverage</text>
+              <text x="310" y="140" transform="scale(.1)" fill="#fff" textLength="520">coverage</text>
+              <text x="910" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="480">${COVERAGE}%</text>
+              <text x="910" y="140" transform="scale(.1)" fill="#fff" textLength="480">${COVERAGE}%</text>
+            </g>
+          </svg>
+          SVGEOF
+
+      - name: Deploy badge to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          files: coverage.xml
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./badges
+          keep_files: true

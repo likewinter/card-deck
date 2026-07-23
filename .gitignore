@@ -2,3 +2,4 @@ vendor/
 .phpactor.json
 .vscode/
 .qwen/
+coverage.xml

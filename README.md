@@ -1,7 +1,7 @@
 # Card Deck
 
 [![CI](https://github.com/likewinter/card-deck/actions/workflows/ci.yml/badge.svg)](https://github.com/likewinter/card-deck/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/likewinter/card-deck/graph/badge.svg)](https://codecov.io/gh/likewinter/card-deck)
+![Coverage](https://likewinter.github.io/card-deck/coverage.svg)
 [![PHPStan](https://img.shields.io/badge/PHPStan-level%208-brightgreen)](https://phpstan.org/)
 
 A PHP 8.4+ engine for building card games — the primitives, not the UI.
