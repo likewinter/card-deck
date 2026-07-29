@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-07-29
+
+API consolidation: SuitOrder absorbs RankOrder into a single-object
+trick-taking API, boolean `$fromTop` flags are replaced by named
+methods, and two new reference games (Solitaire, JokerPoker) validate
+both PlayableCard decorators.
+
 ### Changed
 
 #### Breaking changes
@@ -450,7 +457,8 @@ poker values. Included `Card`, `Rank`, `Suit`, `Stack`, `Deck`, `Hand`,
 `Dealer`, and a basic `Games\Poker` implementation with `PokerHand` and
 `HandRank` (9 ranks, no royal flush, no hand comparison).
 
-[Unreleased]: https://github.com/likewinter/card-deck/compare/0.6.0...HEAD
+[Unreleased]: https://github.com/likewinter/card-deck/compare/0.7.0...HEAD
+[0.7.0]: https://github.com/likewinter/card-deck/compare/0.6.0...0.7.0
 [0.6.0]: https://github.com/likewinter/card-deck/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/likewinter/card-deck/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/likewinter/card-deck/compare/0.3.0...0.4.0
