@@ -36,6 +36,7 @@
         "analyze": "mago analyze",
         "format": "mago format",
         "format:check": "mago format --check",
+        "hooks": "git config core.hooksPath .githooks",
         "ci": [
             "@audit",
             "@phpstan",
@@ -54,6 +55,7 @@
         "analyze": "Run Mago static analyzer",
         "format": "Format PHP source with Mago",
         "format:check": "Check formatting without modifying files",
+        "hooks": "Point git hooks at .githooks/ (run once after cloning)",
         "ci": "Run all CI checks (audit + phpstan + lint + analyze + format + tests)"
     }
 }
