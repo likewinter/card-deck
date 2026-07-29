@@ -18,13 +18,14 @@ preset = "default"
 
 [linter]
 integrations = ["pest"]
-baseline = "mago-baseline.json"
-baseline-variant = "loose"
 
 [linter.rules]
 ambiguous-function-call = { enabled = false }
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000 }
+cyclomatic-complexity = { threshold = 45 }
+kan-defect = { threshold = 4.5 }
+too-many-methods = { threshold = 30 }
 
 [analyzer]
 plugins = []

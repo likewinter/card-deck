@@ -137,6 +137,20 @@ describe('taking cards', function () {
         $stack = new Stack(cards: $cards);
         $stack->takeCards(count($cards) + 1);
     })->with('not enought cards to take')->throws(\InvalidArgumentException::class);
+
+    it('can take cards from the bottom', function () {
+        $stack = Stack::fromString('A♣,2♦,3♥,4♠,5♣');
+        $taken = $stack->takeBottom(2);
+        expect((string) $taken)->toBe('4♠,5♣');
+        expect((string) $stack)->toBe('A♣,2♦,3♥');
+    });
+
+    it('can peek from the bottom', function () {
+        $stack = Stack::fromString('A♣,2♦,3♥,4♠,5♣');
+        $peeked = $stack->peekBottom(2);
+        expect((string) $peeked)->toBe('4♠,5♣');
+        expect($stack->count())->toBe(5);
+    });
 });
 
 describe('moving cards', function () {

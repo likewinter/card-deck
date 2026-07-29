@@ -273,7 +273,7 @@ it('peekDeck shows cards without removing them', function () {
     $table = new Table(deck: DeckBuilder::standard52()->build());
 
     $top = $table->peekDeck(1);
-    $bottom = $table->peekDeck(1, fromTop: false);
+    $bottom = $table->peekDeckBottom(1);
 
     expect($top->count())->toBe(1)
         ->and($bottom->count())->toBe(1)

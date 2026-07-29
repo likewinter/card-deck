@@ -20,6 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`Trick` constructor** drops the `$rankOrder` parameter:
   `new Trick(SuitOrder $suitOrder, int $numPlayers, int $startingPlayer = 0)`.
   The `RankOrder` lives inside `SuitOrder` now.
+- **Boolean `$fromTop` parameters removed** from `Stack::peek()`,
+  `Stack::takeCards()`, `Stack::moveTo()`, and `Table::peekDeck()`.
+  These methods now always operate from the top. Use the new
+  `Stack::peekBottom()` and `Table::peekDeckBottom()` for bottom access.
+  `Stack::takeBottom()` already existed and is unchanged.
 
 ### Added
 

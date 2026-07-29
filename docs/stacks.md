@@ -50,7 +50,8 @@ $stack->isFull();             // bool (false if no capacity set)
 
 | Method | Description |
 |--------|-------------|
-| `peek(int $n = 1, bool $fromTop = true)` | Returns a new Stack with $n cards (without removing) |
+| `peek(int $n = 1)` | Returns a new Stack with $n cards from the top (without removing) |
+| `peekBottom(int $n = 1)` | Returns a new Stack with $n cards from the bottom (without removing) |
 | `peekRandom(int $n = 1)` | Returns a new Stack with $n random cards |
 | `hasCards(Card ...$c)` | True if all given cards are present (duplicates ignored) |
 | `hasExactCards(Card ...$c)` | True if all given cards are present with correct multiplicities |
@@ -58,8 +59,8 @@ $stack->isFull();             // bool (false if no capacity set)
 | `enoughCards(int $n)` | True if the stack has at least $n cards |
 | `isSame(Stack $other)` | True if same cards in same order |
 
-`peek` and `peekRandom` return a *new* `Stack` — they don't modify the
-original. `fromTop = false` peeks from the bottom.
+`peek`, `peekBottom`, and `peekRandom` return a *new* `Stack` — they
+don't modify the original.
 
 ### Adding and removing
 
@@ -78,10 +79,10 @@ For `Wildcard`, same wild card.
 
 | Method | Description |
 |--------|-------------|
-| `takeCards(int $n = 1, bool $fromTop = true)` | Removes and returns $n cards as a new Stack |
-| `takeTop(int $n = 1)` | Shortcut for `takeCards($n, true)` |
-| `takeBottom(int $n = 1)` | Shortcut for `takeCards($n, false)` |
-| `moveTo(Stack $target, int $n = 1, bool $fromTop = true)` | Moves $n cards to another stack |
+| `takeCards(int $n = 1)` | Removes and returns $n cards from the top as a new Stack |
+| `takeTop(int $n = 1)` | Alias for `takeCards($n)` |
+| `takeBottom(int $n = 1)` | Removes and returns $n cards from the bottom as a new Stack |
+| `moveTo(Stack $target, int $n = 1)` | Moves $n cards from the top to another stack |
 | `moveAllTo(Stack $target)` | Moves all cards to another stack |
 | `moveCardsTo(Stack $target, Card ...$c)` | Moves specific cards to another stack |
 

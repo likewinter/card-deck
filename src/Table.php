@@ -197,9 +197,17 @@ class Table
     /**
      * Peek at cards in the deck without removing them.
      */
-    public function peekDeck(int $num = 1, bool $fromTop = true): Stack
+    public function peekDeck(int $num = 1): Stack
     {
-        return $this->deck->peek($num, $fromTop);
+        return $this->deck->peek($num);
+    }
+
+    /**
+     * Peek at cards from the bottom of the deck without removing them.
+     */
+    public function peekDeckBottom(int $num = 1): Stack
+    {
+        return $this->deck->peekBottom($num);
     }
 
     // ── Private draw strategies ──────────────────────────────────────────

@@ -201,13 +201,22 @@ class Stack implements IteratorAggregate, \Countable
         $this->cards = $remaining;
     }
 
-    public function peek(int $num = 1, bool $fromTop = true): self
+    public function peek(int $num = 1): self
     {
         if (!$this->enoughCards($num)) {
             throw new \InvalidArgumentException('Not enough cards in stack');
         }
 
-        return new self(array_slice($this->cards, $fromTop ? 0 : -$num, $num));
+        return new self(array_slice($this->cards, 0, $num));
+    }
+
+    public function peekBottom(int $num = 1): self
+    {
+        if (!$this->enoughCards($num)) {
+            throw new \InvalidArgumentException('Not enough cards in stack');
+        }
+
+        return new self(array_slice($this->cards, -$num, $num));
     }
 
     public function peekRandom(int $num = 1): self
@@ -224,38 +233,42 @@ class Stack implements IteratorAggregate, \Countable
         return new self(array_map(fn($key) => $this->cards[$key], $keys));
     }
 
-    public function takeCards(int $num = 1, bool $fromTop = true): self
+    public function takeCards(int $num = 1): self
     {
         if (!$this->enoughCards($num)) {
             throw new \InvalidArgumentException('Not enough cards in stack');
         }
 
-        $cards = array_splice($this->cards, $fromTop ? 0 : -$num, $num);
+        $cards = array_splice($this->cards, 0, $num);
 
         return new self($cards);
     }
 
     public function takeTop(int $num = 1): self
     {
-        return $this->takeCards($num, true);
+        return $this->takeCards($num);
     }
 
     public function takeBottom(int $num = 1): self
     {
-        return $this->takeCards($num, false);
+        if (!$this->enoughCards($num)) {
+            throw new \InvalidArgumentException('Not enough cards in stack');
+        }
+
+        $cards = array_splice($this->cards, -$num, $num);
+
+        return new self($cards);
     }
 
-    public function moveTo(self $target, int $num = 1, bool $fromTop = true): void
+    public function moveTo(self $target, int $num = 1): void
     {
-        $cards = $this->takeCards($num, $fromTop);
+        $cards = $this->takeCards($num);
         try {
             $target->addCards(...$cards);
         } catch (\InvalidArgumentException $e) {
             // Rollback: return the taken cards to the source so they
             // aren't lost when the target rejects them (e.g. full stack).
-            $this->cards = $fromTop
-                ? array_merge($cards->cards, $this->cards)
-                : array_merge($this->cards, $cards->cards);
+            $this->cards = array_merge($cards->cards, $this->cards);
             throw $e;
         }
     }
