@@ -55,6 +55,7 @@ echo "Alice: {$table->hand('alice')}\n";  // Alice: A♣,K♦,Q♥,J♠,10♣
 | [`Stack`](src/Stack.php) | Ordered collection of playable cards with capacity |
 | [`DeckBuilder`](src/DeckBuilder.php) | Fluent factory for standard and custom decks |
 | [`Table`](src/Table.php) | Orchestrates dealing, discarding, and resetting across named hands |
+| [`DrawMode`](src/DrawMode.php) | How Table draws from the deck (Sequential, OneByOne, Random) |
 | [`RankOrder`](src/RankOrder.php) | Game-specific rank values and comparison |
 | [`SuitOrder`](src/SuitOrder.php) | Trick-taking: trump and lead-suit rules |
 | [`Trick`](src/Trick.php) | One round of play with turn order and winner determination |
@@ -147,6 +148,10 @@ Tests cover every primitive and all five reference games:
 ```bash
 composer test           # Pest test suite
 composer phpstan        # PHPStan level 8 static analysis
+composer lint           # Mago linter
+composer analyze        # Mago static analyzer
+composer format:check   # Mago formatting check
+composer ci             # All of the above + security audit
 ```
 
 ## Changelog
