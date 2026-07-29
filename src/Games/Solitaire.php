@@ -2,8 +2,13 @@
 
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{CardInPlay, DeckBuilder, Face, RankOrder, Stack};
-use Likewinter\CardDeck\Card\{Rank, Suit};
+use Likewinter\CardDeck\Card\Rank;
+use Likewinter\CardDeck\Card\Suit;
+use Likewinter\CardDeck\CardInPlay;
+use Likewinter\CardDeck\DeckBuilder;
+use Likewinter\CardDeck\Face;
+use Likewinter\CardDeck\RankOrder;
+use Likewinter\CardDeck\Stack;
 
 /**
  * Klondike Solitaire — a single-player game with face-down tableau cards.
@@ -41,19 +46,13 @@ readonly class Solitaire
             $offset += $count;
             $pile = [];
             foreach ($slice as $j => $card) {
-                $pile[] = new CardInPlay(
-                    $card->underlyingCard(),
-                    $j === 0 ? Face::Up : Face::Down,
-                );
+                $pile[] = new CardInPlay($card->underlyingCard(), $j === 0 ? Face::Up : Face::Down);
             }
             $tableau[$i] = new Stack($pile);
         }
         $this->tableau = $tableau;
 
-        $stockCards = array_map(
-            fn($c) => CardInPlay::down($c->underlyingCard()),
-            array_slice($cards, $offset),
-        );
+        $stockCards = array_map(fn($c) => CardInPlay::down($c->underlyingCard()), array_slice($cards, $offset));
         $this->stock = new Stack($stockCards);
         $this->waste = new Stack();
 
@@ -249,7 +248,7 @@ readonly class Solitaire
 
         $topUnderlying = $top->underlyingCard();
 
-        if ($this->rankOrder->value($underlying->rank) !== $this->rankOrder->value($topUnderlying->rank) - 1) {
+        if ($this->rankOrder->value($underlying->rank) !== ($this->rankOrder->value($topUnderlying->rank) - 1)) {
             throw new \InvalidArgumentException('Card must be one rank lower');
         }
 

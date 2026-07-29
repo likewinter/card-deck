@@ -2,7 +2,8 @@
 
 namespace Likewinter\CardDeck;
 
-use Likewinter\CardDeck\Card\{Rank, Suit};
+use Likewinter\CardDeck\Card\Rank;
+use Likewinter\CardDeck\Card\Suit;
 
 /**
  * Fluent factory for building decks of arbitrary composition.
@@ -42,7 +43,7 @@ class DeckBuilder
      */
     public static function standard52(): self
     {
-        return (new self())
+        return new self()
             ->suits(Suit::Hearts, Suit::Diamonds, Suit::Clubs, Suit::Spades)
             ->allRanks();
     }
@@ -60,7 +61,7 @@ class DeckBuilder
      */
     public static function euchre(): self
     {
-        return (new self())
+        return new self()
             ->suits(Suit::Hearts, Suit::Diamonds, Suit::Clubs, Suit::Spades)
             ->range(Rank::Nine, Rank::Ace);
     }
@@ -73,7 +74,7 @@ class DeckBuilder
      */
     public static function pinochle(): self
     {
-        return (new self())
+        return new self()
             ->suits(Suit::Hearts, Suit::Diamonds, Suit::Clubs, Suit::Spades)
             ->ranks(Rank::Nine, Rank::Jack, Rank::Queen, Rank::King, Rank::Ten, Rank::Ace)
             ->times(2);
@@ -85,7 +86,7 @@ class DeckBuilder
      */
     public static function piquet(): self
     {
-        return (new self())
+        return new self()
             ->suits(Suit::Hearts, Suit::Diamonds, Suit::Clubs, Suit::Spades)
             ->range(Rank::Seven, Rank::Ace);
     }
@@ -97,7 +98,7 @@ class DeckBuilder
      */
     public static function ranging(Rank $low, Rank $high): self
     {
-        return (new self())
+        return new self()
             ->suits(Suit::Hearts, Suit::Diamonds, Suit::Clubs, Suit::Spades)
             ->range($low, $high);
     }
@@ -138,9 +139,7 @@ class DeckBuilder
             $current = $order->next($current);
         }
         if (end($ranks) !== $high) {
-            throw new \InvalidArgumentException(
-                "Rank range {$low->name}..{$high->name} is invalid"
-            );
+            throw new \InvalidArgumentException("Rank range {$low->name}..{$high->name} is invalid");
         }
         $this->ranks = $ranks;
         return $this;

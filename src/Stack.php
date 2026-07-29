@@ -16,22 +16,18 @@ class Stack implements IteratorAggregate, \Countable
     public function __construct(
         /** @var list<PlayableCard> */
         protected array $cards = [],
-        public readonly ?int $capacity = null
+        public readonly ?int $capacity = null,
     ) {
         if ($capacity !== null && $capacity < 1) {
-            throw new \InvalidArgumentException(
-                "Stack capacity must be greater than 0"
-            );
+            throw new \InvalidArgumentException('Stack capacity must be greater than 0');
         }
         if ($capacity !== null && count($cards) > $capacity) {
-            throw new \InvalidArgumentException("Stack capacity exceeded");
+            throw new \InvalidArgumentException('Stack capacity exceeded');
         }
 
         foreach ($cards as $card) {
             if (!$card instanceof PlayableCard) {
-                throw new \InvalidArgumentException(
-                    "All cards must implement PlayableCard"
-                );
+                throw new \InvalidArgumentException('All cards must implement PlayableCard');
             }
         }
     }
@@ -42,7 +38,7 @@ class Stack implements IteratorAggregate, \Countable
             return new self();
         }
 
-        $cards = explode(",", $string);
+        $cards = explode(',', $string);
 
         return new self(array_map(fn(string $card) => Card::fromString($card), $cards), $capacity);
     }
@@ -59,13 +55,12 @@ class Stack implements IteratorAggregate, \Countable
 
     public function __toString(): string
     {
-        return implode(",", $this->cards);
+        return implode(',', $this->cards);
     }
 
     public function isFull(): bool
     {
-        return $this->capacity !== null &&
-            count($this->cards) === $this->capacity;
+        return $this->capacity !== null && count($this->cards) === $this->capacity;
     }
 
     public function isEmpty(): bool
@@ -94,9 +89,7 @@ class Stack implements IteratorAggregate, \Countable
     public function enoughCards(int $num): bool
     {
         if ($num < 1) {
-            throw new \InvalidArgumentException(
-                "Number of cards to check must be greater than 0"
-            );
+            throw new \InvalidArgumentException('Number of cards to check must be greater than 0');
         }
 
         return $this->count() >= $num;
@@ -159,13 +152,8 @@ class Stack implements IteratorAggregate, \Countable
 
     public function addCards(PlayableCard ...$cards): void
     {
-        if (
-            $this->capacity !== null &&
-            count($this->cards) + count($cards) > $this->capacity
-        ) {
-            throw new \InvalidArgumentException(
-                "Adding these cards would exceed stack capacity"
-            );
+        if ($this->capacity !== null && (count($this->cards) + count($cards)) > $this->capacity) {
+            throw new \InvalidArgumentException('Adding these cards would exceed stack capacity');
         }
         $this->cards = array_merge($this->cards, array_values($cards));
     }
@@ -173,7 +161,7 @@ class Stack implements IteratorAggregate, \Countable
     public function removeCards(PlayableCard ...$cards): void
     {
         if (!$this->hasExactCards(...$cards)) {
-            throw new \InvalidArgumentException("Cards not found in stack");
+            throw new \InvalidArgumentException('Cards not found in stack');
         }
 
         $indicesToRemove = [];
@@ -198,7 +186,7 @@ class Stack implements IteratorAggregate, \Countable
     public function peek(int $num = 1, bool $fromTop = true): self
     {
         if (!$this->enoughCards($num)) {
-            throw new \InvalidArgumentException("Not enough cards in stack");
+            throw new \InvalidArgumentException('Not enough cards in stack');
         }
 
         return new self(array_slice($this->cards, $fromTop ? 0 : -$num, $num));
@@ -207,7 +195,7 @@ class Stack implements IteratorAggregate, \Countable
     public function peekRandom(int $num = 1): self
     {
         if (!$this->enoughCards($num)) {
-            throw new \InvalidArgumentException("Not enough cards in stack");
+            throw new \InvalidArgumentException('Not enough cards in stack');
         }
 
         $keys = array_rand($this->cards, $num);
@@ -221,7 +209,7 @@ class Stack implements IteratorAggregate, \Countable
     public function takeCards(int $num = 1, bool $fromTop = true): self
     {
         if (!$this->enoughCards($num)) {
-            throw new \InvalidArgumentException("Not enough cards in stack");
+            throw new \InvalidArgumentException('Not enough cards in stack');
         }
 
         $cards = array_splice($this->cards, $fromTop ? 0 : -$num, $num);
@@ -239,11 +227,8 @@ class Stack implements IteratorAggregate, \Countable
         return $this->takeCards($num, false);
     }
 
-    public function moveTo(
-        self $target,
-        int $num = 1,
-        bool $fromTop = true
-    ): void {
+    public function moveTo(self $target, int $num = 1, bool $fromTop = true): void
+    {
         $cards = $this->takeCards($num, $fromTop);
         try {
             $target->addCards(...$cards);
@@ -269,7 +254,7 @@ class Stack implements IteratorAggregate, \Countable
     public function moveCardsTo(Stack $target, PlayableCard ...$cards): void
     {
         if (!$this->hasExactCards(...$cards)) {
-            throw new \InvalidArgumentException("Cards not found in stack");
+            throw new \InvalidArgumentException('Cards not found in stack');
         }
 
         $target->addCards(...$cards);
@@ -278,7 +263,10 @@ class Stack implements IteratorAggregate, \Countable
 
     public function sortByRank(RankOrder $rankOrder): void
     {
-        $this->sort(fn(PlayableCard $a, PlayableCard $b) => $rankOrder->compare($a->underlyingCard()->rank, $b->underlyingCard()->rank));
+        $this->sort(fn(PlayableCard $a, PlayableCard $b) => $rankOrder->compare(
+            $a->underlyingCard()->rank,
+            $b->underlyingCard()->rank,
+        ));
     }
 
     /** @return list<Rank> */

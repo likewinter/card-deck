@@ -71,7 +71,6 @@ final readonly class Wildcard implements PlayableCard
 
     public function equals(PlayableCard $other): bool
     {
-        return $other instanceof self
-            && $this->wild->equals($other->wild);
+        return $other instanceof self && $this->wild->equals($other->wild);
     }
 }

@@ -63,16 +63,21 @@ final readonly class RankOrder
      */
     public static function poker(): self
     {
-        return self::build(
-            values: [
-                Rank::Two->name => 2, Rank::Three->name => 3, Rank::Four->name => 4,
-                Rank::Five->name => 5, Rank::Six->name => 6, Rank::Seven->name => 7,
-                Rank::Eight->name => 8, Rank::Nine->name => 9, Rank::Ten->name => 10,
-                Rank::Jack->name => 11, Rank::Queen->name => 12, Rank::King->name => 13,
-                Rank::Ace->name => 14,
-            ],
-            highest: Rank::Ace,
-        );
+        return self::build(values: [
+            Rank::Two->name => 2,
+            Rank::Three->name => 3,
+            Rank::Four->name => 4,
+            Rank::Five->name => 5,
+            Rank::Six->name => 6,
+            Rank::Seven->name => 7,
+            Rank::Eight->name => 8,
+            Rank::Nine->name => 9,
+            Rank::Ten->name => 10,
+            Rank::Jack->name => 11,
+            Rank::Queen->name => 12,
+            Rank::King->name => 13,
+            Rank::Ace->name => 14,
+        ], highest: Rank::Ace);
     }
 
     /**
@@ -81,16 +86,21 @@ final readonly class RankOrder
      */
     public static function pokerLowAce(): self
     {
-        return self::build(
-            values: [
-                Rank::Ace->name => 1,
-                Rank::Two->name => 2, Rank::Three->name => 3, Rank::Four->name => 4,
-                Rank::Five->name => 5, Rank::Six->name => 6, Rank::Seven->name => 7,
-                Rank::Eight->name => 8, Rank::Nine->name => 9, Rank::Ten->name => 10,
-                Rank::Jack->name => 11, Rank::Queen->name => 12, Rank::King->name => 13,
-            ],
-            highest: Rank::King,
-        );
+        return self::build(values: [
+            Rank::Ace->name => 1,
+            Rank::Two->name => 2,
+            Rank::Three->name => 3,
+            Rank::Four->name => 4,
+            Rank::Five->name => 5,
+            Rank::Six->name => 6,
+            Rank::Seven->name => 7,
+            Rank::Eight->name => 8,
+            Rank::Nine->name => 9,
+            Rank::Ten->name => 10,
+            Rank::Jack->name => 11,
+            Rank::Queen->name => 12,
+            Rank::King->name => 13,
+        ], highest: Rank::King);
     }
 
     /**
@@ -102,22 +112,30 @@ final readonly class RankOrder
      */
     public static function blackjack(): self
     {
-        return self::build(
-            values: [
-                Rank::Two->name => 2, Rank::Three->name => 3, Rank::Four->name => 4,
-                Rank::Five->name => 5, Rank::Six->name => 6, Rank::Seven->name => 7,
-                Rank::Eight->name => 8, Rank::Nine->name => 9, Rank::Ten->name => 10,
-                Rank::Jack->name => 10, Rank::Queen->name => 10, Rank::King->name => 10,
-                Rank::Ace->name => 11,
-            ],
-            highest: Rank::Ace,
-        );
+        return self::build(values: [
+            Rank::Two->name => 2,
+            Rank::Three->name => 3,
+            Rank::Four->name => 4,
+            Rank::Five->name => 5,
+            Rank::Six->name => 6,
+            Rank::Seven->name => 7,
+            Rank::Eight->name => 8,
+            Rank::Nine->name => 9,
+            Rank::Ten->name => 10,
+            Rank::Jack->name => 10,
+            Rank::Queen->name => 10,
+            Rank::King->name => 10,
+            Rank::Ace->name => 11,
+        ], highest: Rank::Ace);
     }
 
     public function value(Rank $rank): int
     {
-        return $this->values[$rank->name]
-            ?? throw new \InvalidArgumentException("Rank {$rank->name} is not in this RankOrder");
+        return (
+            $this->values[$rank->name] ?? throw new \InvalidArgumentException(
+                "Rank {$rank->name} is not in this RankOrder",
+            )
+        );
     }
 
     /**
@@ -186,7 +204,7 @@ final readonly class RankOrder
         $nextMap = [];
         $prevMap = [];
         for ($i = 0, $n = count($flat); $i < $n; $i++) {
-            if ($i < $n - 1) {
+            if ($i < ($n - 1)) {
                 $nextMap[$flat[$i]] = $rankByName[$flat[$i + 1]];
             }
             if ($i > 0) {

@@ -2,8 +2,10 @@
 
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{DeckBuilder, Stack, Table};
+use Likewinter\CardDeck\DeckBuilder;
 use Likewinter\CardDeck\Games\Blackjack\BlackjackHand;
+use Likewinter\CardDeck\Stack;
+use Likewinter\CardDeck\Table;
 
 /**
  * Blackjack (Twenty-One) — a hand-value game where players race the
@@ -25,10 +27,7 @@ readonly class Blackjack
         int $numDecks = self::DEFAULT_NUM_DECKS,
         ?Table $table = null,
     ) {
-        $this->table = $table ?? new Table(
-            deck: DeckBuilder::standard52()->times($numDecks)->build(),
-            shuffle: true,
-        );
+        $this->table = $table ?? new Table(deck: DeckBuilder::standard52()->times($numDecks)->build(), shuffle: true);
 
         $this->table->addHand('dealer', new Stack());
 

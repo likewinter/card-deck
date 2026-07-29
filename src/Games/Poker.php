@@ -2,8 +2,10 @@
 
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{DeckBuilder, Stack, Table};
+use Likewinter\CardDeck\DeckBuilder;
 use Likewinter\CardDeck\Games\Poker\PokerHand;
+use Likewinter\CardDeck\Stack;
+use Likewinter\CardDeck\Table;
 
 readonly class Poker
 {
@@ -17,10 +19,7 @@ readonly class Poker
         private readonly int $numHands = self::DEFAULT_NUM_HANDS,
         ?Table $table = null,
     ) {
-        $this->table = $table ?? new Table(
-            deck: DeckBuilder::standard52()->build(),
-            shuffle: true,
-        );
+        $this->table = $table ?? new Table(deck: DeckBuilder::standard52()->build(), shuffle: true);
 
         $this->validateConfig();
 
@@ -32,9 +31,11 @@ readonly class Poker
     private function validateConfig(): void
     {
         if ($this->numHands < self::MIN_HANDS || $this->numHands > self::MAX_HANDS) {
-            throw new \InvalidArgumentException(
-                sprintf('Number of hands must be between %d and %d', self::MIN_HANDS, self::MAX_HANDS)
-            );
+            throw new \InvalidArgumentException(sprintf(
+                'Number of hands must be between %d and %d',
+                self::MIN_HANDS,
+                self::MAX_HANDS,
+            ));
         }
     }
 

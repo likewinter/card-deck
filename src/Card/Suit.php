@@ -27,10 +27,7 @@ enum Suit: string
      */
     public static function casesWithoutJoker(): array
     {
-        return array_values(array_filter(
-            self::cases(),
-            fn(Suit $suit) => $suit !== self::Joker
-        ));
+        return array_values(array_filter(self::cases(), fn(Suit $suit) => $suit !== self::Joker));
     }
 
     public function getColor(): string

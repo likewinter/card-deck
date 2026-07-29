@@ -102,11 +102,7 @@ final class Trick
 
         $winnerIdx = 0;
         for ($i = 1, $n = count($this->cards); $i < $n; $i++) {
-            if ($this->suitOrder->beats(
-                $this->cards[$i],
-                $this->cards[$winnerIdx],
-                $this->leadSuit
-            )) {
+            if ($this->suitOrder->beats($this->cards[$i], $this->cards[$winnerIdx], $this->leadSuit)) {
                 $winnerIdx = $i;
             }
         }

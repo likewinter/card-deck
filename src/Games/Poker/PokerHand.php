@@ -6,9 +6,9 @@ use ArrayIterator;
 use Iterator;
 use IteratorAggregate;
 use Likewinter\CardDeck\Card;
+use Likewinter\CardDeck\Card\Rank;
 use Likewinter\CardDeck\RankOrder;
 use Likewinter\CardDeck\Stack;
-use Likewinter\CardDeck\Card\Rank;
 
 /**
  * An immutable, classified 5-card poker hand.
@@ -36,14 +36,14 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
     /**
      * @param list<Card> $cards Exactly 5 cards.
      */
-    public function __construct(
-        array $cards,
-        ?RankOrder $rankOrder = null,
-    ) {
+    public function __construct(array $cards, ?RankOrder $rankOrder = null)
+    {
         if (count($cards) !== self::HAND_SIZE) {
-            throw new \InvalidArgumentException(
-                sprintf('PokerHand requires exactly %d cards, got %d', self::HAND_SIZE, count($cards))
-            );
+            throw new \InvalidArgumentException(sprintf(
+                'PokerHand requires exactly %d cards, got %d',
+                self::HAND_SIZE,
+                count($cards),
+            ));
         }
 
         $this->rankOrder = $rankOrder ?? RankOrder::poker();
@@ -65,10 +65,7 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
      */
     public static function fromHand(Stack $hand): self
     {
-        $cards = array_map(
-            fn($card) => $card->underlyingCard(),
-            [...$hand],
-        );
+        $cards = array_map(fn($card) => $card->underlyingCard(), [...$hand]);
 
         return new self(array_values($cards));
     }
@@ -169,9 +166,11 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
 
     private function isRoyalFlush(): bool
     {
-        return $this->isStraightFlush()
+        return (
+            $this->isStraightFlush()
             && $this->rankOrder->isHighest(Rank::Ace)
-            && $this->getHighCardValue() === $this->rankOrder->value(Rank::Ace);
+            && $this->getHighCardValue() === $this->rankOrder->value(Rank::Ace)
+        );
     }
 
     private function isStraightFlush(): bool
@@ -253,7 +252,7 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
         }
 
         for ($i = 1; $i < 5; $i++) {
-            if ($values[$i] !== $values[$i - 1] + 1) {
+            if ($values[$i] !== ($values[$i - 1] + 1)) {
                 return false;
             }
         }

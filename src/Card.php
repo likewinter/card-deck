@@ -19,8 +19,8 @@ class Card implements PlayableCard
         public readonly Rank $rank,
     ) {
         if (
-            ($this->suit === Suit::Joker && $this->rank !== Rank::Joker) ||
-            ($this->rank === Rank::Joker && $this->suit !== Suit::Joker)
+            $this->suit === Suit::Joker && $this->rank !== Rank::Joker
+            || $this->rank === Rank::Joker && $this->suit !== Suit::Joker
         ) {
             throw new \InvalidArgumentException('Joker suit must have Joker rank');
         }
@@ -49,9 +49,7 @@ class Card implements PlayableCard
 
     public function equals(PlayableCard $other): bool
     {
-        return $other instanceof self
-            && $this->suit === $other->suit
-            && $this->rank === $other->rank;
+        return $other instanceof self && $this->suit === $other->suit && $this->rank === $other->rank;
     }
 
     public function isJoker(): bool

@@ -2,8 +2,14 @@
 
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{DeckBuilder, RankOrder, Stack, SuitOrder, Table, Trick};
-use Likewinter\CardDeck\Card\{Rank, Suit};
+use Likewinter\CardDeck\Card\Rank;
+use Likewinter\CardDeck\Card\Suit;
+use Likewinter\CardDeck\DeckBuilder;
+use Likewinter\CardDeck\RankOrder;
+use Likewinter\CardDeck\Stack;
+use Likewinter\CardDeck\SuitOrder;
+use Likewinter\CardDeck\Table;
+use Likewinter\CardDeck\Trick;
 
 /**
  * Spades — a trick-taking game where spades are always trump.
@@ -24,10 +30,7 @@ readonly class Spades
 
     public function __construct(?Table $table = null)
     {
-        $this->table = $table ?? new Table(
-            deck: DeckBuilder::standard52()->build(),
-            shuffle: true,
-        );
+        $this->table = $table ?? new Table(deck: DeckBuilder::standard52()->build(), shuffle: true);
 
         for ($i = 0; $i < self::NUM_PLAYERS; $i++) {
             $this->table->addHand("player-{$i}", new Stack(capacity: self::CARDS_PER_PLAYER));
@@ -67,11 +70,7 @@ readonly class Spades
         $leader = 0;
 
         for ($t = 0; $t < self::CARDS_PER_PLAYER; $t++) {
-            $trick = new Trick(
-                suitOrder: $this->suitOrder,
-                numPlayers: self::NUM_PLAYERS,
-                startingPlayer: $leader,
-            );
+            $trick = new Trick(suitOrder: $this->suitOrder, numPlayers: self::NUM_PLAYERS, startingPlayer: $leader);
 
             for ($p = 0; $p < self::NUM_PLAYERS; $p++) {
                 $player = $trick->currentPlayer();

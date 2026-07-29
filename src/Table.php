@@ -57,8 +57,7 @@ class Table
 
     public function hand(string $name): Stack
     {
-        return $this->hands[$name]
-            ?? throw new \InvalidArgumentException("Hand '{$name}' does not exist");
+        return $this->hands[$name] ?? throw new \InvalidArgumentException("Hand '{$name}' does not exist");
     }
 
     public function hasHand(string $name): bool
@@ -101,7 +100,7 @@ class Table
             throw new \LogicException('No hands registered');
         }
 
-        if ($num * count($this->hands) > $this->deck->count()) {
+        if (($num * count($this->hands)) > $this->deck->count()) {
             throw new \LogicException('Not enough cards in deck');
         }
 

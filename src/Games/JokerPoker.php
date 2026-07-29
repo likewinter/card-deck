@@ -2,9 +2,14 @@
 
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\{Card, DeckBuilder, Stack, Table, Wildcard};
-use Likewinter\CardDeck\Card\{Rank, Suit};
+use Likewinter\CardDeck\Card;
+use Likewinter\CardDeck\Card\Rank;
+use Likewinter\CardDeck\Card\Suit;
+use Likewinter\CardDeck\DeckBuilder;
 use Likewinter\CardDeck\Games\Poker\PokerHand;
+use Likewinter\CardDeck\Stack;
+use Likewinter\CardDeck\Table;
+use Likewinter\CardDeck\Wildcard;
 
 /**
  * Joker Poker — 5-card poker with jokers as wildcards.
@@ -26,10 +31,7 @@ readonly class JokerPoker
         private int $numHands = 2,
         ?Table $table = null,
     ) {
-        $this->table = $table ?? new Table(
-            deck: self::buildWildDeck(),
-            shuffle: true,
-        );
+        $this->table = $table ?? new Table(deck: self::buildWildDeck(), shuffle: true);
 
         for ($i = 0; $i < $this->numHands; $i++) {
             $this->table->addHand("hand-{$i}", new Stack(capacity: self::HAND_SIZE));
@@ -42,10 +44,7 @@ readonly class JokerPoker
     private static function buildWildDeck(): Stack
     {
         $deck = DeckBuilder::standard52WithJokers(2)->build();
-        $cards = array_map(
-            fn($c) => $c->isJoker() ? new Wildcard($c->underlyingCard()) : $c,
-            [...$deck],
-        );
+        $cards = array_map(fn($c) => $c->isJoker() ? new Wildcard($c->underlyingCard()) : $c, [...$deck]);
 
         return new Stack($cards, count($cards));
     }

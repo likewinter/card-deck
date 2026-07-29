@@ -6,9 +6,9 @@ use ArrayIterator;
 use Iterator;
 use IteratorAggregate;
 use Likewinter\CardDeck\Card;
+use Likewinter\CardDeck\Card\Rank;
 use Likewinter\CardDeck\RankOrder;
 use Likewinter\CardDeck\Stack;
-use Likewinter\CardDeck\Card\Rank;
 
 /**
  * An immutable blackjack hand with additive value calculation.
@@ -37,10 +37,7 @@ final readonly class BlackjackHand implements IteratorAggregate, \Countable, \St
 
     public static function fromHand(Stack $hand): self
     {
-        $cards = array_map(
-            fn($card) => $card->underlyingCard(),
-            [...$hand],
-        );
+        $cards = array_map(fn($card) => $card->underlyingCard(), [...$hand]);
 
         return new self(array_values($cards));
     }

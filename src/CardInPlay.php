@@ -35,10 +35,7 @@ final readonly class CardInPlay implements PlayableCard
      */
     public function flip(): self
     {
-        return new self(
-            $this->card,
-            $this->face === Face::Up ? Face::Down : Face::Up
-        );
+        return new self($this->card, $this->face === Face::Up ? Face::Down : Face::Up);
     }
 
     /**
@@ -79,8 +76,6 @@ final readonly class CardInPlay implements PlayableCard
 
     public function equals(PlayableCard $other): bool
     {
-        return $other instanceof self
-            && $this->card->equals($other->card)
-            && $this->face === $other->face;
+        return $other instanceof self && $this->card->equals($other->card) && $this->face === $other->face;
     }
 }
