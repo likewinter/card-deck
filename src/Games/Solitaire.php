@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck\Games;
 
 use Likewinter\CardDeck\Card\Rank;
@@ -48,11 +50,11 @@ readonly class Solitaire
             foreach ($slice as $j => $card) {
                 $pile[] = new CardInPlay($card->underlyingCard(), $j === 0 ? Face::Up : Face::Down);
             }
-            $tableau[$i] = new Stack($pile);
+            $tableau[] = new Stack($pile);
         }
         $this->tableau = $tableau;
 
-        $stockCards = array_map(fn($c) => CardInPlay::down($c->underlyingCard()), array_slice($cards, $offset));
+        $stockCards = array_map(static fn($c) => CardInPlay::down($c->underlyingCard()), array_slice($cards, $offset));
         $this->stock = new Stack($stockCards);
         $this->waste = new Stack();
 
@@ -82,7 +84,11 @@ readonly class Solitaire
 
     public function foundation(Suit $suit): Stack
     {
-        return $this->foundations[$suit->value];
+        return (
+            $this->foundations[$suit->value] ?? throw new \InvalidArgumentException(
+                "No foundation for suit '{$suit->value}'",
+            )
+        );
     }
 
     // ── Drawing ────────────────────────────────────────────────────
@@ -120,7 +126,7 @@ readonly class Solitaire
         $card = [...$this->waste->peek()][0];
         $this->validateFoundationMove($card, $suit);
         $this->waste->takeTop();
-        $this->foundations[$suit->value]->addCards($card);
+        $this->foundation($suit)->addCards($card);
     }
 
     public function moveToFoundation(int $tableauIndex, Suit $suit): void
@@ -134,7 +140,7 @@ readonly class Solitaire
         $this->validateFoundationMove($card, $suit);
         $pile->takeTop();
         $this->flipIfNeeded($tableauIndex);
-        $this->foundations[$suit->value]->addCards($card);
+        $this->foundation($suit)->addCards($card);
     }
 
     public function moveWasteToTableau(int $pileIndex): void
@@ -211,7 +217,7 @@ readonly class Solitaire
             throw new \InvalidArgumentException('Card suit does not match foundation');
         }
 
-        $foundation = $this->foundations[$suit->value];
+        $foundation = $this->foundation($suit);
 
         if ($foundation->isEmpty()) {
             if ($underlying->rank !== Rank::Ace) {

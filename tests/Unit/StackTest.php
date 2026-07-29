@@ -20,7 +20,6 @@ it('can be created with cards', function (array $cards) {
 })->with('five random cards');
 
 it('cant be created with invalid cards', function () {
-    // @phpstan-ignore-next-line
     new Stack(cards: ['not a card']);
 })->throws(\InvalidArgumentException::class);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck;
 
 use Likewinter\CardDeck\Card\Rank;
@@ -183,9 +185,11 @@ class DeckBuilder
     }
 
     /**
-     * Build and return the deck as a Stack.
+     * Build the deck as a list of Card objects.
+     *
+     * @return list<Card>
      */
-    public function build(): Stack
+    private function makeCards(): array
     {
         $cards = [];
 
@@ -213,7 +217,17 @@ class DeckBuilder
             $cards[] = $card;
         }
 
+        return $cards;
+    }
+
+    /**
+     * Build and return the deck as a Stack.
+     */
+    public function build(): Stack
+    {
+        $cards = $this->makeCards();
         $total = count($cards);
+
         return new Stack($cards, $total);
     }
 
@@ -224,6 +238,6 @@ class DeckBuilder
      */
     public function buildCards(): array
     {
-        return [...$this->build()];
+        return $this->makeCards();
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck\Games\Blackjack;
 
 use ArrayIterator;
@@ -27,7 +29,7 @@ final readonly class BlackjackHand implements IteratorAggregate, \Countable, \St
     private array $cards;
 
     /**
-     * @param list<Card> $cards
+     * @param array<array-key, Card> $cards
      */
     public function __construct(array $cards, ?RankOrder $rankOrder = null)
     {
@@ -37,9 +39,9 @@ final readonly class BlackjackHand implements IteratorAggregate, \Countable, \St
 
     public static function fromHand(Stack $hand): self
     {
-        $cards = array_map(fn($card) => $card->underlyingCard(), [...$hand]);
+        $cards = array_map(static fn($card) => $card->underlyingCard(), [...$hand]);
 
-        return new self(array_values($cards));
+        return new self($cards);
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck;
 
 use ArrayIterator;
@@ -13,34 +15,44 @@ use Likewinter\CardDeck\Card\Suit;
  */
 class Stack implements IteratorAggregate, \Countable
 {
+    /** @var list<PlayableCard> */
+    protected array $cards = [];
+
+    /**
+     * @param iterable<mixed, mixed> $cards Any iterable of items; each must implement PlayableCard (validated at runtime).
+     */
     public function __construct(
-        /** @var list<PlayableCard> */
-        protected array $cards = [],
+        iterable $cards = [],
         public readonly ?int $capacity = null,
     ) {
         if ($capacity !== null && $capacity < 1) {
             throw new \InvalidArgumentException('Stack capacity must be greater than 0');
         }
-        if ($capacity !== null && count($cards) > $capacity) {
-            throw new \InvalidArgumentException('Stack capacity exceeded');
-        }
 
+        $list = [];
         foreach ($cards as $card) {
             if (!$card instanceof PlayableCard) {
                 throw new \InvalidArgumentException('All cards must implement PlayableCard');
             }
+            $list[] = $card;
         }
+
+        if ($capacity !== null && count($list) > $capacity) {
+            throw new \InvalidArgumentException('Stack capacity exceeded');
+        }
+
+        $this->cards = $list;
     }
 
     public static function fromString(string $string, ?int $capacity = null): self
     {
-        if (empty($string)) {
+        if ($string === '') {
             return new self();
         }
 
         $cards = explode(',', $string);
 
-        return new self(array_map(fn(string $card) => Card::fromString($card), $cards), $capacity);
+        return new self(array_map(Card::fromString(...), $cards), $capacity);
     }
 
     public function getIterator(): Iterator
@@ -65,7 +77,7 @@ class Stack implements IteratorAggregate, \Countable
 
     public function isEmpty(): bool
     {
-        return empty($this->cards);
+        return $this->cards === [];
     }
 
     /**
@@ -106,10 +118,12 @@ class Stack implements IteratorAggregate, \Countable
         foreach ($cards as $card) {
             $found = false;
             foreach ($this->cards as $existing) {
-                if ($existing->equals($card)) {
-                    $found = true;
-                    break;
+                if (!$existing->equals($card)) {
+                    continue;
                 }
+
+                $found = true;
+                break;
             }
             if (!$found) {
                 return false;
@@ -125,7 +139,7 @@ class Stack implements IteratorAggregate, \Countable
      */
     public function hasExactCards(PlayableCard ...$cards): bool
     {
-        if (empty($cards)) {
+        if ($cards === []) {
             return true;
         }
 
@@ -133,7 +147,7 @@ class Stack implements IteratorAggregate, \Countable
         foreach ($cards as $card) {
             $found = false;
             foreach ($this->cards as $i => $existing) {
-                if (isset($matched[$i])) {
+                if (array_key_exists($i, $matched)) {
                     continue;
                 }
                 if ($existing->equals($card)) {
@@ -167,7 +181,7 @@ class Stack implements IteratorAggregate, \Countable
         $indicesToRemove = [];
         foreach ($cards as $card) {
             foreach ($this->cards as $index => $existing) {
-                if (isset($indicesToRemove[$index])) {
+                if (array_key_exists($index, $indicesToRemove)) {
                     continue;
                 }
                 if ($existing->equals($card)) {
@@ -177,10 +191,14 @@ class Stack implements IteratorAggregate, \Countable
             }
         }
 
-        foreach (array_keys($indicesToRemove) as $index) {
-            unset($this->cards[$index]);
+        $remaining = [];
+        foreach ($this->cards as $index => $existing) {
+            if (array_key_exists($index, $indicesToRemove)) {
+                continue;
+            }
+            $remaining[] = $existing;
         }
-        $this->cards = array_values($this->cards);
+        $this->cards = $remaining;
     }
 
     public function peek(int $num = 1, bool $fromTop = true): self
@@ -263,7 +281,7 @@ class Stack implements IteratorAggregate, \Countable
 
     public function sortByRank(RankOrder $rankOrder): void
     {
-        $this->sort(fn(PlayableCard $a, PlayableCard $b) => $rankOrder->compare(
+        $this->sort(static fn(PlayableCard $a, PlayableCard $b) => $rankOrder->compare(
             $a->underlyingCard()->rank,
             $b->underlyingCard()->rank,
         ));
@@ -272,7 +290,7 @@ class Stack implements IteratorAggregate, \Countable
     /** @return list<Rank> */
     public function getRanks(): array
     {
-        return array_map(fn(PlayableCard $card) => $card->underlyingCard()->rank, $this->cards);
+        return array_map(static fn(PlayableCard $card) => $card->underlyingCard()->rank, $this->cards);
     }
 
     public function hasRank(Rank $rank): bool
@@ -289,7 +307,7 @@ class Stack implements IteratorAggregate, \Countable
     /** @return list<Suit> */
     public function getSuits(): array
     {
-        return array_map(fn(PlayableCard $card) => $card->underlyingCard()->suit, $this->cards);
+        return array_map(static fn(PlayableCard $card) => $card->underlyingCard()->suit, $this->cards);
     }
 
     public function sort(callable $callback): void

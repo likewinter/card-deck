@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck\Games\Poker;
 
 use ArrayIterator;
@@ -65,7 +67,7 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
      */
     public static function fromHand(Stack $hand): self
     {
-        $cards = array_map(fn($card) => $card->underlyingCard(), [...$hand]);
+        $cards = array_map(static fn($card) => $card->underlyingCard(), [...$hand]);
 
         return new self(array_values($cards));
     }
@@ -182,7 +184,7 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
     {
         $counts = $this->countRankGroups();
 
-        return !empty($counts) && max($counts) === 4;
+        return $counts !== [] && max($counts) === 4;
     }
 
     private function isFullHouse(): bool
@@ -204,7 +206,7 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
     {
         $counts = $this->countRankGroups();
 
-        return !empty($counts) && max($counts) === 3;
+        return $counts !== [] && max($counts) === 3;
     }
 
     private function isTwoPair(): bool
@@ -216,7 +218,7 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
     {
         $counts = $this->countRankGroups();
 
-        return !empty($counts) && max($counts) === 2;
+        return $counts !== [] && max($counts) === 2;
     }
 
     // ── Detection helpers ───────────────────────────────────────────────
@@ -236,7 +238,7 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
 
     private function detectSameSuit(): bool
     {
-        return count(array_unique(array_map(fn(Card $card) => $card->suit->getSymbol(), $this->cards))) === 1;
+        return count(array_unique(array_map(static fn(Card $card) => $card->suit->getSymbol(), $this->cards))) === 1;
     }
 
     private function detectSequentialRank(): bool
@@ -265,7 +267,7 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
      */
     private function countRankGroups(): array
     {
-        $counts = array_map(fn(array $cards) => count($cards), $this->rankSets);
+        $counts = array_map(static fn(array $cards) => count($cards), $this->rankSets);
         sort($counts);
 
         return $counts;
@@ -274,7 +276,7 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
     // ── Tiebreaker helpers ──────────────────────────────────────────────
 
     /**
-     * @return list<int>
+     * @return non-empty-list<int>
      */
     private function getSortedUniqueRankValues(): array
     {
@@ -310,8 +312,8 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
         $remaining = $counts;
 
         foreach ($groupSizes as $size) {
-            $candidates = array_filter($remaining, fn(int $c) => $c === $size);
-            if (empty($candidates)) {
+            $candidates = array_filter($remaining, static fn(int $c) => $c === $size);
+            if ($candidates === []) {
                 continue;
             }
             $keys = array_keys($candidates);

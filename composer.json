@@ -6,7 +6,7 @@
         "php": "^8.4"
     },
     "require-dev": {
-        "phpstan/phpstan": "^1.12",
+        "phpstan/phpstan": "^2.0",
         "pestphp/pest": "^4.2"
     },
     "license": "MIT",
@@ -28,12 +28,15 @@
     },
     "scripts": {
         "test": ["Composer\\Config::disableProcessTimeout", "pest"],
-        "phpstan": "phpstan analyse",
+        "phpstan": "phpstan analyse --memory-limit=1G",
         "audit": "composer audit --format=plain",
         "coverage": ["Composer\\Config::disableProcessTimeout", "pest --coverage"],
+        "lint": "mago lint",
+        "format": "mago format",
         "ci": [
             "@audit",
             "@phpstan",
+            "@lint",
             "@test"
         ]
     },
@@ -42,6 +45,8 @@
         "phpstan": "Run PHPStan static analysis at level 8",
         "audit": "Check dependencies for known security vulnerabilities",
         "coverage": "Run tests with PCOV coverage report",
-        "ci": "Run all CI checks (audit + phpstan + tests)"
+        "lint": "Run Mago linter against the configured baseline",
+        "format": "Format PHP source with Mago",
+        "ci": "Run all CI checks (audit + phpstan + lint + tests)"
     }
 }
