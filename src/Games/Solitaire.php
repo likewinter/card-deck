@@ -9,6 +9,7 @@ use Likewinter\CardDeck\Card\Suit;
 use Likewinter\CardDeck\CardInPlay;
 use Likewinter\CardDeck\DeckBuilder;
 use Likewinter\CardDeck\Face;
+use Likewinter\CardDeck\PlayableCard;
 use Likewinter\CardDeck\RankOrder;
 use Likewinter\CardDeck\Stack;
 
@@ -111,7 +112,7 @@ readonly class Solitaire
             return;
         }
 
-        $card = [...$this->stock->takeTop()][0];
+        $card = $this->asCardInPlay([...$this->stock->takeTop()][0]);
         $this->waste->addCards($card->reveal());
     }
 
@@ -123,7 +124,7 @@ readonly class Solitaire
             throw new \LogicException('Waste is empty');
         }
 
-        $card = [...$this->waste->peek()][0];
+        $card = $this->asCardInPlay([...$this->waste->peek()][0]);
         $this->validateFoundationMove($card, $suit);
         $this->waste->takeTop();
         $this->foundation($suit)->addCards($card);
@@ -149,7 +150,7 @@ readonly class Solitaire
             throw new \LogicException('Waste is empty');
         }
 
-        $card = [...$this->waste->peek()][0];
+        $card = $this->asCardInPlay([...$this->waste->peek()][0]);
         $this->validateTableauMove($card, $pileIndex);
         $this->waste->takeTop();
         $this->tableau[$pileIndex]->addCards($card);
@@ -184,9 +185,18 @@ readonly class Solitaire
 
     // ── Private ────────────────────────────────────────────────────
 
+    private function asCardInPlay(PlayableCard $card): CardInPlay
+    {
+        if (!$card instanceof CardInPlay) {
+            throw new \LogicException('Expected a CardInPlay');
+        }
+
+        return $card;
+    }
+
     private function tableauTop(int $index): CardInPlay
     {
-        $top = [...$this->tableau[$index]->peek()][0];
+        $top = $this->asCardInPlay([...$this->tableau[$index]->peek()][0]);
 
         if ($top->isFaceDown()) {
             throw new \LogicException('Cannot move a face-down card');
@@ -202,7 +212,7 @@ readonly class Solitaire
             return;
         }
 
-        $top = [...$pile->peek()][0];
+        $top = $this->asCardInPlay([...$pile->peek()][0]);
         if ($top->isFaceDown()) {
             $pile->takeTop();
             $pile->addCards($top->reveal());
@@ -246,7 +256,7 @@ readonly class Solitaire
             return;
         }
 
-        $top = [...$pile->peek()][0];
+        $top = $this->asCardInPlay([...$pile->peek()][0]);
 
         if ($top->isFaceDown()) {
             throw new \LogicException('Cannot place on a face-down card');

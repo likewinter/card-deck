@@ -12,7 +12,7 @@ namespace Likewinter\CardDeck;
  * can live in a Stack, and all three can be compared by their string
  * representation for equality checks.
  */
-interface PlayableCard
+interface PlayableCard extends \Stringable
 {
     /**
      * The underlying Card this playable card represents.

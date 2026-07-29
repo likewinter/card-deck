@@ -44,7 +44,9 @@ readonly class JokerPoker
     private static function buildWildDeck(): Stack
     {
         $deck = DeckBuilder::standard52WithJokers(2)->build();
-        $cards = array_map(static fn($c) => $c->isJoker() ? new Wildcard($c->underlyingCard()) : $c, [...$deck]);
+        $cards = array_map(static fn($c) => $c->underlyingCard()->isJoker()
+            ? new Wildcard($c->underlyingCard())
+            : $c, [...$deck]);
 
         return new Stack($cards, count($cards));
     }

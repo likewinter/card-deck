@@ -29,6 +29,16 @@ too-many-methods = { threshold = 30 }
 
 [analyzer]
 plugins = []
+ignore = [
+    # $num is validated >= 1 by enoughCards() before the array_rand call
+    { code = "possibly-invalid-argument", pattern = "array_rand", in = ["src/Stack.php"] },
+    # Constructor validates iterable<mixed, mixed> items via instanceof at runtime
+    { code = "mixed-assignment", in = ["src/Stack.php"] },
+    # $flat is built from array_keys() string values, never null
+    { code = "possibly-null-array-index", in = ["src/RankOrder.php"] },
+    # 5-card hand guarantees non-empty; array_unique loses the non-empty proof
+    { code = "invalid-return-statement", pattern = "non-empty-list", in = ["src/Games/Poker/PokerHand.php"] },
+]
 find-unused-definitions = true
 find-unused-expressions = false
 analyze-dead-code = false

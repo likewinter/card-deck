@@ -323,6 +323,9 @@ class Stack implements IteratorAggregate, \Countable
         return array_map(static fn(PlayableCard $card) => $card->underlyingCard()->suit, $this->cards);
     }
 
+    /**
+     * @param callable(PlayableCard, PlayableCard): int $callback
+     */
     public function sort(callable $callback): void
     {
         usort($this->cards, $callback);
