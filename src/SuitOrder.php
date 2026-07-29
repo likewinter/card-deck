@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck;
 
 use Likewinter\CardDeck\Card\Suit;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck\Card;
 
 enum Suit: string
@@ -27,15 +29,14 @@ enum Suit: string
      */
     public static function casesWithoutJoker(): array
     {
-        return array_values(array_filter(self::cases(), fn(Suit $suit) => $suit !== self::Joker));
+        return array_values(array_filter(self::cases(), static fn(Suit $suit) => $suit !== self::Joker));
     }
 
     public function getColor(): string
     {
         return match ($this) {
             self::Hearts, self::Diamonds => 'red',
-            self::Clubs, self::Spades => 'black',
-            self::Joker => 'black',
+            self::Clubs, self::Spades, self::Joker => 'black',
         };
     }
 

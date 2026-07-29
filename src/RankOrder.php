@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck;
 
 use Likewinter\CardDeck\Card\Rank;
@@ -43,7 +45,7 @@ final readonly class RankOrder
      */
     public static function fromRanks(Rank ...$ordered): self
     {
-        if (empty($ordered)) {
+        if ($ordered === []) {
             throw new \InvalidArgumentException('RankOrder requires at least one rank');
         }
 

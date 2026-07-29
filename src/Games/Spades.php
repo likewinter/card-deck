@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck\Games;
 
-use Likewinter\CardDeck\Card\Rank;
 use Likewinter\CardDeck\Card\Suit;
 use Likewinter\CardDeck\DeckBuilder;
 use Likewinter\CardDeck\RankOrder;
@@ -25,8 +26,8 @@ readonly class Spades
     public const NUM_PLAYERS = 4;
     public const CARDS_PER_PLAYER = 13;
 
-    private readonly Table $table;
-    private readonly SuitOrder $suitOrder;
+    private Table $table;
+    private SuitOrder $suitOrder;
 
     public function __construct(?Table $table = null)
     {

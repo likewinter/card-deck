@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck\Games;
 
 use Likewinter\CardDeck\DeckBuilder;
@@ -13,10 +15,10 @@ readonly class Poker
     private const MIN_HANDS = 2;
     private const MAX_HANDS = 5;
 
-    private readonly Table $table;
+    private Table $table;
 
     public function __construct(
-        private readonly int $numHands = self::DEFAULT_NUM_HANDS,
+        private int $numHands = self::DEFAULT_NUM_HANDS,
         ?Table $table = null,
     ) {
         $this->table = $table ?? new Table(deck: DeckBuilder::standard52()->build(), shuffle: true);
@@ -85,7 +87,7 @@ readonly class Poker
     {
         $pokerHands = $this->hands();
 
-        if (empty($pokerHands)) {
+        if ($pokerHands === []) {
             return [];
         }
 
@@ -97,7 +99,9 @@ readonly class Poker
             if ($cmp > 0) {
                 $best = $pokerHands[$i];
                 $winners = [$best];
-            } elseif ($cmp === 0) {
+                continue;
+            }
+            if ($cmp === 0) {
                 $winners[] = $pokerHands[$i];
             }
         }

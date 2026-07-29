@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck\Card;
 
 /**
@@ -52,7 +54,7 @@ enum Rank: string
      */
     public static function casesWithoutJoker(): array
     {
-        return array_values(array_filter(self::cases(), fn(Rank $rank) => $rank !== self::Joker));
+        return array_values(array_filter(self::cases(), static fn(Rank $rank) => $rank !== self::Joker));
     }
 
     /**

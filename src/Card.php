@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck;
 
 use Likewinter\CardDeck\Card\Rank;
@@ -31,13 +33,9 @@ class Card implements PlayableCard
         if (mb_strlen($string) < 2 || mb_strlen($string) > 3) {
             throw new \InvalidArgumentException('Invalid card string');
         }
-        if (mb_strlen($string) === 3) {
-            $rank = mb_substr($string, 0, 2);
-            $suit = mb_substr($string, 2, 1);
-        } else {
-            $rank = mb_substr($string, 0, 1);
-            $suit = mb_substr($string, 1, 1);
-        }
+        $isLong = mb_strlen($string) === 3;
+        $rank = $isLong ? mb_substr($string, 0, 2) : mb_substr($string, 0, 1);
+        $suit = $isLong ? mb_substr($string, 2, 1) : mb_substr($string, 1, 1);
 
         return new self(suit: Suit::fromSymbol($suit), rank: Rank::fromSymbol($rank));
     }

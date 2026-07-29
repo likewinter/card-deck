@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck;
 
 use Likewinter\CardDeck\Card\Suit;
@@ -86,7 +88,7 @@ final class Trick
      */
     public function isEmpty(): bool
     {
-        return empty($this->cards);
+        return $this->cards === [];
     }
 
     /**
@@ -102,9 +104,11 @@ final class Trick
 
         $winnerIdx = 0;
         for ($i = 1, $n = count($this->cards); $i < $n; $i++) {
-            if ($this->suitOrder->beats($this->cards[$i], $this->cards[$winnerIdx], $this->leadSuit)) {
-                $winnerIdx = $i;
+            if (!$this->suitOrder->beats($this->cards[$i], $this->cards[$winnerIdx], $this->leadSuit)) {
+                continue;
             }
+
+            $winnerIdx = $i;
         }
 
         return $this->players[$winnerIdx];

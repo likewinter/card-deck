@@ -18,6 +18,8 @@ preset = "default"
 
 [linter]
 integrations = ["pest"]
+baseline = "mago-baseline.json"
+baseline-variant = "loose"
 
 [linter.rules]
 ambiguous-function-call = { enabled = false }

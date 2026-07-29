@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck\Games;
 
 use Likewinter\CardDeck\Card;
-use Likewinter\CardDeck\Card\Rank;
-use Likewinter\CardDeck\Card\Suit;
 use Likewinter\CardDeck\DeckBuilder;
 use Likewinter\CardDeck\Games\Poker\PokerHand;
 use Likewinter\CardDeck\Stack;
@@ -44,7 +44,7 @@ readonly class JokerPoker
     private static function buildWildDeck(): Stack
     {
         $deck = DeckBuilder::standard52WithJokers(2)->build();
-        $cards = array_map(fn($c) => $c->isJoker() ? new Wildcard($c->underlyingCard()) : $c, [...$deck]);
+        $cards = array_map(static fn($c) => $c->isJoker() ? new Wildcard($c->underlyingCard()) : $c, [...$deck]);
 
         return new Stack($cards, count($cards));
     }
@@ -67,11 +67,13 @@ readonly class JokerPoker
         $hand = $this->hand($handIndex);
 
         foreach ([...$hand] as $card) {
-            if ($card instanceof Wildcard && $card->isUnassigned()) {
-                $hand->removeCards($card);
-                $hand->addCards($card->assign($represents));
-                return;
+            if (!($card instanceof Wildcard && $card->isUnassigned())) {
+                continue;
             }
+
+            $hand->removeCards($card);
+            $hand->addCards($card->assign($represents));
+            return;
         }
 
         throw new \LogicException('No unassigned wildcard in hand');
@@ -115,7 +117,7 @@ readonly class JokerPoker
             }
         }
 
-        if (empty($pokerHands)) {
+        if ($pokerHands === []) {
             return [];
         }
 
@@ -127,7 +129,9 @@ readonly class JokerPoker
             if ($cmp > 0) {
                 $best = $pokerHands[$i];
                 $winners = [$best];
-            } elseif ($cmp === 0) {
+                continue;
+            }
+            if ($cmp === 0) {
                 $winners[] = $pokerHands[$i];
             }
         }
@@ -143,10 +147,12 @@ readonly class JokerPoker
         foreach ($this->table->handNames() as $name) {
             $hand = $this->table->hand($name);
             foreach ([...$hand] as $card) {
-                if ($card instanceof Wildcard && $card->isAssigned()) {
-                    $hand->removeCards($card);
-                    $hand->addCards($card->unassign());
+                if (!($card instanceof Wildcard && $card->isAssigned())) {
+                    continue;
                 }
+
+                $hand->removeCards($card);
+                $hand->addCards($card->unassign());
             }
         }
 

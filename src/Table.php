@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck;
 
 /**
@@ -39,7 +41,7 @@ class Table
 
     public function addHand(string $name, Stack $hand): void
     {
-        if (isset($this->hands[$name])) {
+        if (array_key_exists($name, $this->hands)) {
             throw new \InvalidArgumentException("Hand '{$name}' already exists");
         }
         $this->hands[$name] = $hand;
@@ -62,7 +64,7 @@ class Table
 
     public function hasHand(string $name): bool
     {
-        return isset($this->hands[$name]);
+        return array_key_exists($name, $this->hands);
     }
 
     /** @return list<string> */
@@ -96,7 +98,7 @@ class Table
      */
     public function drawAll(int $num = 1): void
     {
-        if (empty($this->hands)) {
+        if ($this->hands === []) {
             throw new \LogicException('No hands registered');
         }
 
@@ -145,7 +147,7 @@ class Table
     {
         $hand = $this->hand($name);
 
-        if (empty($cards)) {
+        if ($cards === []) {
             $hand->moveAllTo($this->pile);
             return;
         }

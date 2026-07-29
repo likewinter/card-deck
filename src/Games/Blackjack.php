@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Likewinter\CardDeck\Games;
 
 use Likewinter\CardDeck\DeckBuilder;
@@ -20,10 +22,10 @@ readonly class Blackjack
     private const DEFAULT_NUM_DECKS = 6;
     private const DEALER_STANDS_ON = 17;
 
-    private readonly Table $table;
+    private Table $table;
 
     public function __construct(
-        private readonly int $numPlayers = 1,
+        private int $numPlayers = 1,
         int $numDecks = self::DEFAULT_NUM_DECKS,
         ?Table $table = null,
     ) {
