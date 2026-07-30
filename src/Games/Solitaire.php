@@ -39,7 +39,7 @@ readonly class Solitaire
             shuffle($cards);
         }
 
-        $this->rankOrder = RankOrder::poker();
+        $this->rankOrder = RankOrder::pokerLowAce();
 
         $offset = 0;
         $tableau = [];

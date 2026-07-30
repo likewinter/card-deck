@@ -171,16 +171,28 @@ describe('foundation moves', function () {
         $game->moveToFoundation(0, Suit::Spades);
     })->throws(\InvalidArgumentException::class);
 
-    it('accepts ascending same-suit cards', function () {
-        // Deck: A♥, 2♥, ... so A♥ is pile 0 top, 2♥ is somewhere in tableau
-        $game = new Solitaire(deck: orderedDeck(), shuffle: false);
+    it('builds foundation A→2→3 in sequence', function () {
+        // Pile 0: [A♥(Up)], Pile 1: [K♠(Down), 2♥(Up)], Pile 2: [K♣(Down), Q♠(Down), 3♥(Up)]
+        $game = new Solitaire(
+            deck: deckStartingWith('A♥', 'K♠', '2♥', 'K♣', 'Q♠', '3♥'),
+            shuffle: false,
+        );
 
-        // Move A♥ to foundation
         $game->moveToFoundation(0, Suit::Hearts);
         expect($game->foundation(Suit::Hearts)->count())->toBe(1);
 
-        // Pile 1: [2♥(Down), 3♥(Up)]. Top = 3♥.
-        // 3♥ on A♥ foundation: expected next is 2♥, got 3♥. Should fail.
+        $game->moveToFoundation(1, Suit::Hearts);
+        expect($game->foundation(Suit::Hearts)->count())->toBe(2);
+
+        $game->moveToFoundation(2, Suit::Hearts);
+        expect($game->foundation(Suit::Hearts)->count())->toBe(3);
+    });
+
+    it('rejects skipping a rank in foundation', function () {
+        // Pile 0: [A♥(Up)], Pile 1: [K♠(Down), 3♥(Up)]. 3♥ on A♥ skips 2♥.
+        $game = new Solitaire(deck: deckStartingWith('A♥', 'K♠', '3♥'), shuffle: false);
+
+        $game->moveToFoundation(0, Suit::Hearts);
         $game->moveToFoundation(1, Suit::Hearts);
     })->throws(\InvalidArgumentException::class);
 });
@@ -205,8 +217,17 @@ describe('tableau moves', function () {
         $game->moveToTableau(1, 0);
     })->throws(\InvalidArgumentException::class);
 
+    it('accepts Ace on Two (lowest descending step)', function () {
+        // Pile 0: [2♠(Up)], Pile 1: [K♣(Down), A♥(Up)]. A(1) on 2(2): descending ✓, red on black ✓.
+        $game = new Solitaire(deck: deckStartingWith('2♠', 'K♣', 'A♥'), shuffle: false);
+
+        $game->moveToTableau(1, 0);
+
+        expect($game->tableau(0)->count())->toBe(2);
+    });
+
     it('rejects non-adjacent rank placement', function () {
-        // Pile 0: [A♠(Up)], Pile 1: [K♥(Down), Q♥(Up)]. Q(12) on A(14): not adjacent.
+        // Pile 0: [A♠(Up)], Pile 1: [K♥(Down), Q♥(Up)]. Q(12) on A(1): not adjacent.
         $game = new Solitaire(deck: deckStartingWith('A♠', 'K♥', 'Q♥'), shuffle: false);
 
         $game->moveToTableau(1, 0);
