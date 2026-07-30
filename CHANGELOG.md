@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-07-30
+
+### Fixed
+
+- **Solitaire foundation building broken by poker rank order.**
+  `Solitaire` used `RankOrder::poker()` (Ace=14), so `next(Ace)`
+  returned `null` and foundations could never build past Ace. Now uses
+  `RankOrder::pokerLowAce()` (Ace=1). Also fixes a latent tableau bug
+  where Ace could not be placed on Two.
+
+## [0.7.1] - 2026-07-29
+
+### Fixed
+
+- **Solitaire tableau using wrong Stack end after move + flip.**
+  `moveToTableau` and `moveToFoundation` operated on the wrong end of
+  the source pile, causing revealed cards to be inaccessible.
+
 ## [0.7.0] - 2026-07-29
 
 API consolidation: SuitOrder absorbs RankOrder into a single-object
