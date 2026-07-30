@@ -68,7 +68,7 @@ describe('initial deal', function () {
         $game = new Solitaire(deck: orderedDeck(), shuffle: false);
 
         for ($i = 0; $i < 7; $i++) {
-            $top = [...$game->tableau($i)->peek()][0];
+            $top = [...$game->tableau($i)->peekBottom()][0];
             expect($top)->toBeInstanceOf(CardInPlay::class)
                 ->and($top->isFaceUp())->toBeTrue();
         }
@@ -78,10 +78,10 @@ describe('initial deal', function () {
         $game = new Solitaire(deck: orderedDeck(), shuffle: false);
 
         $cards = [...$game->tableau(6)];
-        expect($cards[0]->isFaceUp())->toBeTrue();
-        for ($j = 1; $j < 7; $j++) {
+        for ($j = 0; $j < 6; $j++) {
             expect($cards[$j]->isFaceDown())->toBeTrue();
         }
+        expect($cards[6]->isFaceUp())->toBeTrue();
     });
 
     it('stock cards are all face-down', function () {
@@ -102,7 +102,7 @@ describe('drawFromStock', function () {
         expect($game->stock()->count())->toBe(23)
             ->and($game->waste()->count())->toBe(1);
 
-        $wasteCard = [...$game->waste()->peek()][0];
+        $wasteCard = [...$game->waste()->peekBottom()][0];
         expect($wasteCard->isFaceUp())->toBeTrue();
     });
 
@@ -158,7 +158,7 @@ describe('foundation moves', function () {
     });
 
     it('rejects non-Ace to empty foundation', function () {
-        // 3♥ is card2 → pile 1 top. Not an Ace.
+        // Pile 1: [2♥(Down), 3♥(Up)]. Top = 3♥. Not an Ace.
         $game = new Solitaire(deck: orderedDeck(), shuffle: false);
 
         $game->moveToFoundation(1, Suit::Hearts);
@@ -179,14 +179,7 @@ describe('foundation moves', function () {
         $game->moveToFoundation(0, Suit::Hearts);
         expect($game->foundation(Suit::Hearts)->count())->toBe(1);
 
-        // 2♥ is card1 → pile 1 bottom (face-down). Can't reach it yet.
-        // Draw from stock to find 2♥... it's in the tableau, not stock.
-        // This test verifies the sequential constraint.
-        // We can't easily reach 2♥ without more setup, so test the rejection:
-        // Try to put 3♥ (pile 1 top is 3♥... wait, let me check.
-
-        // Pile 1: takeTop(2) = [2♥, 3♥], reversed = [3♥, 2♥].
-        // Top = 3♥ (face-up), bottom = 2♥ (face-down).
+        // Pile 1: [2♥(Down), 3♥(Up)]. Top = 3♥.
         // 3♥ on A♥ foundation: expected next is 2♥, got 3♥. Should fail.
         $game->moveToFoundation(1, Suit::Hearts);
     })->throws(\InvalidArgumentException::class);
@@ -194,10 +187,8 @@ describe('foundation moves', function () {
 
 describe('tableau moves', function () {
     it('moves a card to a valid destination (descending, alternating color)', function () {
-        // Deck: K♠, A♥, Q♥, ...
-        // Pile 0: [K♠] (face-up)
-        // Pile 1: takeTop(2) = [A♥, Q♥], reversed = [Q♥, A♥].
-        //   Top = Q♥ (face-up), bottom = A♥ (face-down).
+        // Pile 0: [K♠(Up)]
+        // Pile 1: [A♥(Down), Q♥(Up)]. Top = Q♥.
         // Q♥ on K♠: Q(12) on K(13) descending ✓, red on black ✓.
         $game = new Solitaire(deck: deckStartingWith('K♠', 'A♥', 'Q♥'), shuffle: false);
 
@@ -208,85 +199,90 @@ describe('tableau moves', function () {
     });
 
     it('rejects same-color placement', function () {
-        // Q♥ on K♥: both red. Should fail.
+        // Pile 0: [K♥(Up)], Pile 1: [A♠(Down), Q♥(Up)]. Q♥ on K♥: both red.
         $game = new Solitaire(deck: deckStartingWith('K♥', 'A♠', 'Q♥'), shuffle: false);
 
         $game->moveToTableau(1, 0);
     })->throws(\InvalidArgumentException::class);
 
     it('rejects non-adjacent rank placement', function () {
-        // Q♥ on A♠: Q(12) on A(14), not adjacent. Should fail.
-        // Wait, A is 14 in poker ordering. Q is 12. 12 ≠ 14-1=13. Fail.
+        // Pile 0: [A♠(Up)], Pile 1: [K♥(Down), Q♥(Up)]. Q(12) on A(14): not adjacent.
         $game = new Solitaire(deck: deckStartingWith('A♠', 'K♥', 'Q♥'), shuffle: false);
 
         $game->moveToTableau(1, 0);
     })->throws(\InvalidArgumentException::class);
 
     it('only Kings go on empty tableau', function () {
-        // Move K♠ from pile 0, then try to put Q♥ on the empty pile.
-        $game = new Solitaire(deck: deckStartingWith('K♠', 'A♥', 'Q♥'), shuffle: false);
-
-        // Move K♠ to pile 1 (K on Q? No, K is higher. Can't.)
-        // Actually, K♠ can't go on Q♥ (K > Q, not descending).
-        // Let me move K♠ to an empty pile. But all piles have cards.
-        // Pile 0 has only K♠. If I move K♠ somewhere, pile 0 becomes empty.
-        // K♠ can go on... nothing useful. Let me use a different setup.
-
-        // Deck: K♠, K♥, Q♠, ...
-        // Pile 0: [K♠] (face-up)
-        // Pile 1: takeTop(2) = [K♥, Q♠], reversed = [Q♠, K♥].
-        //   Top = Q♠ (face-up), bottom = K♥ (face-down).
-        // Q♠ on K♠: Q(12) on K(13) descending ✓, black on black ✗. Same color!
-
-        // Let me try: K♠, A♥, Q♦, ...
-        // Pile 0: [K♠]
-        // Pile 1: [Q♦, A♥]. Q♦ on K♠: descending ✓, red on black ✓. Valid!
+        // Pile 0: [K♠(Up)], Pile 1: [A♥(Down), Q♦(Up)].
+        // Q♦ on K♠: descending ✓, red on black ✓. Valid.
         $game = new Solitaire(deck: deckStartingWith('K♠', 'A♥', 'Q♦'), shuffle: false);
 
-        // Move Q♦ from pile 1 to pile 0
         $game->moveToTableau(1, 0);
-        // Pile 0: [Q♦, K♠], Pile 1: [A♥] (auto-flipped)
 
-        // Now pile 1 has A♥. Try to move A♥ to empty pile 2.
-        // Wait, pile 2 is not empty. Let me check.
-        // Pile 2: takeTop(3) from remaining deck. It has 3 cards.
-        // I need an empty pile. Only pile 0 was 1 card, and it now has 2.
-
-        // This test is getting complicated. Let me test the King rule differently.
         expect($game->tableau(0)->count())->toBe(2);
     });
 
     it('rejects non-King on empty tableau', function () {
-        // Pile 0: [A♥] (face-up). Move it to foundation, pile 0 becomes empty.
+        // Pile 0: [A♥(Up)]. Move to foundation → pile 0 empty.
         $game = new Solitaire(deck: orderedDeck(), shuffle: false);
 
         $game->moveToFoundation(0, Suit::Hearts);
         expect($game->tableau(0)->count())->toBe(0);
 
-        // Try to move 3♥ (pile 1 top) to empty pile 0. 3♥ is not a King.
+        // Pile 1 top = 3♥. Not a King → rejected.
         $game->moveToTableau(1, 0);
     })->throws(\InvalidArgumentException::class);
 });
 
 describe('auto-flip', function () {
     it('flips the new top card after removing the face-up card', function () {
-        // Deck: K♠, A♥, Q♦, ...
-        // Pile 0: [K♠]
-        // Pile 1: [Q♦ (face-up), A♥ (face-down)]
+        // Pile 0: [K♠(Up)], Pile 1: [A♥(Down), Q♦(Up)].
         $game = new Solitaire(deck: deckStartingWith('K♠', 'A♥', 'Q♦'), shuffle: false);
 
-        // Verify A♥ is face-down
         $pile1Cards = [...$game->tableau(1)];
-        expect($pile1Cards[1]->isFaceDown())->toBeTrue();
+        expect($pile1Cards[0]->isFaceDown())->toBeTrue();
 
         // Move Q♦ from pile 1 to pile 0 (Q♦ on K♠: valid)
         $game->moveToTableau(1, 0);
 
         // A♥ should now be face-up (auto-flipped)
-        $newTop = [...$game->tableau(1)->peek()][0];
+        $newTop = [...$game->tableau(1)->peekBottom()][0];
         expect($newTop->isFaceUp())->toBeTrue()
             ->and($newTop->underlyingCard()->rank)->toBe(Rank::Ace)
             ->and($newTop->underlyingCard()->suit)->toBe(Suit::Hearts);
+    });
+});
+
+describe('move + flip + subsequent move (regression #1)', function () {
+    it('revealed card is movable after flip', function () {
+        // Pile 0: [K♠(Up)], Pile 1: [A♥(Down), Q♦(Up)].
+        $game = new Solitaire(deck: deckStartingWith('K♠', 'A♥', 'Q♦'), shuffle: false);
+
+        // Move Q♦ away from pile 1 → A♥ auto-flips to face-up.
+        $game->moveToTableau(1, 0);
+
+        // The revealed A♥ must be accessible — move it to foundation.
+        $game->moveToFoundation(1, Suit::Hearts);
+        expect($game->foundation(Suit::Hearts)->count())->toBe(1)
+            ->and($game->tableau(1)->count())->toBe(0);
+    });
+
+    it('revealed card is usable as a move destination', function () {
+        // Pile 0: [K♠(Up)], Pile 1: [J♥(Down), Q♥(Up)], Pile 2: [A♦(Down), 2♦(Down), 10♣(Up)].
+        $game = new Solitaire(
+            deck: deckStartingWith('K♠', 'J♥', 'Q♥', 'A♦', '2♦', '10♣'),
+            shuffle: false,
+        );
+
+        // Move Q♥ onto K♠ (red on black, descending) → J♥ flips up in pile 1.
+        $game->moveToTableau(1, 0);
+
+        // Move 10♣ onto the revealed J♥ (black on red, descending).
+        $game->moveToTableau(2, 1);
+
+        expect($game->tableau(1)->count())->toBe(2);
+        $top = [...$game->tableau(1)->peekBottom()][0];
+        expect($top->underlyingCard()->rank)->toBe(Rank::Ten);
     });
 });
 
@@ -298,8 +294,8 @@ describe('face-down enforcement', function () {
 
         $game->moveToTableau(1, 0);
 
-        // Pile 1 now has [A♥ (face-up)]. It's movable.
-        $top = [...$game->tableau(1)->peek()][0];
+        // Pile 1 now has [A♥(Up)]. It's movable.
+        $top = [...$game->tableau(1)->peekBottom()][0];
         expect($top->isFaceUp())->toBeTrue();
     });
 });
@@ -309,7 +305,7 @@ describe('waste moves', function () {
         $game = new Solitaire(deck: orderedDeck(), shuffle: false);
 
         $game->drawFromStock();
-        $wasteCard = [...$game->waste()->peek()][0];
+        $wasteCard = [...$game->waste()->peekBottom()][0];
         $wasteUnderlying = $wasteCard->underlyingCard();
 
         // The waste card might not fit anywhere. Just verify the mechanic works

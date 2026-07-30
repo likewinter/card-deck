@@ -45,11 +45,11 @@ readonly class Solitaire
         $tableau = [];
         for ($i = 0; $i < 7; $i++) {
             $count = $i + 1;
-            $slice = array_reverse(array_slice($cards, $offset, $count));
+            $slice = array_slice($cards, $offset, $count);
             $offset += $count;
             $pile = [];
             foreach ($slice as $j => $card) {
-                $pile[] = new CardInPlay($card->underlyingCard(), $j === 0 ? Face::Up : Face::Down);
+                $pile[] = new CardInPlay($card->underlyingCard(), $j === ($count - 1) ? Face::Up : Face::Down);
             }
             $tableau[] = new Stack($pile);
         }
@@ -124,9 +124,9 @@ readonly class Solitaire
             throw new \LogicException('Waste is empty');
         }
 
-        $card = $this->asCardInPlay([...$this->waste->peek()][0]);
+        $card = $this->asCardInPlay([...$this->waste->peekBottom()][0]);
         $this->validateFoundationMove($card, $suit);
-        $this->waste->takeTop();
+        $this->waste->takeBottom();
         $this->foundation($suit)->addCards($card);
     }
 
@@ -139,7 +139,7 @@ readonly class Solitaire
 
         $card = $this->tableauTop($tableauIndex);
         $this->validateFoundationMove($card, $suit);
-        $pile->takeTop();
+        $pile->takeBottom();
         $this->flipIfNeeded($tableauIndex);
         $this->foundation($suit)->addCards($card);
     }
@@ -150,9 +150,9 @@ readonly class Solitaire
             throw new \LogicException('Waste is empty');
         }
 
-        $card = $this->asCardInPlay([...$this->waste->peek()][0]);
+        $card = $this->asCardInPlay([...$this->waste->peekBottom()][0]);
         $this->validateTableauMove($card, $pileIndex);
-        $this->waste->takeTop();
+        $this->waste->takeBottom();
         $this->tableau[$pileIndex]->addCards($card);
     }
 
@@ -165,7 +165,7 @@ readonly class Solitaire
 
         $card = $this->tableauTop($fromIndex);
         $this->validateTableauMove($card, $toIndex);
-        $from->takeTop();
+        $from->takeBottom();
         $this->flipIfNeeded($fromIndex);
         $this->tableau[$toIndex]->addCards($card);
     }
@@ -196,7 +196,7 @@ readonly class Solitaire
 
     private function tableauTop(int $index): CardInPlay
     {
-        $top = $this->asCardInPlay([...$this->tableau[$index]->peek()][0]);
+        $top = $this->asCardInPlay([...$this->tableau[$index]->peekBottom()][0]);
 
         if ($top->isFaceDown()) {
             throw new \LogicException('Cannot move a face-down card');
@@ -212,9 +212,9 @@ readonly class Solitaire
             return;
         }
 
-        $top = $this->asCardInPlay([...$pile->peek()][0]);
+        $top = $this->asCardInPlay([...$pile->peekBottom()][0]);
         if ($top->isFaceDown()) {
-            $pile->takeTop();
+            $pile->takeBottom();
             $pile->addCards($top->reveal());
         }
     }
@@ -236,7 +236,7 @@ readonly class Solitaire
             return;
         }
 
-        $topUnderlying = [...$foundation->peek()][0]->underlyingCard();
+        $topUnderlying = [...$foundation->peekBottom()][0]->underlyingCard();
         $expected = $this->rankOrder->next($topUnderlying->rank);
 
         if ($underlying->rank !== $expected) {
@@ -256,7 +256,7 @@ readonly class Solitaire
             return;
         }
 
-        $top = $this->asCardInPlay([...$pile->peek()][0]);
+        $top = $this->asCardInPlay([...$pile->peekBottom()][0]);
 
         if ($top->isFaceDown()) {
             throw new \LogicException('Cannot place on a face-down card');

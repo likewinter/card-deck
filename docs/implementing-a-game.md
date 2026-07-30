@@ -190,8 +190,8 @@ foreach ($cards as $i => $card) {
     );
 }
 
-// Reveal the top card when the one above is removed
-$top = $column->takeTop();  // CardInPlay, face-up
+// The interactive "top" is the end of the Stack (where addCards appends)
+$top = $column->takeBottom();  // CardInPlay, face-up
 // ... after removing the card above:
 // $column's new top can be flipped via CardInPlay::reveal()
 ```
