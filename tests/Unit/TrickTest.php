@@ -71,7 +71,7 @@ it('rejects winner determination on an incomplete trick', function () {
         numPlayers: 2,
     );
     $trick->play(trickCard(Suit::Hearts, Rank::Two));
-    $trick->winner();
+    (void) $trick->winner();
 })->throws(\LogicException::class);
 
 it('tracks current player and enforces turn order', function () {

@@ -223,6 +223,7 @@ class DeckBuilder
     /**
      * Build and return the deck as a Stack.
      */
+    #[\NoDiscard]
     public function build(): Stack
     {
         $cards = $this->makeCards();
@@ -236,6 +237,7 @@ class DeckBuilder
      *
      * @return list<Card>
      */
+    #[\NoDiscard]
     public function buildCards(): array
     {
         return $this->makeCards();

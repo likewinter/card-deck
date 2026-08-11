@@ -27,6 +27,7 @@ final readonly class Wildcard implements PlayableCard
     /**
      * Returns a new Wildcard with the assigned substitution card.
      */
+    #[\NoDiscard]
     public function assign(Card $card): self
     {
         return new self($this->wild, $card);
@@ -35,6 +36,7 @@ final readonly class Wildcard implements PlayableCard
     /**
      * Returns a new Wildcard with no assignment (un-assigns the wildcard).
      */
+    #[\NoDiscard]
     public function unassign(): self
     {
         return new self($this->wild, null);

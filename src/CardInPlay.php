@@ -35,6 +35,7 @@ final readonly class CardInPlay implements PlayableCard
     /**
      * Returns a new instance with the opposite face. Does not mutate.
      */
+    #[\NoDiscard]
     public function flip(): self
     {
         return new self($this->card, $this->face === Face::Up ? Face::Down : Face::Up);
@@ -43,6 +44,7 @@ final readonly class CardInPlay implements PlayableCard
     /**
      * Returns a new instance face-up. No-op if already up.
      */
+    #[\NoDiscard]
     public function reveal(): self
     {
         return $this->face === Face::Up ? $this : new self($this->card, Face::Up);
@@ -51,6 +53,7 @@ final readonly class CardInPlay implements PlayableCard
     /**
      * Returns a new instance face-down. No-op if already down.
      */
+    #[\NoDiscard]
     public function hide(): self
     {
         return $this->face === Face::Down ? $this : new self($this->card, Face::Down);

@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`#[\NoDiscard]` (PHP 8.5) on methods whose return value must never
+  be discarded** — `Stack::takeCards()`/`takeTop()`/`takeBottom()`/
+  `peek()`/`peekBottom()`/`peekRandom()`/`fromString()`,
+  `Table::peekDeck()`/`peekDeckBottom()`/`drawUpTo()`, `Trick::winner()`,
+  `CardInPlay::flip()`/`reveal()`/`hide()`, `Wildcard::assign()`/
+  `unassign()`, `DeckBuilder::build()`/`buildCards()`, and
+  `Card::fromString()`. Discarding the result now emits a runtime
+  warning and is flagged by PHPStan; cast with `(void)` to ignore
+  intentionally.
+
+### Changed
+
+- **Requires PHP 8.5 or newer** (was 8.4).
+- Pipe operator (`|>`) adopted in `PokerHand` rank-value normalization.
+
 ## [0.7.2] - 2026-07-30
 
 ### Fixed

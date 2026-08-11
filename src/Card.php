@@ -28,6 +28,7 @@ class Card implements PlayableCard
         }
     }
 
+    #[\NoDiscard]
     public static function fromString(string $string): self
     {
         if (mb_strlen($string) < 2 || mb_strlen($string) > 3) {

@@ -119,6 +119,7 @@ class Table
      *
      * Returns the number of cards actually drawn.
      */
+    #[\NoDiscard]
     public function drawUpTo(string $name, int $target): int
     {
         $hand = $this->hand($name);
@@ -197,6 +198,7 @@ class Table
     /**
      * Peek at cards in the deck without removing them.
      */
+    #[\NoDiscard]
     public function peekDeck(int $num = 1): Stack
     {
         return $this->deck->peek($num);
@@ -205,6 +207,7 @@ class Table
     /**
      * Peek at cards from the bottom of the deck without removing them.
      */
+    #[\NoDiscard]
     public function peekDeckBottom(int $num = 1): Stack
     {
         return $this->deck->peekBottom($num);

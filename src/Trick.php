@@ -96,6 +96,7 @@ final class Trick
      *
      * @throws \LogicException if the trick is not complete.
      */
+    #[\NoDiscard]
     public function winner(): int
     {
         if (!$this->isComplete()) {

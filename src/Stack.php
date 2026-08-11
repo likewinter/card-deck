@@ -44,6 +44,7 @@ class Stack implements IteratorAggregate, \Countable
         $this->cards = $list;
     }
 
+    #[\NoDiscard]
     public static function fromString(string $string, ?int $capacity = null): self
     {
         if ($string === '') {
@@ -201,6 +202,7 @@ class Stack implements IteratorAggregate, \Countable
         $this->cards = $remaining;
     }
 
+    #[\NoDiscard]
     public function peek(int $num = 1): self
     {
         if (!$this->enoughCards($num)) {
@@ -210,6 +212,7 @@ class Stack implements IteratorAggregate, \Countable
         return new self(array_slice($this->cards, 0, $num));
     }
 
+    #[\NoDiscard]
     public function peekBottom(int $num = 1): self
     {
         if (!$this->enoughCards($num)) {
@@ -219,6 +222,7 @@ class Stack implements IteratorAggregate, \Countable
         return new self(array_slice($this->cards, -$num, $num));
     }
 
+    #[\NoDiscard]
     public function peekRandom(int $num = 1): self
     {
         if (!$this->enoughCards($num)) {
@@ -233,6 +237,7 @@ class Stack implements IteratorAggregate, \Countable
         return new self(array_map(fn($key) => $this->cards[$key], $keys));
     }
 
+    #[\NoDiscard]
     public function takeCards(int $num = 1): self
     {
         if (!$this->enoughCards($num)) {
@@ -244,11 +249,13 @@ class Stack implements IteratorAggregate, \Countable
         return new self($cards);
     }
 
+    #[\NoDiscard]
     public function takeTop(int $num = 1): self
     {
         return $this->takeCards($num);
     }
 
+    #[\NoDiscard]
     public function takeBottom(int $num = 1): self
     {
         if (!$this->enoughCards($num)) {

@@ -283,7 +283,7 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
         $values = array_map(fn(Card $card) => $this->rankOrder->value($card->rank), $this->cards);
         sort($values);
 
-        return array_values(array_unique($values));
+        return $values |> array_unique(...) |> array_values(...);
     }
 
     /**

@@ -4,7 +4,7 @@
 ![Coverage](https://likewinter.github.io/card-deck/coverage.svg)
 [![PHPStan](https://img.shields.io/badge/PHPStan-level%208-brightgreen)](https://phpstan.org/)
 
-A PHP 8.4+ engine for building card games — the primitives, not the UI.
+A PHP 8.5+ engine for building card games — the primitives, not the UI.
 
 `likewinter/card-deck` provides game-agnostic building blocks for playing
 card games: cards, decks, stacks, a table, rank/suit ordering,
@@ -20,7 +20,7 @@ aces), [Spades](src/Games/Spades.php) (trick-taking with trump),
 
 ## Requirements
 
-- PHP 8.4 or newer
+- PHP 8.5 or newer
 
 ## Install
 

@@ -135,7 +135,7 @@ describe('taking cards', function () {
 
     it('cant take more cards than are in the stack', function (array $cards, int $num) {
         $stack = new Stack(cards: $cards);
-        $stack->takeCards(count($cards) + 1);
+        (void) $stack->takeCards(count($cards) + 1);
     })->with('not enought cards to take')->throws(\InvalidArgumentException::class);
 
     it('can take cards from the bottom', function () {

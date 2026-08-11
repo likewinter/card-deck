@@ -47,7 +47,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: ['8.4', '8.5']
+        php: ['8.5']
 
     steps:
       - name: Checkout
@@ -162,7 +162,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           coverage: pcov
 
       - name: Get composer cache directory
@@ -173,8 +173,8 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-php-8.4-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-php-8.4-
+          key: ${{ runner.os }}-php-8.5-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-php-8.5-
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-progress

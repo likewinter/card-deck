@@ -126,7 +126,7 @@ readonly class Solitaire
 
         $card = $this->asCardInPlay([...$this->waste->peekBottom()][0]);
         $this->validateFoundationMove($card, $suit);
-        $this->waste->takeBottom();
+        (void) $this->waste->takeBottom();
         $this->foundation($suit)->addCards($card);
     }
 
@@ -139,7 +139,7 @@ readonly class Solitaire
 
         $card = $this->tableauTop($tableauIndex);
         $this->validateFoundationMove($card, $suit);
-        $pile->takeBottom();
+        (void) $pile->takeBottom();
         $this->flipIfNeeded($tableauIndex);
         $this->foundation($suit)->addCards($card);
     }
@@ -152,7 +152,7 @@ readonly class Solitaire
 
         $card = $this->asCardInPlay([...$this->waste->peekBottom()][0]);
         $this->validateTableauMove($card, $pileIndex);
-        $this->waste->takeBottom();
+        (void) $this->waste->takeBottom();
         $this->tableau[$pileIndex]->addCards($card);
     }
 
@@ -165,7 +165,7 @@ readonly class Solitaire
 
         $card = $this->tableauTop($fromIndex);
         $this->validateTableauMove($card, $toIndex);
-        $from->takeBottom();
+        (void) $from->takeBottom();
         $this->flipIfNeeded($fromIndex);
         $this->tableau[$toIndex]->addCards($card);
     }
@@ -214,7 +214,7 @@ readonly class Solitaire
 
         $top = $this->asCardInPlay([...$pile->peekBottom()][0]);
         if ($top->isFaceDown()) {
-            $pile->takeBottom();
+            (void) $pile->takeBottom();
             $pile->addCards($top->reveal());
         }
     }
