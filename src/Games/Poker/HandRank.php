@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Likewinter\CardDeck\Games\Poker;
 
+/**
+ * The ten poker hand categories, ordered from worst (HIGH_CARD) to best
+ * (ROYAL_FLUSH). Int-backed so cases compare naturally by value.
+ */
 enum HandRank: int
 {
     case HIGH_CARD = 0;
@@ -17,6 +21,9 @@ enum HandRank: int
     case STRAIGHT_FLUSH = 8;
     case ROYAL_FLUSH = 9;
 
+    /**
+     * Human-readable name, e.g. "Full House".
+     */
     public function getName(): string
     {
         return match ($this) {

@@ -17,16 +17,26 @@ namespace Likewinter\CardDeck;
  */
 final readonly class CardInPlay implements PlayableCard
 {
+    /**
+     * @param Card $card The wrapped card.
+     * @param Face $face Orientation; defaults to face-up.
+     */
     public function __construct(
         public Card $card,
         public Face $face = Face::Up,
     ) {}
 
+    /**
+     * Create a face-up card in play.
+     */
     public static function up(Card $card): self
     {
         return new self($card, Face::Up);
     }
 
+    /**
+     * Create a face-down card in play.
+     */
     public static function down(Card $card): self
     {
         return new self($card, Face::Down);
@@ -59,26 +69,41 @@ final readonly class CardInPlay implements PlayableCard
         return $this->face === Face::Down ? $this : new self($this->card, Face::Down);
     }
 
+    /**
+     * Whether the card is currently face-up.
+     */
     public function isFaceUp(): bool
     {
         return $this->face->isUp();
     }
 
+    /**
+     * Whether the card is currently face-down.
+     */
     public function isFaceDown(): bool
     {
         return $this->face->isDown();
     }
 
+    /**
+     * Renders "██" when face-down, otherwise the wrapped card's string form.
+     */
     public function __toString(): string
     {
         return $this->face === Face::Down ? '██' : (string) $this->card;
     }
 
+    /**
+     * Returns the wrapped card, regardless of face state.
+     */
     public function underlyingCard(): Card
     {
         return $this->card;
     }
 
+    /**
+     * Equal when both the wrapped card and the face state match.
+     */
     public function equals(PlayableCard $other): bool
     {
         return $other instanceof self && $this->card->equals($other->card) && $this->face === $other->face;

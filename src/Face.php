@@ -16,11 +16,17 @@ enum Face: string
     case Up = 'up';
     case Down = 'down';
 
+    /**
+     * Whether the card is face-up.
+     */
     public function isUp(): bool
     {
         return $this === self::Up;
     }
 
+    /**
+     * Whether the card is face-down.
+     */
     public function isDown(): bool
     {
         return $this === self::Down;

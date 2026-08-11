@@ -16,6 +16,12 @@ use Likewinter\CardDeck\Card\Suit;
  */
 class Card implements PlayableCard
 {
+    /**
+     * @param Suit $suit The card's suit.
+     * @param Rank $rank The card's rank.
+     *
+     * @throws \InvalidArgumentException If exactly one of suit/rank is Joker — jokers pair the Joker suit with the Joker rank.
+     */
     public function __construct(
         public readonly Suit $suit,
         public readonly Rank $rank,
@@ -28,6 +34,12 @@ class Card implements PlayableCard
         }
     }
 
+    /**
+     * Parse a card from its string form, e.g. "A♠", "10♦", or "🃏🃏" for
+     * a joker.
+     *
+     * @throws \InvalidArgumentException If the string is not a valid card.
+     */
     #[\NoDiscard]
     public static function fromString(string $string): self
     {
@@ -41,21 +53,33 @@ class Card implements PlayableCard
         return new self(suit: Suit::fromSymbol($suit), rank: Rank::fromSymbol($rank));
     }
 
+    /**
+     * Renders the card as rank symbol + suit symbol, e.g. "A♠".
+     */
     public function __toString(): string
     {
         return "{$this->rank->getSymbol()}{$this->suit->getSymbol()}";
     }
 
+    /**
+     * Two Cards are equal when they have the same suit and rank.
+     */
     public function equals(PlayableCard $other): bool
     {
         return $other instanceof self && $this->suit === $other->suit && $this->rank === $other->rank;
     }
 
+    /**
+     * Whether this card is a joker.
+     */
     public function isJoker(): bool
     {
         return $this->rank === Rank::Joker;
     }
 
+    /**
+     * Returns this card itself — a Card is its own underlying card.
+     */
     public function underlyingCard(): Card
     {
         return $this;

@@ -16,6 +16,12 @@ use Likewinter\CardDeck\Card\Suit;
  */
 final readonly class SuitOrder
 {
+    /**
+     * @param Suit|null $trumpSuit The trump suit, or null for no trump.
+     * @param RankOrder $rankOrder Rank comparison rules used within suits.
+     *
+     * @throws \InvalidArgumentException If $trumpSuit is the Joker suit.
+     */
     public function __construct(
         public ?Suit $trumpSuit,
         private RankOrder $rankOrder,
@@ -25,16 +31,25 @@ final readonly class SuitOrder
         }
     }
 
+    /**
+     * No trump suit — only lead suit and rank decide tricks.
+     */
     public static function noTrump(RankOrder $rankOrder): self
     {
         return new self(null, $rankOrder);
     }
 
+    /**
+     * Trump configuration with the given suit as trump.
+     */
     public static function suit(Suit $suit, RankOrder $rankOrder): self
     {
         return new self($suit, $rankOrder);
     }
 
+    /**
+     * Whether the card belongs to the trump suit. Always false in no-trump.
+     */
     public function isTrump(Card $card): bool
     {
         return $this->trumpSuit !== null && $card->suit === $this->trumpSuit;

@@ -32,6 +32,14 @@ readonly class Solitaire
     private array $foundations;
     private RankOrder $rankOrder;
 
+    /**
+     * Deal the Klondike layout: 7 tableau columns of 1–7 cards (only
+     * the top card face-up), the remainder to the stock, and 4 empty
+     * foundations.
+     *
+     * @param Stack|null $deck Deck to deal from; defaults to a standard 52-card deck.
+     * @param bool $shuffle Shuffle the deck before dealing.
+     */
     public function __construct(?Stack $deck = null, bool $shuffle = true)
     {
         $cards = [...($deck ?? DeckBuilder::standard52()->build())];
@@ -68,21 +76,35 @@ readonly class Solitaire
 
     // ── Accessors ──────────────────────────────────────────────────
 
+    /**
+     * The face-down stock pile.
+     */
     public function stock(): Stack
     {
         return $this->stock;
     }
 
+    /**
+     * The face-up waste pile drawn from the stock.
+     */
     public function waste(): Stack
     {
         return $this->waste;
     }
 
+    /**
+     * A tableau column by index (0–6).
+     */
     public function tableau(int $index): Stack
     {
         return $this->tableau[$index];
     }
 
+    /**
+     * The foundation pile for a suit.
+     *
+     * @throws \InvalidArgumentException If there is no foundation for the suit (e.g. Joker).
+     */
     public function foundation(Suit $suit): Stack
     {
         return (
@@ -97,6 +119,8 @@ readonly class Solitaire
     /**
      * Draw the top stock card to the waste (face-up).
      * If the stock is empty, recycle the waste back to stock (face-down).
+     *
+     * @throws \LogicException If both stock and waste are empty.
      */
     public function drawFromStock(): void
     {
@@ -118,6 +142,12 @@ readonly class Solitaire
 
     // ── Moves ──────────────────────────────────────────────────────
 
+    /**
+     * Move the top waste card onto a foundation.
+     *
+     * @throws \LogicException If the waste is empty.
+     * @throws \InvalidArgumentException If the move violates foundation rules (suit, rank sequence).
+     */
     public function moveWasteToFoundation(Suit $suit): void
     {
         if ($this->waste->isEmpty()) {
@@ -130,6 +160,13 @@ readonly class Solitaire
         $this->foundation($suit)->addCards($card);
     }
 
+    /**
+     * Move the top card of a tableau column onto a foundation. Flips the
+     * newly exposed tableau card face-up if needed.
+     *
+     * @throws \LogicException If the tableau pile is empty or its top card is face-down.
+     * @throws \InvalidArgumentException If the move violates foundation rules (suit, rank sequence).
+     */
     public function moveToFoundation(int $tableauIndex, Suit $suit): void
     {
         $pile = $this->tableau[$tableauIndex];
@@ -144,6 +181,12 @@ readonly class Solitaire
         $this->foundation($suit)->addCards($card);
     }
 
+    /**
+     * Move the top waste card onto a tableau column.
+     *
+     * @throws \LogicException If the waste is empty.
+     * @throws \InvalidArgumentException If the move violates tableau rules (rank sequence, alternating colors).
+     */
     public function moveWasteToTableau(int $pileIndex): void
     {
         if ($this->waste->isEmpty()) {
@@ -156,6 +199,13 @@ readonly class Solitaire
         $this->tableau[$pileIndex]->addCards($card);
     }
 
+    /**
+     * Move the top card of one tableau column onto another. Flips the
+     * newly exposed card in the source column face-up if needed.
+     *
+     * @throws \LogicException If the source pile is empty or its top card is face-down.
+     * @throws \InvalidArgumentException If the move violates tableau rules (rank sequence, alternating colors).
+     */
     public function moveToTableau(int $fromIndex, int $toIndex): void
     {
         $from = $this->tableau[$fromIndex];
@@ -172,6 +222,9 @@ readonly class Solitaire
 
     // ── State ──────────────────────────────────────────────────────
 
+    /**
+     * Whether all four foundations are complete (13 cards each).
+     */
     public function isWon(): bool
     {
         foreach ($this->foundations as $foundation) {

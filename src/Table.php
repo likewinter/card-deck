@@ -25,6 +25,11 @@ class Table
     /** @var array<string, Stack> */
     private array $hands = [];
 
+    /**
+     * @param Stack $deck The draw pile; the table owns it from here on.
+     * @param DrawMode $drawMode How draw()/drawAll() move cards from the deck into hands.
+     * @param bool $shuffle Shuffle the deck immediately.
+     */
     public function __construct(
         Stack $deck,
         private readonly DrawMode $drawMode = DrawMode::Sequential,
@@ -39,6 +44,11 @@ class Table
 
     // ── Hand registry ────────────────────────────────────────────────────
 
+    /**
+     * Register a named hand.
+     *
+     * @throws \InvalidArgumentException If a hand with this name already exists.
+     */
     public function addHand(string $name, Stack $hand): void
     {
         if (array_key_exists($name, $this->hands)) {
@@ -57,17 +67,29 @@ class Table
         unset($this->hands[$name]);
     }
 
+    /**
+     * Returns the named hand.
+     *
+     * @throws \InvalidArgumentException If no hand with this name exists.
+     */
     public function hand(string $name): Stack
     {
         return $this->hands[$name] ?? throw new \InvalidArgumentException("Hand '{$name}' does not exist");
     }
 
+    /**
+     * Whether a hand with this name has been registered.
+     */
     public function hasHand(string $name): bool
     {
         return array_key_exists($name, $this->hands);
     }
 
-    /** @return list<string> */
+    /**
+     * Names of all registered hands, in registration order.
+     *
+     * @return list<string>
+     */
     public function handNames(): array
     {
         return array_keys($this->hands);
@@ -78,6 +100,9 @@ class Table
     /**
      * Draw cards from the deck into a named hand.
      * Respects the table's DrawMode (Random draws random cards).
+     *
+     * @throws \InvalidArgumentException If the hand does not exist.
+     * @throws \LogicException If the deck has fewer than $num cards.
      */
     public function draw(string $name, int $num = 1): void
     {
@@ -95,6 +120,8 @@ class Table
 
     /**
      * Draw $num cards to every registered hand, respecting DrawMode.
+     *
+     * @throws \LogicException If no hands are registered or the deck cannot cover the full deal.
      */
     public function drawAll(int $num = 1): void
     {
@@ -118,6 +145,8 @@ class Table
      * or the deck runs out — whichever comes first.
      *
      * Returns the number of cards actually drawn.
+     *
+     * @throws \InvalidArgumentException If the hand does not exist.
      */
     #[\NoDiscard]
     public function drawUpTo(string $name, int $target): int
@@ -143,6 +172,8 @@ class Table
     /**
      * Discard specific cards from a named hand to the pile.
      * With no cards argument, discards the entire hand.
+     *
+     * @throws \InvalidArgumentException If the hand does not exist or does not contain the given cards.
      */
     public function discard(string $name, PlayableCard ...$cards): void
     {
@@ -178,6 +209,9 @@ class Table
         $this->pile->moveAllTo($this->deck);
     }
 
+    /**
+     * Shuffle the deck. Does not affect hands or the pile.
+     */
     public function shuffle(): void
     {
         $this->deck->shuffle();
@@ -185,11 +219,17 @@ class Table
 
     // ── Inspection ───────────────────────────────────────────────────────
 
+    /**
+     * Number of cards remaining in the deck.
+     */
     public function deckCount(): int
     {
         return $this->deck->count();
     }
 
+    /**
+     * Number of cards currently in the pile.
+     */
     public function pileCount(): int
     {
         return $this->pile->count();
@@ -197,6 +237,8 @@ class Table
 
     /**
      * Peek at cards in the deck without removing them.
+     *
+     * @throws \InvalidArgumentException If the deck has fewer than $num cards.
      */
     #[\NoDiscard]
     public function peekDeck(int $num = 1): Stack
@@ -206,6 +248,8 @@ class Table
 
     /**
      * Peek at cards from the bottom of the deck without removing them.
+     *
+     * @throws \InvalidArgumentException If the deck has fewer than $num cards.
      */
     #[\NoDiscard]
     public function peekDeckBottom(int $num = 1): Stack

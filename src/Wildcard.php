@@ -19,6 +19,10 @@ namespace Likewinter\CardDeck;
  */
 final readonly class Wildcard implements PlayableCard
 {
+    /**
+     * @param Card $wild The wild card itself (typically a joker).
+     * @param Card|null $assigned The card it currently represents, if any.
+     */
     public function __construct(
         public Card $wild,
         public ?Card $assigned = null,
@@ -50,16 +54,25 @@ final readonly class Wildcard implements PlayableCard
         return $this->assigned;
     }
 
+    /**
+     * Whether the wildcard currently represents a card.
+     */
     public function isAssigned(): bool
     {
         return $this->assigned !== null;
     }
 
+    /**
+     * Whether the wildcard does not yet represent a card.
+     */
     public function isUnassigned(): bool
     {
         return $this->assigned === null;
     }
 
+    /**
+     * Renders the assigned card if set, otherwise the wild card itself.
+     */
     public function __toString(): string
     {
         if ($this->assigned !== null) {
@@ -68,11 +81,18 @@ final readonly class Wildcard implements PlayableCard
         return (string) $this->wild;
     }
 
+    /**
+     * The assigned card if set, otherwise the wild card itself.
+     */
     public function underlyingCard(): Card
     {
         return $this->assigned ?? $this->wild;
     }
 
+    /**
+     * Two wildcards are equal when their wild cards match, regardless of
+     * assignment.
+     */
     public function equals(PlayableCard $other): bool
     {
         return $other instanceof self && $this->wild->equals($other->wild);

@@ -75,6 +75,7 @@ echo "Alice: {$table->hand('alice')}\n";  // Alice: A♣,K♦,Q♥,J♠,10♣
 - [Face-down cards](docs/face-down.md) — `CardInPlay`, `Face`, when to use them
 - [Wildcards](docs/wildcards.md) — `Wildcard`, jokers, wild 8s, Canasta
 - [Implementing a game](docs/implementing-a-game.md) — walk-through using Poker as the reference
+- [API reference](docs/api.md) — every public class, method, and constant, generated from the source docblocks
 
 ## Game fit
 

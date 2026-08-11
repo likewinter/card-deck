@@ -28,6 +28,11 @@ enum Rank: string
     case King = 'K';
     case Ace = 'A';
 
+    /**
+     * Look up a rank by its display symbol ("A", "2"…"10", "J", "Q", "K", "🃏").
+     *
+     * @throws \InvalidArgumentException If the symbol is not a known rank.
+     */
     public static function fromSymbol(string $symbol): self
     {
         return match ($symbol) {

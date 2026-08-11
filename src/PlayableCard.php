@@ -36,5 +36,10 @@ interface PlayableCard extends \Stringable
      */
     public function equals(PlayableCard $other): bool;
 
+    /**
+     * Display form, consistent with Card::fromString() parsing
+     * (rank symbol + suit symbol), except where implementations signal
+     * hidden state (e.g. CardInPlay renders "██" when face-down).
+     */
     public function __toString(): string;
 }

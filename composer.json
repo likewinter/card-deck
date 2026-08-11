@@ -36,6 +36,8 @@
         "analyze": "mago analyze",
         "format": "mago format",
         "format:check": "mago format --check",
+        "api-docs": "php scripts/generate-api-reference.php",
+        "api-docs:check": "php scripts/generate-api-reference.php --check",
         "hooks": "git config core.hooksPath .githooks",
         "ci": [
             "@audit",
@@ -43,6 +45,7 @@
             "@lint",
             "@analyze",
             "@format:check",
+            "@api-docs:check",
             "@test"
         ]
     },
@@ -55,7 +58,9 @@
         "analyze": "Run Mago static analyzer",
         "format": "Format PHP source with Mago",
         "format:check": "Check formatting without modifying files",
+        "api-docs": "Regenerate docs/api.md from the docblocks in src/",
+        "api-docs:check": "Fail if docs/api.md is out of date with the docblocks in src/",
         "hooks": "Point git hooks at .githooks/ (run once after cloning)",
-        "ci": "Run all CI checks (audit + phpstan + lint + analyze + format + tests)"
+        "ci": "Run all CI checks (audit + phpstan + lint + analyze + format + api-docs + tests)"
     }
 }

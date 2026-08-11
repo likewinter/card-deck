@@ -23,13 +23,32 @@ use Likewinter\CardDeck\Stack;
  */
 final readonly class PokerHand implements IteratorAggregate, \Countable, \Stringable
 {
+    /**
+     * Number of cards in a poker hand.
+     */
     public const HAND_SIZE = 5;
 
+    /**
+     * The classified category of this hand.
+     */
     public HandRank $handRank;
-    /** @var array<string, list<Card>> */
+    /**
+     * Cards grouped by rank symbol, e.g. ["A" => [A♠, A♥], "K" => [K♦]].
+     *
+     * @var array<string, list<Card>>
+     */
     public array $rankSets;
+    /**
+     * Whether all five cards share one suit.
+     */
     public bool $isSameSuit;
+    /**
+     * Whether the five ranks form a run (the wheel A-2-3-4-5 counts).
+     */
     public bool $isSequentialRank;
+    /**
+     * The ordering used for classification and comparison.
+     */
     public RankOrder $rankOrder;
 
     /** @var list<Card> */
@@ -37,6 +56,9 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
 
     /**
      * @param list<Card> $cards Exactly 5 cards.
+     * @param RankOrder|null $rankOrder Defaults to RankOrder::poker().
+     *
+     * @throws \InvalidArgumentException If $cards does not contain exactly HAND_SIZE cards.
      */
     public function __construct(array $cards, ?RankOrder $rankOrder = null)
     {
@@ -73,10 +95,10 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
     }
 
     /**
-     * Compare this hand against another. Returns:
-     *   -1 if this hand loses to $other
-     *    0 if they tie
-     *    1 if this hand beats $other
+     * Compare this hand against another.
+     *
+     * Returns -1 if this hand loses to $other, 0 if they tie, and 1 if
+     * this hand beats $other.
      */
     public function compare(self $other): int
     {
@@ -132,17 +154,27 @@ final readonly class PokerHand implements IteratorAggregate, \Countable, \String
         };
     }
 
-    /** @return Iterator<int, Card> */
+    /**
+     * Iterates over the cards sorted by rank, ascending.
+     *
+     * @return Iterator<int, Card>
+     */
     public function getIterator(): Iterator
     {
         return new ArrayIterator($this->cards);
     }
 
+    /**
+     * Always HAND_SIZE (5).
+     */
     public function count(): int
     {
         return count($this->cards);
     }
 
+    /**
+     * Comma-separated cards in ascending rank order.
+     */
     public function __toString(): string
     {
         return implode(',', $this->cards);

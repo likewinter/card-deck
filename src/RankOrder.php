@@ -131,6 +131,11 @@ final readonly class RankOrder
         ], highest: Rank::Ace);
     }
 
+    /**
+     * The comparison value of a rank in this ordering.
+     *
+     * @throws \InvalidArgumentException If the rank is not part of this ordering.
+     */
     public function value(Rank $rank): int
     {
         return (
@@ -142,17 +147,27 @@ final readonly class RankOrder
 
     /**
      * Returns -1, 0, or 1 if $a is lower, equal, or higher than $b.
+     *
+     * @throws \InvalidArgumentException If either rank is not in this ordering.
      */
     public function compare(Rank $a, Rank $b): int
     {
         return $this->value($a) <=> $this->value($b);
     }
 
+    /**
+     * Whether $a ranks above $b in this ordering.
+     *
+     * @throws \InvalidArgumentException If either rank is not in this ordering.
+     */
     public function isHigher(Rank $a, Rank $b): bool
     {
         return $this->value($a) > $this->value($b);
     }
 
+    /**
+     * Whether $rank is the highest rank of this ordering.
+     */
     public function isHighest(Rank $rank): bool
     {
         return $rank === $this->highest;

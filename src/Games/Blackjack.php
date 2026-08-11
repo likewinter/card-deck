@@ -24,6 +24,11 @@ readonly class Blackjack
 
     private Table $table;
 
+    /**
+     * @param int $numPlayers Number of player hands.
+     * @param int $numDecks Number of 52-card decks in the shoe.
+     * @param Table|null $table Custom table; defaults to a shuffled $numDecks-deck shoe.
+     */
     public function __construct(
         private int $numPlayers = 1,
         int $numDecks = self::DEFAULT_NUM_DECKS,

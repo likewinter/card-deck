@@ -30,6 +30,7 @@ final readonly class BlackjackHand implements IteratorAggregate, \Countable, \St
 
     /**
      * @param array<array-key, Card> $cards
+     * @param RankOrder|null $rankOrder Defaults to RankOrder::blackjack().
      */
     public function __construct(array $cards, ?RankOrder $rankOrder = null)
     {
@@ -37,6 +38,10 @@ final readonly class BlackjackHand implements IteratorAggregate, \Countable, \St
         $this->rankOrder = $rankOrder ?? RankOrder::blackjack();
     }
 
+    /**
+     * Build from a Stack's cards, resolving through underlyingCard() so
+     * CardInPlay/Wildcard are unwrapped.
+     */
     public static function fromHand(Stack $hand): self
     {
         $cards = array_map(static fn($card) => $card->underlyingCard(), [...$hand]);
@@ -69,6 +74,9 @@ final readonly class BlackjackHand implements IteratorAggregate, \Countable, \St
         return $total;
     }
 
+    /**
+     * Whether the hand value exceeds 21.
+     */
     public function isBust(): bool
     {
         return $this->value() > 21;
@@ -101,17 +109,27 @@ final readonly class BlackjackHand implements IteratorAggregate, \Countable, \St
         return $aces > 0 && $total <= 21;
     }
 
-    /** @return Iterator<int, Card> */
+    /**
+     * Iterates over the cards in the order they were received.
+     *
+     * @return Iterator<int, Card>
+     */
     public function getIterator(): Iterator
     {
         return new ArrayIterator($this->cards);
     }
 
+    /**
+     * Number of cards in the hand.
+     */
     public function count(): int
     {
         return count($this->cards);
     }
 
+    /**
+     * Comma-separated cards in deal order.
+     */
     public function __toString(): string
     {
         return implode(',', $this->cards);

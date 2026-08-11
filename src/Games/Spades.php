@@ -23,12 +23,22 @@ use Likewinter\CardDeck\Trick;
  */
 readonly class Spades
 {
+    /**
+     * Fixed player count for Spades.
+     */
     public const NUM_PLAYERS = 4;
+
+    /**
+     * Cards dealt to each player.
+     */
     public const CARDS_PER_PLAYER = 13;
 
     private Table $table;
     private SuitOrder $suitOrder;
 
+    /**
+     * @param Table|null $table Custom table; defaults to a fresh shuffled 52-card deck.
+     */
     public function __construct(?Table $table = null)
     {
         $this->table = $table ?? new Table(deck: DeckBuilder::standard52()->build(), shuffle: true);

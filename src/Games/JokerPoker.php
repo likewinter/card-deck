@@ -27,6 +27,10 @@ readonly class JokerPoker
 
     private Table $table;
 
+    /**
+     * @param int $numHands Number of hands to deal (5 cards each).
+     * @param Table|null $table Custom table; defaults to a fresh shuffled 54-card wild deck.
+     */
     public function __construct(
         private int $numHands = 2,
         ?Table $table = null,
@@ -51,11 +55,21 @@ readonly class JokerPoker
         return new Stack($cards, count($cards));
     }
 
+    /**
+     * Deal 5 cards to every hand.
+     *
+     * @throws \LogicException If the deck cannot cover the full deal.
+     */
     public function deal(): void
     {
         $this->table->drawAll(self::HAND_SIZE);
     }
 
+    /**
+     * Returns a hand's stack by index.
+     *
+     * @throws \InvalidArgumentException If no hand with this index exists.
+     */
     public function hand(int $index): Stack
     {
         return $this->table->hand("hand-{$index}");
@@ -63,6 +77,8 @@ readonly class JokerPoker
 
     /**
      * Assign the first unassigned wildcard in a hand to represent a card.
+     *
+     * @throws \LogicException If the hand has no unassigned wildcard.
      */
     public function assignWildcard(int $handIndex, Card $represents): void
     {
@@ -81,6 +97,9 @@ readonly class JokerPoker
         throw new \LogicException('No unassigned wildcard in hand');
     }
 
+    /**
+     * Whether the hand contains a wildcard that has not been assigned.
+     */
     public function hasUnassignedWildcards(int $handIndex): bool
     {
         foreach ([...$this->hand($handIndex)] as $card) {

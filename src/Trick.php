@@ -30,6 +30,13 @@ final class Trick
 
     private PlayerRing $ring;
 
+    /**
+     * @param SuitOrder $suitOrder Rules deciding which card beats which.
+     * @param int $numPlayers Number of players; each plays one card per trick.
+     * @param int $startingPlayer Index of the player who leads the trick.
+     *
+     * @throws \InvalidArgumentException If $numPlayers < 2.
+     */
     public function __construct(
         private readonly SuitOrder $suitOrder,
         private readonly int $numPlayers,
@@ -44,6 +51,8 @@ final class Trick
     /**
      * The current player plays a card. Turn order is enforced — playing
      * out of turn throws. The first card sets the lead suit.
+     *
+     * @throws \LogicException If every player has already played.
      */
     public function play(Card $card): void
     {

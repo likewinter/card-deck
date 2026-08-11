@@ -105,18 +105,27 @@ class DeckBuilder
             ->range($low, $high);
     }
 
+    /**
+     * Replace the suits used to build the deck.
+     */
     public function suits(Suit ...$suits): self
     {
         $this->suits = array_values($suits);
         return $this;
     }
 
+    /**
+     * Use all 13 standard ranks (Two through Ace, no joker).
+     */
     public function allRanks(): self
     {
         $this->ranks = Rank::casesWithoutJoker();
         return $this;
     }
 
+    /**
+     * Replace the ranks used to build the deck.
+     */
     public function ranks(Rank ...$ranks): self
     {
         $this->ranks = array_values($ranks);
@@ -127,6 +136,8 @@ class DeckBuilder
      * Set ranks to a consecutive range (inclusive), using the given
      * ordering to determine what's between $low and $high. Defaults to
      * poker ordering (2 < 3 < ... < A) when no order is supplied.
+     *
+     * @throws \InvalidArgumentException If $high cannot be reached from $low in the given ordering.
      */
     public function range(Rank $low, Rank $high, ?RankOrder $rankOrder = null): self
     {
@@ -149,6 +160,8 @@ class DeckBuilder
 
     /**
      * Add N jokers to the deck.
+     *
+     * @throws \InvalidArgumentException If $count is negative.
      */
     public function withJokers(int $count = 2): self
     {
@@ -162,6 +175,8 @@ class DeckBuilder
     /**
      * Repeat the entire deck N times (for multi-deck shoes like Blackjack).
      * Jokers are not multiplied — they're added after the multiplied base.
+     *
+     * @throws \InvalidArgumentException If $copies < 1.
      */
     public function times(int $copies): self
     {

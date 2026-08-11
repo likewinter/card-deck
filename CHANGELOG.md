@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Generated API reference** (`docs/api.md`) — complete reference of
+  every public class, method, property, and constant, generated from
+  the source docblocks by `scripts/generate-api-reference.php`
+  (`composer api-docs`). CI fails if the reference drifts from the
+  source, and the generator enforces that all public API members carry
+  docblocks. Missing docblocks were filled in across `src/`, adding
+  behavior descriptions and `@throws` documentation where types alone
+  could not express the contract.
+
 ## [0.8.0] - 2026-08-11
 
 ### Added

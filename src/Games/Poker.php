@@ -9,6 +9,13 @@ use Likewinter\CardDeck\Games\Poker\PokerHand;
 use Likewinter\CardDeck\Stack;
 use Likewinter\CardDeck\Table;
 
+/**
+ * 5-card poker reference game.
+ *
+ * Demonstrates: Table dealing into capacity-limited hands, PokerHand
+ * classification, and multi-winner tie handling. 2–5 hands of 5 cards
+ * each, from a shuffled 52-card deck.
+ */
 readonly class Poker
 {
     private const DEFAULT_NUM_HANDS = 3;
@@ -17,6 +24,12 @@ readonly class Poker
 
     private Table $table;
 
+    /**
+     * @param int $numHands Number of hands to deal (2–5).
+     * @param Table|null $table Custom table; defaults to a fresh shuffled 52-card deck.
+     *
+     * @throws \InvalidArgumentException If $numHands is outside 2–5.
+     */
     public function __construct(
         private int $numHands = self::DEFAULT_NUM_HANDS,
         ?Table $table = null,
@@ -41,6 +54,11 @@ readonly class Poker
         }
     }
 
+    /**
+     * Deal 5 cards to every hand.
+     *
+     * @throws \LogicException If the deck cannot cover the full deal.
+     */
     public function deal(): void
     {
         $this->table->drawAll(PokerHand::HAND_SIZE);
