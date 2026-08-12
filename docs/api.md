@@ -44,7 +44,7 @@ ranks or get their values within a specific game's rules.
 
 **Methods**
 
-- **`static fromSymbol(string $symbol): Card\Rank`**
+- **`#[NoDiscard] static fromSymbol(string $symbol): Card\Rank`**
 
   Look up a rank by its display symbol ("A", "2"…"10", "J", "Q", "K", "🃏").
   - **Throws:** `\InvalidArgumentException` — If the symbol is not a known rank.
@@ -75,7 +75,7 @@ lead-suit rules for trick-taking games.
 
 **Methods**
 
-- **`static fromSymbol(string $symbol): Card\Suit`**
+- **`#[NoDiscard] static fromSymbol(string $symbol): Card\Suit`**
 
   Look up a suit by its display symbol ("♥", "♦", "♣", "♠", "🃏").
   - **Throws:** `\InvalidArgumentException` — If the symbol is not a known suit.
@@ -843,7 +843,7 @@ each card contributes its RankOrder value, with Aces counting as
 - **`__construct(array $cards, ?RankOrder $rankOrder = null)`**
 
   - `$rankOrder` — Defaults to RankOrder::blackjack().
-- **`static fromHand(Stack $hand): Games\Blackjack\BlackjackHand`**
+- **`#[NoDiscard] static fromHand(Stack $hand): Games\Blackjack\BlackjackHand`**
 
   Build from a Stack's cards, resolving through underlyingCard() so CardInPlay/Wildcard are unwrapped.
 - **`value(): int`**
@@ -1002,7 +1002,7 @@ or Stack — it is a classified snapshot, not a mutable collection.
   - `$cards` — Exactly 5 cards.
   - `$rankOrder` — Defaults to RankOrder::poker().
   - **Throws:** `\InvalidArgumentException` — If $cards does not contain exactly HAND_SIZE cards.
-- **`static fromHand(Stack $hand): Games\Poker\PokerHand`**
+- **`#[NoDiscard] static fromHand(Stack $hand): Games\Poker\PokerHand`**
 
   Build a PokerHand from a Stack's cards, resolving through underlyingCard() so CardInPlay/Wildcard are unwrapped.
 - **`compare(Games\Poker\PokerHand $other): int`**

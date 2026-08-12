@@ -33,5 +33,5 @@ it('returns correct symbols', function () {
 });
 
 it('rejects invalid symbol', function () {
-    Rank::fromSymbol('X');
+    (void) Rank::fromSymbol('X');
 })->throws(\InvalidArgumentException::class);

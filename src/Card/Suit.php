@@ -24,6 +24,7 @@ enum Suit: string
      *
      * @throws \InvalidArgumentException If the symbol is not a known suit.
      */
+    #[\NoDiscard]
     public static function fromSymbol(string $symbol): self
     {
         return match ($symbol) {

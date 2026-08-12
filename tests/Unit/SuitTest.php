@@ -38,5 +38,5 @@ it('returns correct colors', function () {
 });
 
 it('rejects invalid symbol', function () {
-    Suit::fromSymbol('X');
+    (void) Suit::fromSymbol('X');
 })->throws(\InvalidArgumentException::class);

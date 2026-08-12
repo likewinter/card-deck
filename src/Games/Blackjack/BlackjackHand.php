@@ -42,6 +42,7 @@ final readonly class BlackjackHand implements IteratorAggregate, \Countable, \St
      * Build from a Stack's cards, resolving through underlyingCard() so
      * CardInPlay/Wildcard are unwrapped.
      */
+    #[\NoDiscard]
     public static function fromHand(Stack $hand): self
     {
         $cards = array_map(static fn($card) => $card->underlyingCard(), [...$hand]);

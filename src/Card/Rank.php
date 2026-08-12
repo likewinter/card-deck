@@ -33,6 +33,7 @@ enum Rank: string
      *
      * @throws \InvalidArgumentException If the symbol is not a known rank.
      */
+    #[\NoDiscard]
     public static function fromSymbol(string $symbol): self
     {
         return match ($symbol) {
