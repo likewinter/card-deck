@@ -49,8 +49,9 @@ final class Trick
     }
 
     /**
-     * The current player plays a card. Turn order is enforced — playing
-     * out of turn throws. The first card sets the lead suit.
+     * Plays a card for the current player and advances the turn ring.
+     * The first card played sets the lead suit. Callers enforce turn
+     * order by checking currentPlayer() before playing.
      *
      * @throws \LogicException If every player has already played.
      */

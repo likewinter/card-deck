@@ -101,6 +101,7 @@ function groupIntoSections(array $types): array
         'Reference games' => [],
     ];
 
+    $unmatched = [];
     foreach ($types as $type) {
         $namespace = $type->getNamespaceName();
         if ($namespace === ROOT_NAMESPACE . '\Card') {
@@ -109,7 +110,18 @@ function groupIntoSections(array $types): array
             $sections['Core primitives'][] = $type;
         } elseif (str_starts_with($namespace, ROOT_NAMESPACE . '\Games')) {
             $sections['Reference games'][] = $type;
+        } else {
+            $unmatched[] = $type->getName();
         }
+    }
+
+    if ($unmatched !== []) {
+        fwrite(STDERR, "These types are outside the known reference sections:\n");
+        foreach ($unmatched as $name) {
+            fwrite(STDERR, "  - {$name}\n");
+        }
+        fwrite(STDERR, 'Extend groupIntoSections() with a section for their namespaces.' . "\n");
+        exit(1);
     }
 
     foreach ($sections as &$sectionTypes) {
@@ -580,10 +592,10 @@ function renderMethod(ReflectionMethod $method): string
                 $bullets[] = sprintf('- `$%s` — %s', $info['name'], $info['description']);
             }
         } elseif ($tag['name'] === 'return' && $tag['body'] !== '') {
-            [$returnType, $returnDescription] = leadingType($tag['body']);
+            [$returnDocType, $returnDescription] = leadingType($tag['body']);
             $bullets[] = sprintf(
                 '- **Returns:** `%s`%s',
-                shortenTypes($returnType),
+                shortenTypes($returnDocType),
                 $returnDescription !== '' ? ' — ' . $returnDescription : '',
             );
         } elseif ($tag['name'] === 'throws') {
